@@ -25,3 +25,19 @@ def login():
 @public_bp.route('/signup')
 def signup():
     return render_template('auth/signup.html')
+
+@public_bp.route('/workflow')
+def workflow():
+    return render_template('public/workflow.html')
+
+@public_bp.route('/faq')
+def faq():
+    return render_template('public/faq.html')
+
+@public_bp.route('/terms')
+def terms():
+    return render_template('public/terms.html')
+
+@public_bp.route('/privacy')
+def privacy():
+    return render_template('public/privacy.html')

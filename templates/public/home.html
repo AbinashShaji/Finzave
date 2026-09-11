@@ -7,15 +7,22 @@
     <div class="max-w-[1000px] mx-auto px-6 text-center z-10">
         
         <h1 class="text-6xl md:text-8xl lg:text-[7rem] font-bold tracking-tighter leading-[0.95] mb-8 text-fz-black">
-            Understand your money. <br/>
-            <span class="text-fz-gray-300">Don't just track it.</span>
+            <span class="inline-block opacity-0 fz-hero-word">Understand</span>
+            <span class="inline-block opacity-0 fz-hero-word">your</span>
+            <span class="inline-block opacity-0 fz-hero-word">money.</span> <br/>
+            <span class="text-fz-gray-300">
+                <span class="inline-block opacity-0 fz-hero-word">Don't</span>
+                <span class="inline-block opacity-0 fz-hero-word">just</span>
+                <span class="inline-block opacity-0 fz-hero-word">track</span>
+                <span class="inline-block opacity-0 fz-hero-word">it.</span>
+            </span>
         </h1>
         
-        <p class="text-xl md:text-2xl text-fz-gray-800 leading-relaxed max-w-[30ch] mx-auto mb-12">
+        <p class="text-xl md:text-2xl text-fz-gray-800 leading-relaxed max-w-[30ch] mx-auto mb-12 opacity-0 fz-hero-after">
             FinZave analyzes your financial behaviour, turning raw data into clear, actionable insights.
         </p>
         
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-6">
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-6 opacity-0 fz-hero-after">
             <a href="{{ url_for('public.signup') }}" class="inline-flex justify-center items-center px-10 py-4 bg-fz-black text-white text-lg font-medium rounded-full hover:bg-fz-red transition-all duration-300 hover:-translate-y-1 shadow-xl shadow-fz-black/5">
                 Start Your Journey
             </a>
@@ -29,97 +36,572 @@
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-tr from-fz-gray-100 to-white rounded-full blur-[100px] -z-10 opacity-50"></div>
 </section>
 
-<!-- The Narrative Section (Typography-Driven) -->
-<section class="py-32 bg-fz-black text-white relative">
+<!-- SECTION — THE PROBLEM -->
+<section class="py-32 bg-fz-white border-b border-fz-gray-200 overflow-hidden">
+    <div class="max-w-[1200px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24">
+        <div class="lg:col-span-5 observe-me fz-reveal-left">
+            <span class="inline-block px-3 py-1 bg-fz-gray-100 rounded-full text-xs font-semibold tracking-widest text-fz-gray-800 uppercase mb-8 border border-fz-gray-200">
+                The Problem
+            </span>
+            <h2 class="text-4xl md:text-5xl font-semibold tracking-tighter text-fz-black leading-tight">
+                Knowing where your money goes isn't enough.
+            </h2>
+        </div>
+        <div class="lg:col-span-7 flex flex-col justify-center observe-me fz-reveal-right" data-delay="100">
+            <p class="text-xl md:text-2xl text-fz-gray-700 leading-relaxed max-w-[45ch]">
+                Traditional expense tracking records financial activity, but raw numbers do not always help you understand your spending, savings, or financial decisions. Recording is just the first step.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION — WHAT FINZAVE DOES -->
+<section class="py-32 bg-fz-black text-white overflow-hidden">
+    <div class="max-w-[1200px] mx-auto px-6 text-center">
+        <h2 class="text-3xl md:text-5xl font-semibold tracking-tighter mb-20 observe-me fz-reveal-up">
+            More than a financial ledger.
+        </h2>
+        
+        <p class="text-lg text-fz-gray-400 mb-12 observe-me fz-reveal-up" data-delay="100">FinZave brings together:</p>
+
+        <div class="flex flex-wrap justify-center items-center gap-4 text-xl md:text-2xl font-medium tracking-tight mb-16 observe-me fz-reveal-up" data-delay="200">
+            <span>Income</span>
+            <span class="text-fz-red">+</span>
+            <span>Expenses</span>
+            <span class="text-fz-red">+</span>
+            <span>Savings</span>
+            <span class="text-fz-red">+</span>
+            <span>Goals</span>
+            <span class="text-fz-red">+</span>
+            <span>Analysis</span>
+            <span class="text-fz-red">+</span>
+            <span>Rule-Based Insights</span>
+        </div>
+
+        <div class="h-16 flex justify-center mb-16 observe-me fz-reveal-up" data-delay="300">
+            <div class="w-px bg-gradient-to-b from-fz-red to-transparent"></div>
+        </div>
+
+        <div class="inline-block px-8 py-4 border-2 border-fz-red bg-fz-red/10 rounded-full text-fz-red font-semibold text-xl tracking-wide shadow-[0_0_30px_rgba(239,68,68,0.15)] observe-me fz-reveal-up" data-delay="400">
+            Better Financial Understanding
+        </div>
+    </div>
+</section>
+
+<!-- SECTION — HOW FINZAVE HELPS (Key Capabilities) -->
+<section class="py-32 bg-fz-white border-b border-fz-gray-200">
     <div class="max-w-[1200px] mx-auto px-6">
         
-        <div class="mb-32 md:text-center max-w-3xl mx-auto">
-            <h2 class="text-3xl md:text-5xl font-semibold tracking-tight leading-tight mb-6">
-                Most expense trackers fail because they only look backward.
+        <div class="flex flex-col gap-0 border-t border-fz-gray-200">
+            <!-- 01 -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-12 py-12 border-b border-fz-gray-200 group observe-me fz-reveal-up fz-scroll-row">
+                <div class="md:col-span-2">
+                    <span class="text-3xl md:text-4xl font-light text-fz-black transition-colors duration-400 fz-scroll-num">01</span>
+                </div>
+                <div class="md:col-span-4 flex items-center">
+                    <h3 class="text-2xl font-semibold text-fz-black tracking-tight">Track</h3>
+                </div>
+                <div class="md:col-span-6 flex items-center">
+                    <p class="text-lg text-fz-gray-600 leading-relaxed">
+                        Easily log your income and expenses to build a reliable financial record.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- 02 -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-12 py-12 border-b border-fz-gray-200 group observe-me fz-reveal-up fz-scroll-row">
+                <div class="md:col-span-2">
+                    <span class="text-3xl md:text-4xl font-light text-fz-black transition-colors duration-400 fz-scroll-num">02</span>
+                </div>
+                <div class="md:col-span-4 flex items-center">
+                    <h3 class="text-2xl font-semibold text-fz-black tracking-tight">Understand</h3>
+                </div>
+                <div class="md:col-span-6 flex items-center">
+                    <p class="text-lg text-fz-gray-600 leading-relaxed">
+                        Identify your spending habits and recognize true financial patterns.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 03 -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-12 py-12 border-b border-fz-gray-200 group observe-me fz-reveal-up fz-scroll-row">
+                <div class="md:col-span-2">
+                    <span class="text-3xl md:text-4xl font-light text-fz-black transition-colors duration-400 fz-scroll-num">03</span>
+                </div>
+                <div class="md:col-span-4 flex items-center">
+                    <h3 class="text-2xl font-semibold text-fz-black tracking-tight">Analyze</h3>
+                </div>
+                <div class="md:col-span-6 flex items-center">
+                    <p class="text-lg text-fz-gray-600 leading-relaxed">
+                        Evaluate monthly and yearly financial performance to see where you stand.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 04 -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-12 py-12 border-b border-fz-gray-200 group observe-me fz-reveal-up fz-scroll-row">
+                <div class="md:col-span-2">
+                    <span class="text-3xl md:text-4xl font-light text-fz-black transition-colors duration-400 fz-scroll-num">04</span>
+                </div>
+                <div class="md:col-span-4 flex items-center">
+                    <h3 class="text-2xl font-semibold text-fz-black tracking-tight">Plan</h3>
+                </div>
+                <div class="md:col-span-6 flex items-center">
+                    <p class="text-lg text-fz-gray-600 leading-relaxed">
+                        Set, track, and manage targets for your long-term financial goals and savings.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 05 -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-12 py-12 border-b border-fz-gray-200 group observe-me fz-reveal-up fz-scroll-row">
+                <div class="md:col-span-2">
+                    <span class="text-3xl md:text-4xl font-light text-fz-black transition-colors duration-400 fz-scroll-num">05</span>
+                </div>
+                <div class="md:col-span-4 flex items-center">
+                    <h3 class="text-2xl font-semibold text-fz-black tracking-tight">Calculate</h3>
+                </div>
+                <div class="md:col-span-6 flex items-center">
+                    <p class="text-lg text-fz-gray-600 leading-relaxed">
+                        Utilize SIP and EMI calculators to project potential returns or loan commitments.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 06 -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-12 py-12 border-b border-fz-gray-200 group observe-me fz-reveal-up fz-scroll-row">
+                <div class="md:col-span-2">
+                    <span class="text-3xl md:text-4xl font-light text-fz-black transition-colors duration-400 fz-scroll-num">06</span>
+                </div>
+                <div class="md:col-span-4 flex items-center">
+                    <h3 class="text-2xl font-semibold text-fz-black tracking-tight">Decide</h3>
+                </div>
+                <div class="md:col-span-6 flex items-center">
+                    <p class="text-lg text-fz-gray-600 leading-relaxed">
+                        Receive transparent, rule-based financial insights to inform your choices.
+                    </p>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</section>
+
+<!-- SECTION — THE FINZAVE DIFFERENCE -->
+<section class="py-32 bg-fz-gray-50 border-b border-fz-gray-200 overflow-hidden">
+    <div class="max-w-[1200px] mx-auto px-6 text-center">
+        <h2 class="text-3xl md:text-4xl font-semibold tracking-tighter text-fz-black mb-20 observe-me fz-reveal-up">
+            From tracking to understanding.
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24 max-w-4xl mx-auto">
+            
+            <!-- Traditional Tracking -->
+            <div class="flex flex-col items-center observe-me fz-reveal-left">
+                <span class="text-xs font-semibold tracking-widest text-fz-gray-400 uppercase mb-10">Traditional Tracking</span>
+                
+                <div class="flex flex-col items-center text-sm font-semibold tracking-widest uppercase gap-4 text-fz-gray-500">
+                    <div class="w-48 bg-white border border-fz-gray-200 rounded-xl p-4 shadow-sm">Record</div>
+                    <div>&darr;</div>
+                    <div class="w-48 bg-white border border-fz-gray-200 rounded-xl p-4 shadow-sm">View History</div>
+                </div>
+            </div>
+
+            <!-- FinZave -->
+            <div class="flex flex-col items-center relative observe-me fz-reveal-right" data-delay="100">
+                <div class="hidden md:block absolute top-0 -left-12 h-full w-px bg-fz-gray-200"></div>
+                <span class="text-xs font-semibold tracking-widest text-fz-red uppercase mb-10">FinZave</span>
+                
+                <div class="flex flex-col items-center text-sm font-semibold tracking-widest uppercase gap-4 text-fz-black">
+                    <div class="w-48 bg-white border-2 border-fz-black rounded-xl p-4 shadow-sm">Record</div>
+                    <div>&darr;</div>
+                    <div class="w-48 bg-white border-2 border-fz-black rounded-xl p-4 shadow-sm">Calculate</div>
+                    <div>&darr;</div>
+                    <div class="w-48 bg-white border-2 border-fz-black rounded-xl p-4 shadow-sm">Analyze</div>
+                    <div>&darr;</div>
+                    <div class="w-48 bg-white border-2 border-fz-black rounded-xl p-4 shadow-sm">Evaluate</div>
+                    <div>&darr;</div>
+                    <div class="w-48 bg-white border-2 border-fz-red rounded-xl p-4 shadow-sm text-fz-red">Understand</div>
+                    <div>&darr;</div>
+                    <div class="w-48 bg-fz-black border-2 border-fz-black rounded-xl p-4 shadow-lg text-white">Decide</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- SECTION — WORKFLOW PREVIEW -->
+<section class="py-32 bg-fz-white border-b border-fz-gray-200 overflow-hidden">
+    <div class="max-w-[1200px] mx-auto px-6 text-center">
+        <h2 class="text-3xl md:text-5xl font-semibold tracking-tighter text-fz-black mb-16 observe-me fz-reveal-up">
+            See how it works.
+        </h2>
+        
+        <div class="flex flex-col md:flex-row items-center justify-center gap-3 text-xs font-semibold tracking-widest text-fz-gray-500 uppercase overflow-x-auto no-scrollbar pb-8 mb-12 fz-wf-sequence-container">
+            <span class="px-4 py-2 border border-fz-gray-200 rounded-full whitespace-nowrap opacity-0 fz-wf-step transition-all duration-500">Input</span>
+            <span class="text-fz-gray-300 hidden md:inline opacity-0 fz-wf-step transition-all duration-500 origin-left">&rarr;</span>
+            <span class="text-fz-gray-300 md:hidden opacity-0 fz-wf-step transition-all duration-500 origin-top">&darr;</span>
+            <span class="px-4 py-2 border border-fz-gray-200 rounded-full whitespace-nowrap opacity-0 fz-wf-step transition-all duration-500">Record</span>
+            <span class="text-fz-gray-300 hidden md:inline opacity-0 fz-wf-step transition-all duration-500 origin-left">&rarr;</span>
+            <span class="text-fz-gray-300 md:hidden opacity-0 fz-wf-step transition-all duration-500 origin-top">&darr;</span>
+            <span class="px-4 py-2 border border-fz-gray-200 rounded-full whitespace-nowrap opacity-0 fz-wf-step transition-all duration-500">Calculate</span>
+            <span class="text-fz-gray-300 hidden md:inline opacity-0 fz-wf-step transition-all duration-500 origin-left">&rarr;</span>
+            <span class="text-fz-gray-300 md:hidden opacity-0 fz-wf-step transition-all duration-500 origin-top">&darr;</span>
+            <span class="px-4 py-2 border border-fz-gray-200 rounded-full whitespace-nowrap opacity-0 fz-wf-step transition-all duration-500">Analyze</span>
+            <span class="text-fz-gray-300 hidden md:inline opacity-0 fz-wf-step transition-all duration-500 origin-left">&rarr;</span>
+            <span class="text-fz-gray-300 md:hidden opacity-0 fz-wf-step transition-all duration-500 origin-top">&darr;</span>
+            <span class="px-4 py-2 bg-fz-gray-100 text-fz-black rounded-full whitespace-nowrap border border-fz-gray-300 opacity-0 fz-wf-step transition-all duration-500">Evaluate</span>
+            <span class="text-fz-gray-300 hidden md:inline opacity-0 fz-wf-step transition-all duration-500 origin-left">&rarr;</span>
+            <span class="text-fz-gray-300 md:hidden opacity-0 fz-wf-step transition-all duration-500 origin-top">&darr;</span>
+            <span class="px-4 py-2 bg-fz-red text-white rounded-full whitespace-nowrap shadow-md shadow-fz-red/20 opacity-0 fz-wf-step transition-all duration-500">Insight</span>
+            <span class="text-fz-gray-300 hidden md:inline opacity-0 fz-wf-step transition-all duration-500 origin-left">&rarr;</span>
+            <span class="text-fz-gray-300 md:hidden opacity-0 fz-wf-step transition-all duration-500 origin-top">&darr;</span>
+            <span class="px-4 py-2 bg-fz-black text-white rounded-full whitespace-nowrap opacity-0 fz-wf-step transition-all duration-500">Decide</span>
+        </div>
+
+        <div class="observe-me fz-reveal-up" data-delay="200">
+            <a href="{{ url_for('public.workflow') }}" class="inline-flex items-center gap-2 text-sm font-semibold tracking-widest text-fz-black hover:text-fz-red uppercase transition-colors fz-underline-hover">
+                Explore the Workflow &rarr;
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION — FINANCIAL TOOLS -->
+<section class="py-32 bg-fz-black text-white border-b border-fz-gray-900 overflow-hidden">
+    <div class="max-w-[1200px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24">
+        <div class="lg:col-span-5 observe-me fz-reveal-left">
+            <h2 class="text-3xl md:text-5xl font-semibold tracking-tighter mb-8 leading-tight">
+                Tools for everyday financial decisions.
             </h2>
-            <p class="text-lg text-fz-gray-300 leading-relaxed">
-                Recording transactions isn't enough. Knowing you spent ₹20,000 last month doesn't tell you if you're spending too much, or if you can afford your next major purchase. 
-                <br/><br/>
-                You don't need another spreadsheet. You need to understand your behaviour.
+            <p class="text-lg text-fz-gray-400 max-w-[40ch]">
+                FinZave provides mathematical calculators to project the numbers before you commit to them.
+            </p>
+        </div>
+        
+        <div class="lg:col-span-7 flex flex-col gap-12">
+            
+            <div class="border-l-2 border-fz-gray-800 pl-8 observe-me fz-reveal-right" data-delay="100">
+                <div class="flex items-center gap-3 mb-2 text-white">
+                    <i data-lucide="refresh-cw" class="w-5 h-5 text-fz-red"></i>
+                    <h3 class="text-xl font-semibold">SIP Calculator</h3>
+                </div>
+                <p class="text-fz-gray-400 mb-4">WHAT IT DOES: Projects compounding returns based on regular monthly contributions and estimated annual interest rates.</p>
+                <p class="text-fz-gray-300 text-sm">WHY IT IS USEFUL: Helps visualize the long-term impact of consistent savings over time.</p>
+            </div>
+
+            <div class="border-l-2 border-fz-gray-800 pl-8 observe-me fz-reveal-right" data-delay="200">
+                <div class="flex items-center gap-3 mb-2 text-white">
+                    <i data-lucide="calculator" class="w-5 h-5 text-fz-red"></i>
+                    <h3 class="text-xl font-semibold">EMI Calculator</h3>
+                </div>
+                <p class="text-fz-gray-400 mb-4">WHAT IT DOES: Computes monthly loan repayment amounts based on the principal, tenure, and interest rate.</p>
+                <p class="text-fz-gray-300 text-sm">WHY IT IS USEFUL: Allows you to mathematically determine if a loan installment fits into your current savings capacity.</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- SECTION — INSIGHTS / RULE ENGINE -->
+<section class="py-32 bg-fz-white border-b border-fz-gray-200 overflow-hidden">
+    <div class="max-w-[1200px] mx-auto px-6">
+        
+        <div class="max-w-3xl mx-auto text-center mb-24 observe-me fz-reveal-up">
+            <h2 class="text-3xl md:text-5xl font-semibold tracking-tighter text-fz-black mb-8 leading-tight">
+                Numbers become useful when they make sense.
+            </h2>
+            <p class="text-xl text-fz-gray-700 leading-relaxed">
+                FinZave evaluates financial conditions using predefined rules and calculations to provide understandable insights.
             </p>
         </div>
 
-        <!-- Staggered Editorial Steps -->
-        <div class="flex flex-col gap-0 border-t border-fz-gray-800">
+        <div class="flex flex-col md:flex-row items-center justify-center gap-6 max-w-5xl mx-auto">
             
-            <!-- Step 01 -->
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 py-16 border-b border-fz-gray-800 group transition-colors hover:bg-white/[0.02]">
-                <div class="md:col-span-2">
-                    <span class="text-5xl font-light tracking-tighter text-fz-gray-800 group-hover:text-fz-red transition-colors duration-500">01</span>
+            <!-- INPUT DATA -->
+            <div class="flex-1 w-full bg-fz-gray-50 border border-fz-gray-200 rounded-2xl p-8 text-center shadow-sm observe-me fz-reveal-up h-64 flex flex-col justify-center">
+                <div class="flex justify-center mb-4">
+                    <div class="p-3 bg-white rounded-full shadow-sm">
+                        <i data-lucide="database" class="w-5 h-5 text-fz-gray-500"></i>
+                    </div>
                 </div>
-                <div class="md:col-span-4">
-                    <h3 class="text-3xl font-semibold tracking-tight">Track</h3>
-                </div>
-                <div class="md:col-span-6">
-                    <p class="text-lg text-fz-gray-300 leading-relaxed max-w-[40ch]">
-                        Effortlessly record fixed and variable income. Add expenses quickly with smart categorization based on transaction context.
-                    </p>
+                <span class="block text-xs font-semibold tracking-widest text-fz-gray-500 uppercase mb-6">Input</span>
+                <div class="inline-block bg-white border border-fz-gray-200 rounded-lg px-4 py-2 font-mono text-sm text-fz-black shadow-sm">
+                    Savings Rate: 12%
                 </div>
             </div>
-            
-            <!-- Step 02 -->
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 py-16 border-b border-fz-gray-800 group transition-colors hover:bg-white/[0.02]">
-                <div class="md:col-span-2">
-                    <span class="text-5xl font-light tracking-tighter text-fz-gray-800 group-hover:text-fz-red transition-colors duration-500">02</span>
+
+            <!-- ARROW -->
+            <div class="hidden md:flex text-fz-gray-300 text-2xl font-light observe-me fz-reveal-up" data-delay="100">&rarr;</div>
+            <div class="md:hidden text-fz-gray-300 text-2xl font-light observe-me fz-reveal-up" data-delay="100">&darr;</div>
+
+            <!-- RULE ENGINE -->
+            <div class="flex-1.5 w-full bg-white border-2 border-fz-black rounded-2xl p-8 text-center shadow-xl observe-me fz-reveal-up h-64 flex flex-col justify-center relative z-10" data-delay="200">
+                <div class="flex justify-center mb-4">
+                    <div class="p-3 bg-fz-black rounded-full shadow-md">
+                        <i data-lucide="workflow" class="w-5 h-5 text-white"></i>
+                    </div>
                 </div>
-                <div class="md:col-span-4">
-                    <h3 class="text-3xl font-semibold tracking-tight">Analyze</h3>
-                </div>
-                <div class="md:col-span-6">
-                    <p class="text-lg text-fz-gray-300 leading-relaxed max-w-[40ch]">
-                        The engine computes savings rates, trend slopes, and category weights instantly using rule-based architecture.
-                    </p>
-                </div>
-            </div>
-            
-            <!-- Step 03 -->
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 py-16 border-b border-fz-gray-800 group transition-colors hover:bg-white/[0.02]">
-                <div class="md:col-span-2">
-                    <span class="text-5xl font-light tracking-tighter text-fz-gray-800 group-hover:text-fz-red transition-colors duration-500">03</span>
-                </div>
-                <div class="md:col-span-4">
-                    <h3 class="text-3xl font-semibold tracking-tight">Understand</h3>
-                </div>
-                <div class="md:col-span-6">
-                    <p class="text-lg text-fz-gray-300 leading-relaxed max-w-[40ch]">
-                        Detect patterns. Are your expenses rising? Is discretionary spending eating into your savings capacity?
-                    </p>
+                <span class="block text-xs font-semibold tracking-widest text-fz-gray-500 uppercase mb-4">Rule Engine</span>
+                
+                <div class="flex flex-col gap-2 items-center">
+                    <div class="inline-flex items-center gap-2 bg-fz-gray-50 border border-fz-gray-200 rounded-lg px-4 py-2 font-mono text-sm text-fz-black">
+                        <span class="font-bold text-fz-gray-400">IF</span> Savings Rate &lt; 20%
+                    </div>
+                    <div class="h-4 w-px bg-fz-gray-300"></div>
+                    <div class="inline-flex items-center gap-2 bg-fz-red/10 border border-fz-red/30 rounded-lg px-4 py-2 font-mono text-sm text-fz-red font-medium">
+                        <span class="font-bold">THEN</span> Generate Insight
+                    </div>
                 </div>
             </div>
-            
-            <!-- Step 04 -->
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 py-16 border-b border-fz-gray-800 group transition-colors hover:bg-white/[0.02]">
-                <div class="md:col-span-2">
-                    <span class="text-5xl font-light tracking-tighter text-fz-gray-800 group-hover:text-fz-red transition-colors duration-500">04</span>
+
+            <!-- ARROW -->
+            <div class="hidden md:flex text-fz-gray-300 text-2xl font-light observe-me fz-reveal-up" data-delay="300">&rarr;</div>
+            <div class="md:hidden text-fz-gray-300 text-2xl font-light observe-me fz-reveal-up" data-delay="300">&darr;</div>
+
+            <!-- INSIGHT -->
+            <div class="flex-1 w-full bg-fz-gray-50 border border-fz-gray-200 rounded-2xl p-8 text-center shadow-sm observe-me fz-reveal-up h-64 flex flex-col justify-center" data-delay="400">
+                <div class="flex justify-center mb-4">
+                    <div class="p-3 bg-white rounded-full shadow-sm">
+                        <i data-lucide="lightbulb" class="w-5 h-5 text-fz-gray-500"></i>
+                    </div>
                 </div>
-                <div class="md:col-span-4">
-                    <h3 class="text-3xl font-semibold tracking-tight">Insights & Decisions</h3>
-                </div>
-                <div class="md:col-span-6">
-                    <p class="text-lg text-fz-gray-300 leading-relaxed max-w-[40ch]">
-                        Test your readiness. Before committing to a new EMI or SIP, FinZave evaluates affordability against your actual savings rate.
-                    </p>
-                </div>
+                <span class="block text-xs font-semibold tracking-widest text-fz-gray-500 uppercase mb-6">Insight</span>
+                <p class="text-sm text-fz-black font-medium leading-relaxed italic">
+                    "Your current savings rate is below the recommended 20% threshold."
+                </p>
             </div>
-            
+
         </div>
     </div>
 </section>
 
-<!-- CTA Section -->
-<section class="py-32 bg-fz-white text-center">
-    <div class="max-w-3xl mx-auto px-6">
-        <h2 class="text-4xl md:text-6xl font-semibold tracking-tighter text-fz-black mb-8">
-            Take control of your financial behaviour today.
+<!-- SECTION — DASHBOARD PREVIEW -->
+<section class="py-32 bg-fz-gray-50 border-b border-fz-gray-200 overflow-hidden">
+    <div class="max-w-[1200px] mx-auto px-6">
+        
+        <h2 class="text-3xl md:text-5xl font-semibold tracking-tighter text-fz-black text-center mb-20 observe-me fz-reveal-up">
+            A clear view of your finances.
         </h2>
-        <a href="{{ url_for('public.signup') }}" class="inline-flex justify-center items-center px-10 py-4 bg-fz-black text-white text-lg font-medium rounded-full hover:bg-fz-red transition-all duration-300 hover:-translate-y-1 shadow-lg shadow-fz-black/10">
-            Start with FinZave
-        </a>
+
+        <!-- Abstract Dashboard Wireframe -->
+        <div class="max-w-5xl mx-auto bg-white rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] border border-fz-gray-200 overflow-hidden observe-me fz-reveal-up" data-delay="100">
+            <!-- Mock Header -->
+            <div class="border-b border-fz-gray-100 p-6 flex justify-between items-center bg-fz-white">
+                <div class="text-sm font-semibold tracking-widest uppercase text-fz-gray-800">Dashboard</div>
+                <div class="flex gap-2">
+                    <div class="w-3 h-3 rounded-full bg-fz-gray-200"></div>
+                    <div class="w-3 h-3 rounded-full bg-fz-gray-200"></div>
+                    <div class="w-3 h-3 rounded-full bg-fz-gray-200"></div>
+                </div>
+            </div>
+            
+            <div class="p-8 md:p-12">
+                <!-- Top Metrics -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+                    <div class="p-6 bg-fz-gray-50 rounded-2xl border border-fz-gray-100">
+                        <span class="block text-xs font-semibold tracking-widest text-fz-gray-400 uppercase mb-2">Income</span>
+                        <div class="w-24 h-4 bg-fz-gray-200 rounded-full mt-4"></div>
+                    </div>
+                    <div class="p-6 bg-fz-gray-50 rounded-2xl border border-fz-gray-100">
+                        <span class="block text-xs font-semibold tracking-widest text-fz-gray-400 uppercase mb-2">Total Expenses</span>
+                        <div class="w-32 h-4 bg-fz-gray-200 rounded-full mt-4"></div>
+                    </div>
+                    <div class="p-6 bg-fz-gray-50 rounded-2xl border border-fz-gray-100">
+                        <span class="block text-xs font-semibold tracking-widest text-fz-gray-400 uppercase mb-2">Savings</span>
+                        <div class="w-20 h-4 bg-fz-gray-200 rounded-full mt-4"></div>
+                    </div>
+                    <div class="p-6 bg-fz-gray-50 rounded-2xl border border-fz-gray-100">
+                        <span class="block text-xs font-semibold tracking-widest text-fz-gray-400 uppercase mb-2">Savings Rate</span>
+                        <div class="w-16 h-4 bg-fz-gray-200 rounded-full mt-4"></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Charts Area -->
+                    <div class="md:col-span-2 p-8 bg-fz-white border border-fz-gray-200 rounded-2xl flex flex-col justify-center min-h-[300px]">
+                        <span class="block text-xs font-semibold tracking-widest text-fz-gray-400 uppercase text-center mb-8">Financial Overview Charts</span>
+                        <div class="flex items-end justify-center gap-4 h-32">
+                            <div class="w-12 bg-fz-gray-100 rounded-t-md h-[40%]"></div>
+                            <div class="w-12 bg-fz-black rounded-t-md h-[80%]"></div>
+                            <div class="w-12 bg-fz-gray-100 rounded-t-md h-[60%]"></div>
+                            <div class="w-12 bg-fz-red rounded-t-md h-[30%]"></div>
+                            <div class="w-12 bg-fz-gray-100 rounded-t-md h-[50%]"></div>
+                            <div class="w-12 bg-fz-black rounded-t-md h-[90%]"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Insights Area -->
+                    <div class="p-8 bg-fz-red/5 border border-fz-red/20 rounded-2xl flex flex-col">
+                        <span class="block text-xs font-semibold tracking-widest text-fz-red uppercase mb-8">Rule-Based Insights</span>
+                        <div class="flex flex-col gap-4">
+                            <div class="p-4 bg-white rounded-xl shadow-sm border border-fz-red/10">
+                                <div class="w-full h-3 bg-fz-gray-200 rounded-full mb-2"></div>
+                                <div class="w-3/4 h-3 bg-fz-gray-200 rounded-full"></div>
+                            </div>
+                            <div class="p-4 bg-white rounded-xl shadow-sm border border-fz-red/10">
+                                <div class="w-5/6 h-3 bg-fz-gray-200 rounded-full mb-2"></div>
+                                <div class="w-1/2 h-3 bg-fz-gray-200 rounded-full"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
     </div>
 </section>
+
+<!-- SECTION — WHO IT IS FOR & TRANSPARENCY -->
+<section class="py-32 bg-fz-white border-b border-fz-gray-200 overflow-hidden">
+    <div class="max-w-[1200px] mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-20">
+        
+        <div class="observe-me fz-reveal-left">
+            <h2 class="text-3xl font-semibold tracking-tighter text-fz-black mb-8">
+                Built for everyday financial decisions.
+            </h2>
+            <p class="text-lg text-fz-gray-600 mb-8 leading-relaxed">
+                FinZave is designed for individuals who want more clarity over their money.
+            </p>
+            <ul class="flex flex-col gap-4">
+                <li class="flex items-center gap-4 text-fz-gray-800 font-medium">
+                    <span class="w-1.5 h-1.5 bg-fz-black rounded-full"></span>
+                    Students building financial habits
+                </li>
+                <li class="flex items-center gap-4 text-fz-gray-800 font-medium">
+                    <span class="w-1.5 h-1.5 bg-fz-black rounded-full"></span>
+                    Young professionals managing incomes
+                </li>
+                <li class="flex items-center gap-4 text-fz-gray-800 font-medium">
+                    <span class="w-1.5 h-1.5 bg-fz-black rounded-full"></span>
+                    Individuals managing monthly expenses
+                </li>
+                <li class="flex items-center gap-4 text-fz-gray-800 font-medium">
+                    <span class="w-1.5 h-1.5 bg-fz-black rounded-full"></span>
+                    People working toward financial goals
+                </li>
+            </ul>
+        </div>
+
+        <div class="border-t md:border-t-0 md:border-l border-fz-gray-200 pt-16 md:pt-0 md:pl-20 observe-me fz-reveal-right" data-delay="100">
+            <h2 class="text-3xl font-semibold tracking-tighter text-fz-black mb-8">
+                Transparent by design.
+            </h2>
+            <div class="flex flex-col gap-6 text-fz-gray-700 leading-relaxed">
+                <p>
+                    FinZave relies strictly on the financial information you record.
+                </p>
+                <p>
+                    All calculations are based on clearly implemented financial mathematics, and our insights are generated using explicitly predefined logical rules.
+                </p>
+                <p>
+                    There is no black-box AI making assumptions about your money. You remain fully responsible for your financial decisions.
+                </p>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- SECTION — FINAL CTA -->
+<section class="py-40 bg-fz-white text-center overflow-hidden">
+    <div class="max-w-3xl mx-auto px-6 observe-me fz-reveal-up">
+        <h2 class="text-5xl md:text-7xl font-bold tracking-tighter text-fz-black mb-8 leading-[0.95]">
+            Understand your money.<br/>
+            Make better decisions.
+        </h2>
+        <p class="text-xl md:text-2xl text-fz-gray-600 mb-12">
+            Start tracking, analyzing, and understanding your financial journey with FinZave.
+        </p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-6">
+            <a href="{{ url_for('public.signup') }}" class="inline-flex justify-center items-center px-10 py-4 bg-fz-black text-white text-lg font-medium rounded-full hover:bg-fz-red transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-fz-black/10">
+                Get Started
+            </a>
+            <a href="{{ url_for('public.workflow') }}" class="inline-flex justify-center items-center px-8 py-4 bg-transparent text-fz-black text-lg font-medium hover:text-fz-red transition-colors duration-200 fz-underline-hover">
+                Explore Workflow
+            </a>
+        </div>
+    </div>
+</section>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<style>
+    /* Hero animations */
+    .fz-hero-word {
+        will-change: transform, opacity;
+    }
+    .fz-hero-after {
+        will-change: transform, opacity;
+        transition: opacity 0.6s ease, transform 0.6s ease;
+        transform: translateY(20px);
+    }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    
+    // 1. Hero Reveal
+    const heroWords = document.querySelectorAll('.fz-hero-word');
+    const heroAfters = document.querySelectorAll('.fz-hero-after');
+    
+    if (!prefersReducedMotion) {
+        heroWords.forEach((word, index) => {
+            word.style.transform = 'translateY(20px)';
+            word.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            word.style.transitionDelay = `${index * 80}ms`;
+            
+            // Trigger reflow
+            void word.offsetWidth;
+            
+            requestAnimationFrame(() => {
+                word.style.opacity = '1';
+                word.style.transform = 'translateY(0)';
+            });
+        });
+        
+        // Reveal paragraph and CTAs slightly after words
+        const afterDelay = (heroWords.length * 80) + 100;
+        heroAfters.forEach((el, idx) => {
+            el.style.transitionDelay = `${afterDelay + (idx * 150)}ms`;
+            requestAnimationFrame(() => {
+                el.style.opacity = '1';
+                el.style.transform = 'translateY(0)';
+            });
+        });
+    } else {
+        heroWords.forEach(w => { w.style.opacity = '1'; w.style.transform = 'none'; });
+        heroAfters.forEach(e => { e.style.opacity = '1'; e.style.transform = 'none'; });
+    }
+
+    // 2. Numbered Section (Black -> Red on viewport)
+    const numberRows = document.querySelectorAll('.fz-scroll-row');
+    if (numberRows.length > 0 && !prefersReducedMotion) {
+        // Using a tight root margin to detect when row is precisely in view
+        const numberObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const numTarget = entry.target.querySelector('.fz-scroll-num');
+                if (!numTarget) return;
+                
+                if (entry.isIntersecting) {
+                    numTarget.classList.add('text-fz-red');
+                    numTarget.classList.remove('text-fz-black');
+                } else {
+                    numTarget.classList.remove('text-fz-red');
+                    numTarget.classList.add('text-fz-black');
+                }
+            });
+        }, {
+            root: null,
+            rootMargin: '-20% 0px -40% 0px',
+            threshold: 0.1
+        });
+        
+        numberRows.forEach(row => numberObserver.observe(row));
+    }
+});
+</script>
 {% endblock %}

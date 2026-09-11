@@ -21,7 +21,34 @@ Phase 4.2 — Services Page Redesign COMPLETE
 - **Complete Visual Rewrite**: Discarded the repetitive grid/staggered containers in `services.html` for an asymmetric, typography-led editorial composition.
 - **Core Platform Highlight**: Explicitly positioned "Financial Analysis & Reports" as the core service using a dedicated dark-mode section.
 - **Goal Tracking & Calculators**: Displayed via split-screen layouts and custom abstract visual representations instead of generic mockups. Explicitly highlighted that SIP is purely a mathematical calculator, not investment advice.
+- **Goal Tracking Visual Patch**: Replaced the empty abstract circle placeholder with a polished, meaningful circular progress visualization displaying illustrative FinZave data (Emergency Fund, 70%, target dates, amounts).
 - **Why FinZave**: Added a distinct differentiator section emphasizing deterministic rule-based analysis over AI models.
+
+## Phase 4.3 About Page Redesign
+- **Complete Editorial Overhaul**: Transformed the About Us page from a minimal text document into a comprehensive product/company story page.
+- **Strong Structural Narrative**: Implemented sections for Hero, Problem, Purpose, Goal, Societal Contribution, Journey Timeline (How FinZave Helps), Philosophy, and a direct Comparison with traditional trackers.
+- **Visual Identity**: Used the approved White/Black/Red palette, generous whitespace, large editorial typography, asymmetric layouts, and subtle CSS hover transitions.
+## Phase 4.4 Workflow Page (Redesign)
+- **New Public Route**: Created and redesigned the `/workflow` route focused strictly on explaining the core product working logic.
+- **Workflow Process Engine**: Removed all generic marketing/FAQ content, establishing an uncompromising layout focusing solely on the user data flow (Input &rarr; Record &rarr; Calculate &rarr; Analyze &rarr; Evaluate &rarr; Insight &rarr; Decide).
+- **Rule-Based Evaluation**: Designed a pure transparent-logic section mapping how data triggers condition checks (WHEN / THEN / INSIGHT), ensuring absolute separation from AI/ML rhetoric.
+- **Where Features Fit**: Instead of standard generic feature cards, effectively mapped the user's tools strictly onto the pipeline stages (e.g. mapping Savings/SIP to CALCULATE).
+- **Validation**: Tested the redesigned `workflow.html` across the frontend and confirmed a `200 OK` return.
+
+## Phase 4.5 Supporting & Legal Pages
+- **New Public Routes**: Added `/faq`, `/terms`, and `/privacy` in `routes/public.py`.
+- **404 Handling**: Created a custom `404.html` and registered a global error handler in `app.py`.
+- **Footer Updates**: Added links to FAQ, Terms, and Privacy in `base_public.html` footer.
+- **FAQ Page**: Built a fully accessible native HTML `<details>` accordion matching the FinZave aesthetic. Excluded unverified capabilities (like data export) and strictly stated the lack of ML in insights.
+- **Legal Pages (Terms/Privacy)**: Designed with a strict numbered editorial document layout. Explicitly denied GDPR/encryption claims that aren't verified, and strongly positioned FinZave as an informational tool, not professional advice.
+- **Validation**: Checked `200 OK` for the routes and verified the custom `404` page appears on invalid requests.
+
+## Phase 4.6 Homepage Redesign
+- **Preserved Hero Section**: Left the existing approved hero section entirely unchanged.
+- **Narrative Overhaul**: Replaced the legacy text structure below the hero with an extensive editorial design showcasing the actual product flow.
+- **Sections Built**: Integrated structured sections for "The Problem", "What FinZave Does", "Key Capabilities" (Track, Understand, Analyze, Plan, Calculate, Decide), and mapped the core "Workflow Preview".
+- **Visual Features**: Showcased the SIP/EMI tools without overstating them as investment advice, built a minimalist visual wireframe to demonstrate the dashboard metrics, and clearly laid out target audience and transparency guidelines.
+- **Design Paradigm**: Utilized massive, asymmetric typography layouts, distinct thin dividers, white space, and strictly adhered to the `White + Black + Red` identity to cement FinZave as a premium, rule-based product rather than generic SaaS.
 
 ## Architecture State
 Flask → Extensions → PostgreSQL (Auth Active) + Public UI 

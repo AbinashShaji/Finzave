@@ -71,10 +71,105 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+
+        /* Unified Animation System - CSS Classes */
+        @media (prefers-reduced-motion: no-preference) {
+            .observe-me {
+                opacity: 0;
+                will-change: transform, opacity;
+            }
+            .fz-reveal-up {
+                transform: translateY(20px);
+                transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+            .fz-reveal-left {
+                transform: translateX(-30px);
+                transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+            .fz-reveal-right {
+                transform: translateX(30px);
+                transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+            .is-visible.fz-reveal-up,
+            .is-visible.fz-reveal-left,
+            .is-visible.fz-reveal-right {
+                opacity: 1;
+                transform: translate(0, 0);
+            }
+        }
+        
+        /* Underline Hover for Links */
+        .fz-underline-hover {
+            position: relative;
+            display: inline-block;
+        }
+        .fz-underline-hover::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 1px;
+            bottom: -2px;
+            left: 0;
+            background-color: currentColor;
+            transition: width 0.3s ease;
+        }
+        .fz-underline-hover:hover::after {
+            width: 100%;
+        }
+
+        /* Number Highlights */
+        .fz-number-transition {
+            transition: color 0.5s ease;
+        }
+        .is-visible .fz-number-transition {
+            color: theme('colors.fz.red.DEFAULT');
+        }
+
+        /* Card Hover FX */
+        .fz-card-hover {
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        .fz-card-hover:hover {
+            transform: translateY(-2px);
+            border-color: theme('colors.fz.gray.300');
+        }
+        
+        /* Page Transition Utility */
+        .page-transition-enter {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Unified Workflow Sequence Animation */
+        .fz-wf-step {
+            transform: translateY(12px);
+        }
+        .fz-wf-step.is-arrow {
+            transform: scaleX(0);
+        }
+        .fz-wf-step.is-arrow-vertical {
+            transform: scaleY(0);
+        }
+        
+        .fz-wf-step-revealed {
+            opacity: 1 !important;
+            transform: translate(0, 0) scale(1) !important;
+        }
+        
+        .fz-wf-step-active {
+            transform: scale(1.05) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border-color: theme('colors.fz.gray.300');
+        }
     </style>
     {% block extra_head %}{% endblock %}
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="min-h-screen flex flex-col bg-white text-fz-black selection:bg-fz-red selection:text-white">
+<body class="min-h-screen flex flex-col bg-white text-fz-black selection:bg-fz-red selection:text-white page-transition-enter">
 
     <!-- Public Navbar -->
     <nav class="sticky top-0 z-50 w-full glass-panel border-b border-fz-gray-200/50">
@@ -90,24 +185,23 @@
 
             <!-- Desktop Links -->
             <div class="hidden lg:flex items-center gap-8 text-sm font-medium">
-                <a href="{{ url_for('public.about') }}" class="text-fz-gray-800 hover:text-fz-red transition-colors">About Us</a>
-                <a href="{{ url_for('public.services') }}" class="text-fz-gray-800 hover:text-fz-red transition-colors">Services</a>
-                <a href="{{ url_for('public.reviews') }}" class="text-fz-gray-800 hover:text-fz-red transition-colors">Reviews</a>
+                <a href="{{ url_for('public.about') }}" class="text-fz-gray-800 hover:text-fz-red transition-colors fz-underline-hover">About Us</a>
+                <a href="{{ url_for('public.services') }}" class="text-fz-gray-800 hover:text-fz-red transition-colors fz-underline-hover">Services</a>
+                <a href="{{ url_for('public.workflow') }}" class="text-fz-gray-800 hover:text-fz-red transition-colors fz-underline-hover">Workflow</a>
+                <a href="{{ url_for('public.reviews') }}" class="text-fz-gray-800 hover:text-fz-red transition-colors fz-underline-hover">Reviews</a>
             </div>
 
             <!-- Desktop CTAs -->
             <div class="hidden lg:flex items-center gap-4">
-                <a href="{{ url_for('public.login') }}" class="text-sm font-medium text-fz-black hover:text-fz-red transition-colors">Log in</a>
-                <a href="{{ url_for('public.signup') }}" class="text-sm font-medium bg-fz-black text-white px-5 py-2.5 rounded-full hover:bg-fz-red transition-colors hover:-translate-y-[1px] active:translate-y-0 duration-200">
+                <a href="{{ url_for('public.login') }}" class="text-sm font-medium text-fz-black hover:text-fz-red transition-colors fz-underline-hover">Log in</a>
+                <a href="{{ url_for('public.signup') }}" class="text-sm font-medium bg-fz-black text-white px-5 py-2.5 rounded-full hover:bg-fz-red transition-all hover:scale-[1.02] active:scale-[0.98] duration-200 shadow-sm hover:shadow-md">
                     Get Started
                 </a>
             </div>
 
             <!-- Mobile Menu Toggle -->
             <button id="mobile-menu-btn" class="lg:hidden p-2 text-fz-black" aria-label="Toggle menu">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/>
-                </svg>
+                <i data-lucide="menu"></i>
             </button>
         </div>
 
@@ -115,6 +209,7 @@
         <div id="mobile-menu" class="hidden lg:hidden bg-white border-t border-fz-gray-200 px-6 py-4 flex flex-col gap-4 shadow-lg absolute w-full">
             <a href="{{ url_for('public.about') }}" class="text-sm font-medium text-fz-gray-800 py-2 border-b border-fz-gray-100">About Us</a>
             <a href="{{ url_for('public.services') }}" class="text-sm font-medium text-fz-gray-800 py-2 border-b border-fz-gray-100">Services</a>
+            <a href="{{ url_for('public.workflow') }}" class="text-sm font-medium text-fz-gray-800 py-2 border-b border-fz-gray-100">Workflow</a>
             <a href="{{ url_for('public.reviews') }}" class="text-sm font-medium text-fz-gray-800 py-2 border-b border-fz-gray-100">Reviews</a>
             <div class="flex flex-col gap-3 pt-4">
                 <a href="{{ url_for('public.login') }}" class="text-sm font-medium text-center text-fz-black py-2.5 border border-fz-gray-200 rounded-full">Log in</a>
@@ -147,18 +242,19 @@
             <div class="col-span-1">
                 <h4 class="font-semibold text-sm mb-4">Product</h4>
                 <ul class="flex flex-col gap-3 text-sm text-fz-gray-800">
-                    <li><a href="{{ url_for('public.services') }}#analysis" class="hover:text-fz-red transition-colors">Analysis</a></li>
-                    <li><a href="{{ url_for('public.services') }}#goals" class="hover:text-fz-red transition-colors">Goals</a></li>
-                    <li><a href="{{ url_for('public.services') }}#planning" class="hover:text-fz-red transition-colors">Planning</a></li>
+                    <li><a href="{{ url_for('public.services') }}#analysis" class="hover:text-fz-red transition-colors fz-underline-hover">Analysis</a></li>
+                    <li><a href="{{ url_for('public.services') }}#goals" class="hover:text-fz-red transition-colors fz-underline-hover">Goals</a></li>
+                    <li><a href="{{ url_for('public.services') }}#planning" class="hover:text-fz-red transition-colors fz-underline-hover">Planning</a></li>
                 </ul>
             </div>
             
             <div class="col-span-1">
                 <h4 class="font-semibold text-sm mb-4">Company</h4>
                 <ul class="flex flex-col gap-3 text-sm text-fz-gray-800">
-                    <li><a href="{{ url_for('public.about') }}" class="hover:text-fz-red transition-colors">About Us</a></li>
-                    <li><a href="{{ url_for('public.reviews') }}" class="hover:text-fz-red transition-colors">Reviews</a></li>
-                    <li><a href="{{ url_for('public.login') }}" class="hover:text-fz-red transition-colors">Log in</a></li>
+                    <li><a href="{{ url_for('public.about') }}" class="hover:text-fz-red transition-colors fz-underline-hover">About Us</a></li>
+                    <li><a href="{{ url_for('public.workflow') }}" class="hover:text-fz-red transition-colors fz-underline-hover">Workflow</a></li>
+                    <li><a href="{{ url_for('public.reviews') }}" class="hover:text-fz-red transition-colors fz-underline-hover">Reviews</a></li>
+                    <li><a href="{{ url_for('public.login') }}" class="hover:text-fz-red transition-colors fz-underline-hover">Log in</a></li>
                 </ul>
             </div>
         </div>
@@ -166,8 +262,9 @@
         <div class="max-w-[1400px] mx-auto px-6 pt-8 border-t border-fz-gray-200 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-fz-gray-800">
             <p>&copy; 2026 FinZave. All rights reserved.</p>
             <div class="flex gap-6">
-                <a href="#" class="hover:text-fz-red transition-colors">Privacy</a>
-                <a href="#" class="hover:text-fz-red transition-colors">Terms</a>
+                <a href="{{ url_for('public.faq') }}" class="hover:text-fz-red transition-colors fz-underline-hover">FAQ</a>
+                <a href="{{ url_for('public.privacy') }}" class="hover:text-fz-red transition-colors fz-underline-hover">Privacy</a>
+                <a href="{{ url_for('public.terms') }}" class="hover:text-fz-red transition-colors fz-underline-hover">Terms & Policies</a>
             </div>
         </div>
     </footer>
@@ -180,6 +277,108 @@
         });
     </script>
     
+    <!-- Unified Animation & Icon Initialization -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Initialize Lucide Icons
+            lucide.createIcons();
+
+            // Intersection Observer for scroll animations
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            
+            if (!prefersReducedMotion) {
+                const observerOptions = {
+                    root: null,
+                    rootMargin: '0px',
+                    threshold: 0.15
+                };
+
+                const observer = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            // Read staggered delay if present
+                            const delay = entry.target.getAttribute('data-delay');
+                            if (delay) {
+                                entry.target.style.transitionDelay = `${delay}ms`;
+                            }
+                            entry.target.classList.add('is-visible');
+                            observer.unobserve(entry.target); // Only animate once
+                        }
+                    });
+                }, observerOptions);
+
+                document.querySelectorAll('.observe-me').forEach((el) => {
+                    observer.observe(el);
+                });
+            } else {
+                // If reduced motion is true, force visibility immediately
+                document.querySelectorAll('.observe-me').forEach((el) => {
+                    el.classList.add('is-visible');
+                    el.style.opacity = '1';
+                    el.style.transform = 'none';
+                });
+            }
+
+            // Unified Workflow Preview Animation
+            document.querySelectorAll('.fz-wf-sequence-container').forEach(wfContainer => {
+                const wfSteps = wfContainer.querySelectorAll('.fz-wf-step');
+                
+                // Identify arrows vs containers based on content
+                wfSteps.forEach(step => {
+                    if (step.textContent.includes('→')) {
+                        step.classList.add('is-arrow');
+                    } else if (step.textContent.includes('↓')) {
+                        step.classList.add('is-arrow-vertical');
+                    } else {
+                        step.classList.add('is-container');
+                    }
+                });
+
+                if (!prefersReducedMotion) {
+                    let hasTriggered = false;
+                    
+                    const wfObserver = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting && !hasTriggered) {
+                                hasTriggered = true;
+                                
+                                let currentDelay = 0;
+                                wfSteps.forEach((step, index) => {
+                                    // Assign staggered delays dynamically
+                                    // Arrows get smaller delays
+                                    const delayIncrement = step.classList.contains('is-container') ? 160 : 100;
+                                    
+                                    setTimeout(() => {
+                                        step.classList.add('fz-wf-step-revealed');
+                                        
+                                        // Active state ping pong
+                                        if (step.classList.contains('is-container') && index < wfSteps.length - 1) {
+                                            step.classList.add('fz-wf-step-active');
+                                            setTimeout(() => {
+                                                step.classList.remove('fz-wf-step-active');
+                                            }, 400); // Remove active state after next item begins
+                                        }
+                                        
+                                    }, currentDelay);
+                                    
+                                    currentDelay += delayIncrement;
+                                });
+                                
+                                wfObserver.disconnect();
+                            }
+                        });
+                    }, {
+                        threshold: 0.3
+                    });
+                    
+                    wfObserver.observe(wfContainer);
+                } else {
+                    wfSteps.forEach(step => step.classList.add('fz-wf-step-revealed'));
+                }
+            });
+        });
+    </script>
+
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>

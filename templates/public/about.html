@@ -2,62 +2,382 @@
 {% block title %}About Us - FinZave{% endblock %}
 
 {% block content %}
-<section class="py-24 bg-fz-white">
-    <div class="max-w-[1400px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-16">
+<!-- 01 HERO SECTION -->
+<section class="relative pt-32 pb-40 overflow-hidden bg-fz-white flex flex-col justify-center min-h-[85vh] border-b border-fz-gray-200">
+    <div class="max-w-[1200px] mx-auto px-6 w-full z-10">
         
-        <!-- Sticky Title Area -->
-        <div class="lg:col-span-5 relative">
-            <div class="lg:sticky lg:top-32">
-                <h1 class="text-4xl md:text-6xl font-bold tracking-tighter leading-tight text-fz-black mb-6">
-                    We built a finance assistant, not a ledger.
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-16">
+            <div class="max-w-4xl">
+                <span class="inline-block px-3 py-1 bg-fz-gray-100 rounded-full text-xs font-semibold tracking-widest text-fz-gray-800 uppercase mb-8 border border-fz-gray-200 observe-me fz-reveal-up">
+                    About FinZave
+                </span>
+                
+                <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-[0.95] text-fz-black mb-8 observe-me fz-reveal-up" data-delay="100">
+                    Building better financial habits, <br/>
+                    <span class="text-fz-gray-300">one decision at a time.</span>
                 </h1>
-                <p class="text-lg text-fz-gray-800 leading-relaxed max-w-[35ch]">
-                    The core philosophy behind FinZave is simple: raw data isn't enough to change financial outcomes. 
+                
+                <p class="text-xl md:text-2xl text-fz-gray-800 leading-relaxed max-w-[45ch] observe-me fz-reveal-up" data-delay="200">
+                    FinZave is more than a place to record expenses. It helps people understand where their money goes, recognize their financial patterns, and make more informed decisions.
                 </p>
             </div>
+            
+            <!-- Small supporting visual -->
+            <div class="hidden lg:flex flex-col gap-4 text-xs font-semibold tracking-widest text-fz-gray-400 uppercase text-right">
+                <div class="flex items-center justify-end gap-3 group">
+                    <span class="transition-colors group-hover:text-fz-black">Track</span>
+                    <div class="w-8 h-px bg-fz-gray-300 group-hover:bg-fz-black transition-colors"></div>
+                </div>
+                <div class="flex items-center justify-end gap-3 group">
+                    <span class="transition-colors group-hover:text-fz-black">Understand</span>
+                    <div class="w-16 h-px bg-fz-gray-300 group-hover:bg-fz-black transition-colors"></div>
+                </div>
+                <div class="flex items-center justify-end gap-3 group text-fz-red">
+                    <span>Decide</span>
+                    <div class="w-24 h-px bg-fz-red"></div>
+                </div>
+            </div>
         </div>
-        
-        <!-- Content Area -->
-        <div class="lg:col-span-7 flex flex-col gap-20">
-            
-            <article>
-                <h2 class="text-2xl font-semibold tracking-tight text-fz-black mb-4">The Problem</h2>
-                <div class="text-fz-gray-800 leading-relaxed max-w-[65ch] flex flex-col gap-4">
-                    <p>
-                        Most existing personal finance applications focus primarily on recording transactions. They are digital ledgers. They tell you exactly how much you spent on groceries in October.
-                    </p>
-                    <p>
-                        But they fail to answer the questions that actually matter when managing your financial life: <em>Is my spending increasing relative to my income? How much of my discretionary income is being drained? Can I comfortably afford a new EMI?</em>
-                    </p>
-                </div>
-            </article>
-            
-            <div class="w-full h-px bg-fz-gray-200"></div>
-            
-            <article>
-                <h2 class="text-2xl font-semibold tracking-tight text-fz-black mb-4">Our Purpose</h2>
-                <div class="text-fz-gray-800 leading-relaxed max-w-[65ch] flex flex-col gap-4">
-                    <p>
-                        FinZave was designed to bridge the gap between tracking expenses and making informed decisions. By analyzing your fixed and variable income against your categorized expenses, FinZave computes your true savings capacity.
-                    </p>
-                    <p>
-                        We process this information through a transparent, rule-based algorithm to provide personalized insights—helping you understand the weight of your financial choices before you make them.
-                    </p>
-                </div>
-            </article>
+    </div>
+    
+    <!-- Subtle depth element -->
+    <div class="absolute top-0 right-0 w-[800px] h-[800px] bg-gradient-to-bl from-fz-gray-100 to-transparent rounded-full blur-[120px] -z-10 opacity-60 translate-x-1/4 -translate-y-1/4"></div>
+</section>
 
-            <div class="w-full h-px bg-fz-gray-200"></div>
+<!-- 02 THE PROBLEM -->
+<section class="py-32 bg-fz-black text-white relative overflow-hidden">
+    <div class="max-w-[1200px] mx-auto px-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-16">
             
-            <article>
-                <h2 class="text-2xl font-semibold tracking-tight text-fz-black mb-4">The Philosophy</h2>
-                <div class="text-fz-gray-800 leading-relaxed max-w-[65ch] flex flex-col gap-4">
-                    <p>
-                        No hidden magic. No overly complex AI models pretending to predict the stock market. We believe in practical, rule-based intelligence that respects your data and provides explainable, actionable insights into your spending behavior.
-                    </p>
-                </div>
-            </article>
-
+            <div class="lg:col-span-6 observe-me fz-reveal-left">
+                <h2 class="text-4xl md:text-6xl font-semibold tracking-tighter leading-tight mb-8">
+                    The problem isn't tracking money. <br/>
+                    <span class="text-fz-gray-400">It's understanding it.</span>
+                </h2>
+                <div class="w-24 h-1 bg-fz-red mb-12"></div>
+            </div>
+            
+            <div class="lg:col-span-6 flex flex-col gap-8 text-lg text-fz-gray-300 leading-relaxed observe-me fz-reveal-right" data-delay="100">
+                <p>
+                    Traditional expense trackers mainly record transactions. They act as digital ledgers that tell users what they spent. But raw financial data can be difficult to turn into practical decisions.
+                </p>
+                <ul class="flex flex-col gap-6 border-l border-fz-gray-800 pl-6">
+                    <li class="flex items-start gap-3">
+                        <span class="text-fz-red mt-1.5">•</span>
+                        <span>They don't always explain whether spending is healthy relative to income.</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="text-fz-red mt-1.5">•</span>
+                        <span>They don't clearly show how much income is actually available for saving.</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="text-fz-red mt-1.5">•</span>
+                        <span>They don't help users understand the impact of recurring expenses over time.</span>
+                    </li>
+                </ul>
+            </div>
+            
         </div>
     </div>
 </section>
+
+<!-- 03 OUR PURPOSE & 04 OUR GOAL (Editorial Split) -->
+<section class="py-32 bg-fz-white border-b border-fz-gray-200 overflow-hidden">
+    <div class="max-w-[1200px] mx-auto px-6">
+        
+        <!-- Purpose -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-16 mb-32">
+            <div class="md:col-span-4 observe-me fz-reveal-left">
+                <h3 class="text-sm font-semibold tracking-widest text-fz-red uppercase mb-4">Our Purpose</h3>
+                <h2 class="text-3xl font-semibold tracking-tight text-fz-black">Bridging the gap</h2>
+            </div>
+            <div class="md:col-span-8 observe-me fz-reveal-right" data-delay="100">
+                <h3 class="text-2xl md:text-4xl font-medium tracking-tight text-fz-black leading-tight mb-8">
+                    FinZave was created to bridge the gap between financial tracking and financial understanding.
+                </h3>
+                <div class="text-lg text-fz-gray-800 leading-relaxed space-y-6 max-w-[55ch]">
+                    <p>
+                        We analyze income, fixed and variable expenses, spending categories, savings, and financial goals, converting this information into understandable insights.
+                    </p>
+                    <p class="font-semibold text-fz-black text-xl border-l-2 border-fz-red pl-6 my-8">
+                        Raw numbers are useful only when they help people make better decisions.
+                    </p>
+                    <p>
+                        FinZave uses a transparent, rule-based approach. We provide rule-based financial analysis and spending analysis so users can completely understand why an insight or recommendation is being generated.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="w-full h-px bg-fz-gray-200 mb-32"></div>
+
+        <!-- Goal -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-16">
+            <div class="md:col-span-4 observe-me fz-reveal-left">
+                <h3 class="text-sm font-semibold tracking-widest text-fz-red uppercase mb-4">Where We're Going</h3>
+                <h2 class="text-3xl font-semibold tracking-tight text-fz-black">Our Goal</h2>
+            </div>
+            <div class="md:col-span-8 observe-me fz-reveal-right" data-delay="100">
+                <h3 class="text-2xl md:text-4xl font-medium tracking-tight text-fz-black leading-tight mb-8">
+                    Our goal is to make personal financial decision-making simpler and more accessible.
+                </h3>
+                
+                <p class="text-lg text-fz-gray-800 leading-relaxed max-w-[55ch] mb-12">
+                    FinZave aims to help people understand their spending habits, build consistent saving habits, and set realistic financial goals. By recognizing unnecessary financial pressure, individuals can develop greater awareness of their overall financial health.
+                </p>
+                
+                <div class="bg-fz-gray-100 rounded-3xl p-10 md:p-16 border border-fz-gray-200">
+                    <p class="text-2xl md:text-3xl font-semibold tracking-tighter text-fz-black leading-tight">
+                        "We don't want people to simply know their numbers. We want them to understand what those numbers mean."
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</section>
+
+<!-- 05 OUR CONTRIBUTION TO SOCIETY -->
+<section class="py-32 bg-fz-black text-white relative overflow-hidden">
+    <div class="max-w-[1200px] mx-auto px-6">
+        
+        <!-- Top Editorial Split -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-16 mb-20">
+            <!-- Left 40% (lg:col-span-5) -->
+            <div class="lg:col-span-5 flex flex-col justify-start observe-me fz-reveal-left">
+                <h3 class="text-sm font-semibold tracking-widest text-fz-red uppercase mb-4">Why It Matters</h3>
+                <h2 class="text-4xl md:text-6xl font-semibold tracking-tighter leading-tight">
+                    Contributing to Better<br/>Financial Awareness
+                </h2>
+            </div>
+            
+            <!-- Right 60% (lg:col-span-7) -->
+            <div class="lg:col-span-7 flex flex-col justify-end text-xl text-fz-gray-300 leading-relaxed space-y-8 lg:pl-12 observe-me fz-reveal-right" data-delay="100">
+                <p>
+                    Financial literacy is not only about knowing financial terms. It is about understanding everyday choices and their long-term consequences.
+                </p>
+                <p>
+                    FinZave aims to make financial awareness easier to understand, more accessible, more practical, and more transparent.
+                </p>
+                <p>
+                    By helping users understand their spending and saving patterns, FinZave encourages more conscious financial decisions in everyday life.
+                </p>
+            </div>
+        </div>
+
+        <!-- Clean Numbered Editorial List -->
+        <div class="flex flex-col border-t border-fz-gray-800">
+            
+            <!-- 01 -->
+            <div class="group flex flex-col md:flex-row md:items-baseline gap-4 md:gap-16 py-8 border-b border-fz-gray-800 transition-colors hover:bg-white/[0.02] observe-me fz-reveal-up" data-delay="100">
+                <div class="text-fz-gray-700 font-light text-5xl md:text-7xl tracking-tighter leading-none group-hover:text-fz-gray-500 transition-colors w-24 fz-number-transition">01</div>
+                <div class="flex-1 flex flex-col md:flex-row md:items-start gap-4 md:gap-12 justify-between">
+                    <h3 class="text-2xl md:text-3xl font-medium tracking-tight text-white md:w-1/3">Conscious Spending</h3>
+                    <p class="text-lg text-fz-gray-400 leading-relaxed md:w-2/3">
+                        Help users recognize where their money goes and think more carefully about unnecessary spending.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 02 -->
+            <div class="group flex flex-col md:flex-row md:items-baseline gap-4 md:gap-16 py-8 border-b border-fz-gray-800 transition-colors hover:bg-white/[0.02] observe-me fz-reveal-up" data-delay="200">
+                <div class="text-fz-gray-700 font-light text-5xl md:text-7xl tracking-tighter leading-none group-hover:text-fz-gray-500 transition-colors w-24 fz-number-transition">02</div>
+                <div class="flex-1 flex flex-col md:flex-row md:items-start gap-4 md:gap-12 justify-between">
+                    <h3 class="text-2xl md:text-3xl font-medium tracking-tight text-white md:w-1/3">Understandable Saving</h3>
+                    <p class="text-lg text-fz-gray-400 leading-relaxed md:w-2/3">
+                        Help users understand their actual saving capacity instead of looking at income alone.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 03 -->
+            <div class="group flex flex-col md:flex-row md:items-baseline gap-4 md:gap-16 py-8 border-b border-fz-gray-800 transition-colors hover:bg-white/[0.02] observe-me fz-reveal-up" data-delay="300">
+                <div class="text-fz-gray-700 font-light text-5xl md:text-7xl tracking-tighter leading-none group-hover:text-fz-gray-500 transition-colors w-24 fz-number-transition">03</div>
+                <div class="flex-1 flex flex-col md:flex-row md:items-start gap-4 md:gap-12 justify-between">
+                    <h3 class="text-2xl md:text-3xl font-medium tracking-tight text-white md:w-1/3">Goal-Oriented Planning</h3>
+                    <p class="text-lg text-fz-gray-400 leading-relaxed md:w-2/3">
+                        Help users connect everyday financial decisions with short- and long-term financial goals.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 04 -->
+            <div class="group flex flex-col md:flex-row md:items-baseline gap-4 md:gap-16 py-8 border-b border-fz-gray-800 transition-colors hover:bg-white/[0.02] observe-me fz-reveal-up" data-delay="400">
+                <div class="text-fz-gray-700 font-light text-5xl md:text-7xl tracking-tighter leading-none group-hover:text-fz-gray-500 transition-colors w-24 fz-number-transition">04</div>
+                <div class="flex-1 flex flex-col md:flex-row md:items-start gap-4 md:gap-12 justify-between">
+                    <h3 class="text-2xl md:text-3xl font-medium tracking-tight text-white md:w-1/3">Better Financial Awareness</h3>
+                    <p class="text-lg text-fz-gray-400 leading-relaxed md:w-2/3">
+                        Encourage users to understand the consequences of recurring expenses and spending habits.
+                    </p>
+                </div>
+            </div>
+            
+        </div>
+        
+        <!-- Subtle decorative typography -->
+        <div class="mt-20 pt-8 text-center text-[10px] tracking-[0.3em] font-semibold text-fz-gray-600 uppercase border-t border-fz-gray-900">
+            Better Awareness &rarr; Better Decisions &rarr; Better Habits
+        </div>
+        
+    </div>
+</section>
+
+<!-- 06 HOW FINZAVE HELPS (Timeline) -->
+<section class="py-32 bg-fz-white border-b border-fz-gray-200 overflow-hidden">
+    <div class="max-w-[1200px] mx-auto px-6">
+        
+        <div class="mb-20 observe-me fz-reveal-up">
+            <h2 class="text-3xl md:text-5xl font-semibold tracking-tight text-fz-black">The FinZave Journey</h2>
+        </div>
+        
+        <div class="flex flex-col lg:flex-row gap-8 lg:gap-0 relative">
+            <!-- Continuous line for desktop -->
+            <div class="hidden lg:block absolute top-6 left-0 w-full h-px bg-fz-gray-200"></div>
+            
+            <!-- Timeline Item 01 -->
+            <div class="flex-1 relative group observe-me fz-reveal-up" data-delay="100">
+                <div class="hidden lg:block w-3 h-3 bg-white border-2 border-fz-gray-300 rounded-full absolute top-[21.5px] -translate-y-1/2 group-hover:border-fz-black transition-colors z-10"></div>
+                <div class="lg:pt-12 pl-6 lg:pl-0 border-l lg:border-l-0 border-fz-gray-200 relative">
+                    <div class="lg:hidden absolute left-[-5px] top-2 w-2 h-2 bg-fz-gray-300 rounded-full group-hover:bg-fz-black transition-colors"></div>
+                    <span class="text-sm font-semibold tracking-widest text-fz-red uppercase mb-2 block">01 — Track</span>
+                    <p class="text-fz-black font-medium text-xl mb-2">Record</p>
+                    <p class="text-fz-gray-800 text-sm leading-relaxed pr-6">Record income and expenses cleanly and accurately.</p>
+                </div>
+            </div>
+
+            <!-- Timeline Item 02 -->
+            <div class="flex-1 relative group observe-me fz-reveal-up" data-delay="200">
+                <div class="hidden lg:block w-3 h-3 bg-white border-2 border-fz-gray-300 rounded-full absolute top-[21.5px] -translate-y-1/2 group-hover:border-fz-black transition-colors z-10"></div>
+                <div class="lg:pt-12 pl-6 lg:pl-0 border-l lg:border-l-0 border-fz-gray-200 relative">
+                    <div class="lg:hidden absolute left-[-5px] top-2 w-2 h-2 bg-fz-gray-300 rounded-full group-hover:bg-fz-black transition-colors"></div>
+                    <span class="text-sm font-semibold tracking-widest text-fz-red uppercase mb-2 block">02 — Analyze</span>
+                    <p class="text-fz-black font-medium text-xl mb-2">Pattern</p>
+                    <p class="text-fz-gray-800 text-sm leading-relaxed pr-6">Understand spending patterns and financial ratios.</p>
+                </div>
+            </div>
+
+            <!-- Timeline Item 03 -->
+            <div class="flex-1 relative group observe-me fz-reveal-up" data-delay="300">
+                <div class="hidden lg:block w-3 h-3 bg-white border-2 border-fz-gray-300 rounded-full absolute top-[21.5px] -translate-y-1/2 group-hover:border-fz-black transition-colors z-10"></div>
+                <div class="lg:pt-12 pl-6 lg:pl-0 border-l lg:border-l-0 border-fz-gray-200 relative">
+                    <div class="lg:hidden absolute left-[-5px] top-2 w-2 h-2 bg-fz-gray-300 rounded-full group-hover:bg-fz-black transition-colors"></div>
+                    <span class="text-sm font-semibold tracking-widest text-fz-red uppercase mb-2 block">03 — Understand</span>
+                    <p class="text-fz-black font-medium text-xl mb-2">Impact</p>
+                    <p class="text-fz-gray-800 text-sm leading-relaxed pr-6">See how everyday spending affects savings and long-term goals.</p>
+                </div>
+            </div>
+            
+            <!-- Timeline Item 04 -->
+            <div class="flex-1 relative group observe-me fz-reveal-up" data-delay="400">
+                <div class="hidden lg:block w-3 h-3 bg-white border-2 border-fz-gray-300 rounded-full absolute top-[21.5px] -translate-y-1/2 group-hover:border-fz-black transition-colors z-10"></div>
+                <div class="lg:pt-12 pl-6 lg:pl-0 border-l lg:border-l-0 border-fz-gray-200 relative">
+                    <div class="lg:hidden absolute left-[-5px] top-2 w-2 h-2 bg-fz-gray-300 rounded-full group-hover:bg-fz-black transition-colors"></div>
+                    <span class="text-sm font-semibold tracking-widest text-fz-red uppercase mb-2 block">04 — Decide</span>
+                    <p class="text-fz-black font-medium text-xl mb-2">Inform</p>
+                    <p class="text-fz-gray-800 text-sm leading-relaxed pr-6">Use rule-based insights to make more informed decisions.</p>
+                </div>
+            </div>
+            
+            <!-- Timeline Item 05 -->
+            <div class="flex-1 relative group observe-me fz-reveal-up" data-delay="500">
+                <div class="hidden lg:block w-3 h-3 bg-white border-2 border-fz-gray-300 rounded-full absolute top-[21.5px] -translate-y-1/2 group-hover:border-fz-black transition-colors z-10"></div>
+                <div class="lg:pt-12 pl-6 lg:pl-0 border-l lg:border-l-0 border-transparent relative">
+                    <div class="lg:hidden absolute left-[-5px] top-2 w-2 h-2 bg-fz-gray-300 rounded-full group-hover:bg-fz-black transition-colors"></div>
+                    <span class="text-sm font-semibold tracking-widest text-fz-red uppercase mb-2 block">05 — Improve</span>
+                    <p class="text-fz-black font-medium text-xl mb-2">Habit</p>
+                    <p class="text-fz-gray-800 text-sm leading-relaxed pr-6">Build better financial habits over time through consistency.</p>
+                </div>
+            </div>
+
+        </div>
+        
+    </div>
+</section>
+
+<!-- 07 OUR PHILOSOPHY & 08 WHAT MAKES US DIFFERENT -->
+<section class="py-32 bg-fz-gray-50 border-b border-fz-gray-200 overflow-hidden">
+    <div class="max-w-[1200px] mx-auto px-6">
+        
+        <!-- Philosophy -->
+        <div class="text-center max-w-3xl mx-auto mb-32 observe-me fz-reveal-up">
+            <h2 class="text-4xl md:text-5xl font-semibold tracking-tighter text-fz-black mb-16">
+                Simple principles. Better decisions.
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-12 text-left">
+                <div class="border-l border-fz-red pl-6">
+                    <h4 class="text-lg font-semibold text-fz-black mb-2 uppercase tracking-tight">Transparency</h4>
+                    <p class="text-fz-gray-800 leading-relaxed text-sm">Financial insights should be understandable, not mysterious or obscured by black-box algorithms.</p>
+                </div>
+                <div class="border-l border-fz-red pl-6">
+                    <h4 class="text-lg font-semibold text-fz-black mb-2 uppercase tracking-tight">Awareness</h4>
+                    <p class="text-fz-gray-800 leading-relaxed text-sm">People make better decisions when they clearly understand their own financial patterns.</p>
+                </div>
+                <div class="border-l border-fz-red pl-6">
+                    <h4 class="text-lg font-semibold text-fz-black mb-2 uppercase tracking-tight">Practicality</h4>
+                    <p class="text-fz-gray-800 leading-relaxed text-sm">Financial tools should help with real-life decisions, not just display meaningless raw numbers.</p>
+                </div>
+                <div class="border-l border-fz-red pl-6">
+                    <h4 class="text-lg font-semibold text-fz-black mb-2 uppercase tracking-tight">Consistency</h4>
+                    <p class="text-fz-gray-800 leading-relaxed text-sm">Small financial decisions repeated over time are what shape long-term financial habits.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="w-full h-px bg-fz-gray-200 mb-32"></div>
+        
+        <!-- Comparison -->
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-3xl font-semibold tracking-tighter text-fz-black mb-12 text-center observe-me fz-reveal-up">How we are different</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Traditional -->
+                <div class="bg-white p-10 rounded-3xl border border-fz-gray-200 observe-me fz-reveal-left">
+                    <h3 class="text-sm font-semibold tracking-widest text-fz-gray-400 uppercase mb-6">Traditional Expense Tracker</h3>
+                    <ul class="flex flex-col gap-4 text-fz-gray-800">
+                        <li class="flex items-start gap-3"><span class="text-fz-gray-300 mt-0.5">→</span> Records transactions</li>
+                        <li class="flex items-start gap-3"><span class="text-fz-gray-300 mt-0.5">→</span> Shows spending history</li>
+                        <li class="flex items-start gap-3"><span class="text-fz-gray-300 mt-0.5">→</span> Provides raw information</li>
+                    </ul>
+                </div>
+                
+                <!-- FinZave -->
+                <div class="bg-fz-black text-white p-10 rounded-3xl shadow-xl shadow-fz-black/5 relative overflow-hidden observe-me fz-reveal-right" data-delay="100">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-fz-red/10 rounded-full blur-2xl"></div>
+                    <h3 class="text-sm font-semibold tracking-widest text-fz-red uppercase mb-6 relative z-10">FinZave</h3>
+                    <ul class="flex flex-col gap-4 text-fz-gray-300 relative z-10">
+                        <li class="flex items-start gap-3"><span class="text-fz-red mt-0.5">→</span> Records financial activity</li>
+                        <li class="flex items-start gap-3"><span class="text-fz-red mt-0.5">→</span> Analyzes spending relative to income</li>
+                        <li class="flex items-start gap-3"><span class="text-fz-red mt-0.5">→</span> Calculates savings capacity</li>
+                        <li class="flex items-start gap-3"><span class="text-fz-red mt-0.5">→</span> Helps identify financial patterns</li>
+                        <li class="flex items-start gap-3"><span class="text-fz-red mt-0.5">→</span> Provides transparent rule-based insights</li>
+                        <li class="flex items-start gap-3"><span class="text-fz-red mt-0.5">→</span> Connects spending with financial goals</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</section>
+
+<!-- 09 FINAL CTA -->
+<section class="py-32 bg-fz-white text-center overflow-hidden">
+    <div class="max-w-3xl mx-auto px-6 observe-me fz-reveal-up">
+        <h2 class="text-4xl md:text-6xl font-semibold tracking-tighter text-fz-black mb-6">
+            Your money tells a story.<br/>
+            <span class="text-fz-gray-400">FinZave helps you understand it.</span>
+        </h2>
+        <p class="text-xl text-fz-gray-800 mb-10 max-w-[40ch] mx-auto">
+            Start understanding your spending, savings, and financial goals in one place.
+        </p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a href="{{ url_for('public.signup') }}" class="inline-flex justify-center items-center px-10 py-4 bg-fz-black text-white text-lg font-medium rounded-full hover:bg-fz-red transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-fz-black/10 w-full sm:w-auto">
+                Get Started
+            </a>
+            <a href="{{ url_for('public.services') }}" class="inline-flex justify-center items-center px-10 py-4 bg-white text-fz-black border border-fz-gray-200 text-lg font-medium rounded-full hover:bg-fz-gray-100 transition-colors duration-200 w-full sm:w-auto">
+                Explore Services
+            </a>
+        </div>
+    </div>
+</section>
+
 {% endblock %}

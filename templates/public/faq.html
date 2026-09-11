@@ -1,0 +1,263 @@
+{% extends "base_public.html" %}
+{% block title %}FAQ - FinZave{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Styling for the native details/summary accordion */
+    details > summary {
+        list-style: none;
+    }
+    details > summary::-webkit-details-marker {
+        display: none;
+    }
+    
+    details[open] summary ~ * {
+        animation: slideDown 0.3s ease-out;
+    }
+    
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Icon rotation for open state */
+    details[open] summary .accordion-icon {
+        transform: rotate(180deg);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- HERO SECTION -->
+<section class="pt-32 pb-24 bg-fz-white border-b border-fz-gray-200">
+    <div class="max-w-[800px] mx-auto px-6 text-center observe-me fz-reveal-up">
+        <span class="inline-block px-3 py-1 bg-fz-gray-100 rounded-full text-xs font-semibold tracking-widest text-fz-gray-800 uppercase mb-6 border border-fz-gray-200">
+            FAQ
+        </span>
+        <h1 class="text-4xl md:text-6xl font-bold tracking-tighter text-fz-black mb-6">
+            Everything you need to know about FinZave.
+        </h1>
+    </div>
+</section>
+
+<!-- FAQ CONTENT -->
+<section class="py-24 bg-fz-white">
+    <div class="max-w-[800px] mx-auto px-6">
+        
+        <!-- GENERAL CATEGORY -->
+        <div class="mb-16 observe-me fz-reveal-up">
+            <h2 class="text-xs font-semibold tracking-widest text-fz-red uppercase mb-8 border-b border-fz-gray-200 pb-2">General</h2>
+            
+            <div class="flex flex-col border-b border-fz-gray-200">
+                <details class="group border-t border-fz-gray-200">
+                    <summary class="flex justify-between items-center font-medium cursor-pointer list-none py-6 text-lg text-fz-black hover:text-fz-red transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fz-red focus-visible:ring-offset-2 rounded-sm">
+                        <span>What is FinZave?</span>
+                        <span class="accordion-icon transition-transform duration-300">
+                            <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                        </span>
+                    </summary>
+                    <div class="text-fz-gray-700 pb-6 leading-relaxed">
+                        FinZave is a personal finance assistant that helps you record your income and expenses, and uses rule-based logic to analyze your spending behavior.
+                    </div>
+                </details>
+
+                <details class="group border-t border-fz-gray-200">
+                    <summary class="flex justify-between items-center font-medium cursor-pointer list-none py-6 text-lg text-fz-black hover:text-fz-red transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fz-red focus-visible:ring-offset-2 rounded-sm">
+                        <span>Who is FinZave for?</span>
+                        <span class="accordion-icon transition-transform duration-300">
+                            <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                        </span>
+                    </summary>
+                    <div class="text-fz-gray-700 pb-6 leading-relaxed">
+                        It is designed for individuals who want to move beyond simple expense tracking to actually understanding their financial patterns and saving capacity.
+                    </div>
+                </details>
+
+                <details class="group border-t border-fz-gray-200">
+                    <summary class="flex justify-between items-center font-medium cursor-pointer list-none py-6 text-lg text-fz-black hover:text-fz-red transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fz-red focus-visible:ring-offset-2 rounded-sm">
+                        <span>What does FinZave help with?</span>
+                        <span class="accordion-icon transition-transform duration-300">
+                            <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                        </span>
+                    </summary>
+                    <div class="text-fz-gray-700 pb-6 leading-relaxed">
+                        FinZave helps you record financial data, track goals, analyze monthly spending, and receive transparent insights to support better financial decisions.
+                    </div>
+                </details>
+            </div>
+        </div>
+
+        <!-- WORKING CATEGORY -->
+        <div class="mb-16 observe-me fz-reveal-up">
+            <h2 class="text-xs font-semibold tracking-widest text-fz-red uppercase mb-8 border-b border-fz-gray-200 pb-2">Working</h2>
+            
+            <div class="flex flex-col border-b border-fz-gray-200">
+                <details class="group border-t border-fz-gray-200">
+                    <summary class="flex justify-between items-center font-medium cursor-pointer list-none py-6 text-lg text-fz-black hover:text-fz-red transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fz-red focus-visible:ring-offset-2 rounded-sm">
+                        <span>How does FinZave work?</span>
+                        <span class="accordion-icon transition-transform duration-300">
+                            <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                        </span>
+                    </summary>
+                    <div class="text-fz-gray-700 pb-6 leading-relaxed">
+                        You input your income and expenses. FinZave records the data, performs calculations, evaluates your financial state using predefined rules, and presents the insights on your dashboard.
+                    </div>
+                </details>
+
+                <details class="group border-t border-fz-gray-200">
+                    <summary class="flex justify-between items-center font-medium cursor-pointer list-none py-6 text-lg text-fz-black hover:text-fz-red transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fz-red focus-visible:ring-offset-2 rounded-sm">
+                        <span>How is savings calculated?</span>
+                        <span class="accordion-icon transition-transform duration-300">
+                            <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                        </span>
+                    </summary>
+                    <div class="text-fz-gray-700 pb-6 leading-relaxed">
+                        Savings are calculated mathematically by subtracting your total recorded expenses from your total recorded income over a given period.
+                    </div>
+                </details>
+
+                <details class="group border-t border-fz-gray-200">
+                    <summary class="flex justify-between items-center font-medium cursor-pointer list-none py-6 text-lg text-fz-black hover:text-fz-red transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fz-red focus-visible:ring-offset-2 rounded-sm">
+                        <span>How does financial analysis work?</span>
+                        <span class="accordion-icon transition-transform duration-300">
+                            <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                        </span>
+                    </summary>
+                    <div class="text-fz-gray-700 pb-6 leading-relaxed">
+                        Financial analysis aggregates your data to compute metrics like your savings rate and breaks down your spending by category.
+                    </div>
+                </details>
+
+                <details class="group border-t border-fz-gray-200">
+                    <summary class="flex justify-between items-center font-medium cursor-pointer list-none py-6 text-lg text-fz-black hover:text-fz-red transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fz-red focus-visible:ring-offset-2 rounded-sm">
+                        <span>How are insights generated?</span>
+                        <span class="accordion-icon transition-transform duration-300">
+                            <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                        </span>
+                    </summary>
+                    <div class="text-fz-gray-700 pb-6 leading-relaxed">
+                        Insights are generated when your calculated financial metrics match specific, predefined conditions in our rule engine (e.g., if expenses exceed a certain percentage of income).
+                    </div>
+                </details>
+
+                <details class="group border-t border-fz-gray-200">
+                    <summary class="flex justify-between items-center font-medium cursor-pointer list-none py-6 text-lg text-fz-black hover:text-fz-red transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fz-red focus-visible:ring-offset-2 rounded-sm">
+                        <span>Does FinZave use machine learning?</span>
+                        <span class="accordion-icon transition-transform duration-300">
+                            <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                        </span>
+                    </summary>
+                    <div class="text-fz-gray-700 pb-6 leading-relaxed font-medium">
+                        FinZave uses predefined, rule-based financial logic rather than a trained machine-learning model to generate insights.
+                    </div>
+                </details>
+            </div>
+        </div>
+
+        <!-- FEATURES CATEGORY -->
+        <div class="mb-16 observe-me fz-reveal-up">
+            <h2 class="text-xs font-semibold tracking-widest text-fz-red uppercase mb-8 border-b border-fz-gray-200 pb-2">Features</h2>
+            
+            <div class="flex flex-col border-b border-fz-gray-200">
+                <details class="group border-t border-fz-gray-200">
+                    <summary class="flex justify-between items-center font-medium cursor-pointer list-none py-6 text-lg text-fz-black hover:text-fz-red transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fz-red focus-visible:ring-offset-2 rounded-sm">
+                        <span>How does expense management work?</span>
+                        <span class="accordion-icon transition-transform duration-300">
+                            <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                        </span>
+                    </summary>
+                    <div class="text-fz-gray-700 pb-6 leading-relaxed">
+                        You log your everyday expenses with an amount and category. FinZave stores them to calculate your total monthly outflow and categorical spending.
+                    </div>
+                </details>
+
+                <details class="group border-t border-fz-gray-200">
+                    <summary class="flex justify-between items-center font-medium cursor-pointer list-none py-6 text-lg text-fz-black hover:text-fz-red transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fz-red focus-visible:ring-offset-2 rounded-sm">
+                        <span>How do financial goals work?</span>
+                        <span class="accordion-icon transition-transform duration-300">
+                            <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                        </span>
+                    </summary>
+                    <div class="text-fz-gray-700 pb-6 leading-relaxed">
+                        You define a target amount and date. FinZave tracks your current saved amount against the target, providing progress percentages and required monthly saving figures.
+                    </div>
+                </details>
+
+                <details class="group border-t border-fz-gray-200">
+                    <summary class="flex justify-between items-center font-medium cursor-pointer list-none py-6 text-lg text-fz-black hover:text-fz-red transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fz-red focus-visible:ring-offset-2 rounded-sm">
+                        <span>What is financial analysis?</span>
+                        <span class="accordion-icon transition-transform duration-300">
+                            <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                        </span>
+                    </summary>
+                    <div class="text-fz-gray-700 pb-6 leading-relaxed">
+                        It is the process where your raw income and expense records are evaluated over time to show you where your money is going and how well you are saving.
+                    </div>
+                </details>
+
+                <details class="group border-t border-fz-gray-200">
+                    <summary class="flex justify-between items-center font-medium cursor-pointer list-none py-6 text-lg text-fz-black hover:text-fz-red transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fz-red focus-visible:ring-offset-2 rounded-sm">
+                        <span>What are SIP and EMI calculators?</span>
+                        <span class="accordion-icon transition-transform duration-300">
+                            <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                        </span>
+                    </summary>
+                    <div class="text-fz-gray-700 pb-6 leading-relaxed">
+                        These are mathematical tools. The SIP calculator projects compounding returns over time, while the EMI calculator computes monthly loan repayment amounts.
+                    </div>
+                </details>
+
+                <details class="group border-t border-fz-gray-200">
+                    <summary class="flex justify-between items-center font-medium cursor-pointer list-none py-6 text-lg text-fz-black hover:text-fz-red transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fz-red focus-visible:ring-offset-2 rounded-sm">
+                        <span>Does FinZave provide investment-related functionality?</span>
+                        <span class="accordion-icon transition-transform duration-300">
+                            <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                        </span>
+                    </summary>
+                    <div class="text-fz-gray-700 pb-6 leading-relaxed">
+                        FinZave provides mathematical calculators (like SIP) for estimating returns, but it does not execute trades, manage portfolios, or provide investment advice.
+                    </div>
+                </details>
+            </div>
+        </div>
+
+        <!-- DATA CATEGORY -->
+        <div class="mb-16 observe-me fz-reveal-up">
+            <h2 class="text-xs font-semibold tracking-widest text-fz-red uppercase mb-8 border-b border-fz-gray-200 pb-2">Data</h2>
+            
+            <div class="flex flex-col border-b border-fz-gray-200">
+                <details class="group border-t border-fz-gray-200">
+                    <summary class="flex justify-between items-center font-medium cursor-pointer list-none py-6 text-lg text-fz-black hover:text-fz-red transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fz-red focus-visible:ring-offset-2 rounded-sm">
+                        <span>What information does FinZave use?</span>
+                        <span class="accordion-icon transition-transform duration-300">
+                            <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                        </span>
+                    </summary>
+                    <div class="text-fz-gray-700 pb-6 leading-relaxed">
+                        FinZave uses only the financial records you explicitly input, such as your income entries, expense logs, and financial goals.
+                    </div>
+                </details>
+
+                <details class="group border-t border-fz-gray-200">
+                    <summary class="flex justify-between items-center font-medium cursor-pointer list-none py-6 text-lg text-fz-black hover:text-fz-red transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fz-red focus-visible:ring-offset-2 rounded-sm">
+                        <span>Can financial records be edited or deleted?</span>
+                        <span class="accordion-icon transition-transform duration-300">
+                            <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                        </span>
+                    </summary>
+                    <div class="text-fz-gray-700 pb-6 leading-relaxed">
+                        Yes, you retain full control over your data. Any logged income or expense can be updated or removed from your records at any time.
+                    </div>
+                </details>
+            </div>
+        </div>
+        
+    </div>
+</section>
+{% endblock %}

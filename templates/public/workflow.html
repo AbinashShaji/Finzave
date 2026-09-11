@@ -1,0 +1,475 @@
+{% extends "base_public.html" %}
+{% block title %}Workflow - FinZave{% endblock %}
+
+{% block content %}
+
+<!-- 01 HERO -->
+<section
+    class="relative pt-32 pb-40 overflow-hidden bg-fz-white flex flex-col justify-center min-h-[85vh] border-b border-fz-gray-200">
+    <div class="max-w-[1200px] mx-auto px-6 w-full z-10">
+        <div class="max-w-4xl mb-24 observe-me fz-reveal-up">
+            <span
+                class="inline-block px-3 py-1 bg-fz-gray-100 rounded-full text-xs font-semibold tracking-widest text-fz-gray-800 uppercase mb-8 border border-fz-gray-200">
+                How FinZave Works
+            </span>
+
+            <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-[0.95] text-fz-black mb-8">
+                Workflow
+            </h1>
+
+            <p class="text-2xl md:text-3xl font-medium tracking-tight text-fz-gray-800 leading-tight mb-8">
+                From financial data to meaningful financial insights.
+            </p>
+
+            <p class="text-xl text-fz-gray-600 leading-relaxed max-w-[55ch]">
+                See how FinZave takes your financial information through recording, calculation, analysis and rule-based
+                evaluation to produce useful insights.
+            </p>
+        </div>
+
+        <!-- Main Flow -->
+        <div class="flex flex-col md:flex-row items-center justify-center gap-3 text-xs font-semibold tracking-widest text-fz-gray-500 uppercase overflow-x-auto no-scrollbar pb-8 mb-12 fz-wf-sequence-container">
+            <span class="px-4 py-2 border border-fz-gray-200 rounded-full whitespace-nowrap opacity-0 fz-wf-step transition-all duration-500">Input</span>
+            <span class="text-fz-gray-300 hidden md:inline opacity-0 fz-wf-step transition-all duration-500 origin-left">&rarr;</span>
+            <span class="text-fz-gray-300 md:hidden opacity-0 fz-wf-step transition-all duration-500 origin-top">&darr;</span>
+            <span class="px-4 py-2 border border-fz-gray-200 rounded-full whitespace-nowrap opacity-0 fz-wf-step transition-all duration-500">Record</span>
+            <span class="text-fz-gray-300 hidden md:inline opacity-0 fz-wf-step transition-all duration-500 origin-left">&rarr;</span>
+            <span class="text-fz-gray-300 md:hidden opacity-0 fz-wf-step transition-all duration-500 origin-top">&darr;</span>
+            <span class="px-4 py-2 border border-fz-gray-200 rounded-full whitespace-nowrap opacity-0 fz-wf-step transition-all duration-500">Calculate</span>
+            <span class="text-fz-gray-300 hidden md:inline opacity-0 fz-wf-step transition-all duration-500 origin-left">&rarr;</span>
+            <span class="text-fz-gray-300 md:hidden opacity-0 fz-wf-step transition-all duration-500 origin-top">&darr;</span>
+            <span class="px-4 py-2 border border-fz-gray-200 rounded-full whitespace-nowrap opacity-0 fz-wf-step transition-all duration-500">Analyze</span>
+            <span class="text-fz-gray-300 hidden md:inline opacity-0 fz-wf-step transition-all duration-500 origin-left">&rarr;</span>
+            <span class="text-fz-gray-300 md:hidden opacity-0 fz-wf-step transition-all duration-500 origin-top">&darr;</span>
+            <span class="px-4 py-2 bg-fz-gray-100 text-fz-black rounded-full whitespace-nowrap border border-fz-gray-300 opacity-0 fz-wf-step transition-all duration-500">Evaluate</span>
+            <span class="text-fz-gray-300 hidden md:inline opacity-0 fz-wf-step transition-all duration-500 origin-left">&rarr;</span>
+            <span class="text-fz-gray-300 md:hidden opacity-0 fz-wf-step transition-all duration-500 origin-top">&darr;</span>
+            <span class="px-4 py-2 bg-fz-red text-white rounded-full whitespace-nowrap shadow-md shadow-fz-red/20 opacity-0 fz-wf-step transition-all duration-500">Insight</span>
+            <span class="text-fz-gray-300 hidden md:inline opacity-0 fz-wf-step transition-all duration-500 origin-left">&rarr;</span>
+            <span class="text-fz-gray-300 md:hidden opacity-0 fz-wf-step transition-all duration-500 origin-top">&darr;</span>
+            <span class="px-4 py-2 bg-fz-black text-white rounded-full whitespace-nowrap opacity-0 fz-wf-step transition-all duration-500">Decide</span>
+        </div>
+    </div>
+    <div
+        class="absolute top-0 right-0 w-[800px] h-[800px] bg-gradient-to-bl from-fz-gray-100 to-transparent rounded-full blur-[120px] -z-10 opacity-60 translate-x-1/4 -translate-y-1/4">
+    </div>
+</section>
+
+<!-- 02 HOW IT WORKS -->
+<section class="py-32 bg-fz-white border-b border-fz-gray-200 overflow-hidden">
+    <div class="max-w-[1200px] mx-auto px-6">
+        <h2 class="text-4xl md:text-5xl font-semibold tracking-tighter text-fz-black mb-20 text-center observe-me fz-reveal-up">
+            How It Works
+        </h2>
+
+        <div class="max-w-4xl mx-auto flex flex-col relative">
+            <!-- Vertical connecting line -->
+            <div class="absolute left-[23px] md:left-[39px] top-8 bottom-8 w-px bg-fz-gray-200 z-0"></div>
+
+            <!-- 01 Input -->
+            <div class="flex items-start gap-8 md:gap-12 relative z-10 mb-16 group observe-me fz-reveal-up">
+                <div
+                    class="w-12 h-12 md:w-20 md:h-20 bg-fz-white border border-fz-gray-200 rounded-full flex items-center justify-center font-light text-xl md:text-3xl text-fz-gray-400 group-hover:border-fz-black group-hover:text-fz-black transition-colors shrink-0 fz-number-transition">
+                    01</div>
+                <div class="pt-2 md:pt-4 w-full">
+                    <h3
+                        class="text-xl md:text-2xl font-semibold text-fz-black mb-4 tracking-tight uppercase tracking-widest text-sm text-fz-red">
+                        Input</h3>
+                    <div
+                        class="bg-fz-gray-50 border border-fz-gray-200 rounded-2xl p-6 md:p-8 w-full flex flex-col gap-6">
+                        <div class="flex flex-col md:flex-row md:items-start gap-2 md:gap-8">
+                            <span
+                                class="text-xs font-semibold tracking-widest text-fz-gray-400 uppercase md:w-24 shrink-0 mt-1">Input</span>
+                            <span class="text-fz-black text-lg">User enters financial information such as income,
+                                expenses and goals.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 02 Record -->
+            <div class="flex items-start gap-8 md:gap-12 relative z-10 mb-16 group observe-me fz-reveal-up">
+                <div
+                    class="w-12 h-12 md:w-20 md:h-20 bg-fz-white border border-fz-gray-200 rounded-full flex items-center justify-center font-light text-xl md:text-3xl text-fz-gray-400 group-hover:border-fz-black group-hover:text-fz-black transition-colors shrink-0 fz-number-transition">
+                    02</div>
+                <div class="pt-2 md:pt-4 w-full">
+                    <h3
+                        class="text-xl md:text-2xl font-semibold text-fz-black mb-4 tracking-tight uppercase tracking-widest text-sm text-fz-red">
+                        Record</h3>
+                    <div
+                        class="bg-fz-gray-50 border border-fz-gray-200 rounded-2xl p-6 md:p-8 w-full flex flex-col gap-6">
+                        <div class="flex flex-col md:flex-row md:items-start gap-2 md:gap-8">
+                            <span
+                                class="text-xs font-semibold tracking-widest text-fz-gray-400 uppercase md:w-24 shrink-0 mt-1">Process</span>
+                            <span class="text-fz-black text-lg">FinZave stores and organizes the entered information
+                                securely.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 03 Calculate -->
+            <div class="flex items-start gap-8 md:gap-12 relative z-10 mb-16 group observe-me fz-reveal-up">
+                <div
+                    class="w-12 h-12 md:w-20 md:h-20 bg-fz-white border border-fz-gray-200 rounded-full flex items-center justify-center font-light text-xl md:text-3xl text-fz-gray-400 group-hover:border-fz-black group-hover:text-fz-black transition-colors shrink-0 fz-number-transition">
+                    03</div>
+                <div class="pt-2 md:pt-4 w-full">
+                    <h3
+                        class="text-xl md:text-2xl font-semibold text-fz-black mb-4 tracking-tight uppercase tracking-widest text-sm text-fz-red">
+                        Calculate</h3>
+                    <div
+                        class="bg-fz-gray-50 border border-fz-gray-200 rounded-2xl p-6 md:p-8 w-full flex flex-col gap-6">
+                        <div class="flex flex-col md:flex-row md:items-start gap-2 md:gap-8">
+                            <span
+                                class="text-xs font-semibold tracking-widest text-fz-gray-400 uppercase md:w-24 shrink-0 mt-1">Process</span>
+                            <span class="text-fz-black text-lg">FinZave performs the core financial calculations.</span>
+                        </div>
+                        <div
+                            class="flex flex-col md:flex-row md:items-start gap-2 md:gap-8 border-t border-fz-gray-200 pt-6">
+                            <span
+                                class="text-xs font-semibold tracking-widest text-fz-gray-400 uppercase md:w-24 shrink-0 mt-1">Output</span>
+                            <div class="bg-white border border-fz-gray-200 rounded-lg p-4 font-mono text-sm w-full">
+                                Income − Total Expenses = Savings
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 04 Analyze -->
+            <div class="flex items-start gap-8 md:gap-12 relative z-10 mb-16 group observe-me fz-reveal-up">
+                <div
+                    class="w-12 h-12 md:w-20 md:h-20 bg-fz-white border border-fz-gray-200 rounded-full flex items-center justify-center font-light text-xl md:text-3xl text-fz-gray-400 group-hover:border-fz-black group-hover:text-fz-black transition-colors shrink-0 fz-number-transition">
+                    04</div>
+                <div class="pt-2 md:pt-4 w-full">
+                    <h3
+                        class="text-xl md:text-2xl font-semibold text-fz-black mb-4 tracking-tight uppercase tracking-widest text-sm text-fz-red">
+                        Analyze</h3>
+                    <div
+                        class="bg-fz-gray-50 border border-fz-gray-200 rounded-2xl p-6 md:p-8 w-full flex flex-col gap-6">
+                        <div class="flex flex-col md:flex-row md:items-start gap-2 md:gap-8">
+                            <span
+                                class="text-xs font-semibold tracking-widest text-fz-gray-400 uppercase md:w-24 shrink-0 mt-1">Process</span>
+                            <span class="text-fz-black text-lg">FinZave analyzes financial records, spending patterns
+                                and implemented financial metrics (e.g. savings rate, category breakdowns).</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 05 Evaluate -->
+            <div class="flex items-start gap-8 md:gap-12 relative z-10 mb-16 group observe-me fz-reveal-up">
+                <div
+                    class="w-12 h-12 md:w-20 md:h-20 bg-fz-black border border-fz-black rounded-full flex items-center justify-center font-light text-xl md:text-3xl text-white shadow-lg shrink-0 fz-number-transition">
+                    05</div>
+                <div class="pt-2 md:pt-4 w-full">
+                    <h3
+                        class="text-xl md:text-2xl font-semibold text-fz-black mb-4 tracking-tight uppercase tracking-widest text-sm text-fz-red">
+                        Evaluate</h3>
+                    <div
+                        class="bg-fz-gray-900 border border-fz-gray-800 rounded-2xl p-6 md:p-8 w-full flex flex-col gap-6 text-white">
+                        <div class="flex flex-col md:flex-row md:items-start gap-2 md:gap-8">
+                            <span
+                                class="text-xs font-semibold tracking-widest text-fz-gray-500 uppercase md:w-24 shrink-0 mt-1">Process</span>
+                            <span class="text-lg">The rule-based logic evaluates the user's financial conditions against
+                                predefined rules.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 06 Insight -->
+            <div class="flex items-start gap-8 md:gap-12 relative z-10 mb-16 group observe-me fz-reveal-up">
+                <div
+                    class="w-12 h-12 md:w-20 md:h-20 bg-fz-white border border-fz-gray-200 rounded-full flex items-center justify-center font-light text-xl md:text-3xl text-fz-gray-400 group-hover:border-fz-black group-hover:text-fz-black transition-colors shrink-0 fz-number-transition">
+                    06</div>
+                <div class="pt-2 md:pt-4 w-full">
+                    <h3
+                        class="text-xl md:text-2xl font-semibold text-fz-black mb-4 tracking-tight uppercase tracking-widest text-sm text-fz-red">
+                        Insight</h3>
+                    <div
+                        class="bg-fz-gray-50 border border-fz-gray-200 rounded-2xl p-6 md:p-8 w-full flex flex-col gap-6">
+                        <div class="flex flex-col md:flex-row md:items-start gap-2 md:gap-8">
+                            <span
+                                class="text-xs font-semibold tracking-widest text-fz-gray-400 uppercase md:w-24 shrink-0 mt-1">Output</span>
+                            <span class="text-fz-black text-lg">The system converts analysis results into understandable
+                                financial insights and recommendations.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 07 Decide -->
+            <div class="flex items-start gap-8 md:gap-12 relative z-10 group observe-me fz-reveal-up">
+                <div
+                    class="w-12 h-12 md:w-20 md:h-20 bg-fz-white border border-fz-gray-200 rounded-full flex items-center justify-center font-light text-xl md:text-3xl text-fz-gray-400 group-hover:border-fz-black group-hover:text-fz-black transition-colors shrink-0 fz-number-transition">
+                    07</div>
+                <div class="pt-2 md:pt-4 w-full">
+                    <h3
+                        class="text-xl md:text-2xl font-semibold text-fz-black mb-4 tracking-tight uppercase tracking-widest text-sm text-fz-red">
+                        Decide</h3>
+                    <div
+                        class="bg-white border-2 border-fz-black rounded-2xl p-6 md:p-8 w-full flex flex-col gap-6 shadow-xl shadow-fz-black/5">
+                        <div class="flex flex-col md:flex-row md:items-start gap-2 md:gap-8">
+                            <span
+                                class="text-xs font-semibold tracking-widest text-fz-gray-400 uppercase md:w-24 shrink-0 mt-1">Output</span>
+                            <span class="text-fz-black text-lg font-medium">The user uses the information to make more
+                                informed spending, saving or planning decisions.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- 03 THE DATA FLOW & WHERE FEATURES FIT -->
+<section class="py-32 bg-fz-black text-white border-b border-fz-gray-900 overflow-hidden">
+    <div class="max-w-[1200px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
+
+        <!-- Data Flow -->
+        <div class="observe-me fz-reveal-left">
+            <h2 class="text-3xl font-semibold tracking-tighter mb-12">The Data Flow</h2>
+
+            <div
+                class="flex flex-col items-center justify-center text-center text-sm font-semibold tracking-widest uppercase">
+                <div class="w-full bg-white text-fz-black rounded-xl p-5 shadow-lg">USER</div>
+                <div class="h-6 flex items-center"><span class="text-fz-gray-500">&darr;</span></div>
+                <div class="w-full bg-fz-gray-900 border border-fz-gray-800 rounded-xl p-5">INCOME / EXPENSE / GOAL DATA
+                </div>
+                <div class="h-6 flex items-center"><span class="text-fz-gray-500">&darr;</span></div>
+                <div class="w-full bg-fz-gray-900 border border-fz-gray-800 rounded-xl p-5">FINANCIAL RECORDS</div>
+                <div class="h-6 flex items-center"><span class="text-fz-gray-500">&darr;</span></div>
+                <div class="w-full bg-fz-gray-900 border border-fz-gray-800 rounded-xl p-5">CALCULATIONS</div>
+                <div class="h-6 flex items-center"><span class="text-fz-gray-500">&darr;</span></div>
+                <div class="w-full bg-fz-gray-900 border border-fz-gray-800 rounded-xl p-5">ANALYSIS</div>
+                <div class="h-6 flex items-center"><span class="text-fz-gray-500">&darr;</span></div>
+                <div class="w-full border-2 border-fz-red bg-fz-red/10 rounded-xl p-5 text-fz-red">RULE-BASED EVALUATION
+                </div>
+                <div class="h-6 flex items-center"><span class="text-fz-gray-500">&darr;</span></div>
+                <div class="w-full bg-fz-gray-900 border border-fz-gray-800 rounded-xl p-5">INSIGHTS</div>
+                <div class="h-6 flex items-center"><span class="text-fz-gray-500">&darr;</span></div>
+                <div class="w-full bg-fz-gray-900 border border-fz-gray-800 rounded-xl p-5">DASHBOARD</div>
+                <div class="h-6 flex items-center"><span class="text-fz-gray-500">&darr;</span></div>
+                <div class="w-full bg-white text-fz-black rounded-xl p-5 shadow-[0_0_30px_rgba(255,255,255,0.1)]">USER
+                    DECISION</div>
+            </div>
+        </div>
+
+        <!-- Where Features Fit -->
+        <div class="observe-me fz-reveal-right" data-delay="100">
+            <h2 class="text-3xl font-semibold tracking-tighter mb-12">Where Features Fit</h2>
+
+            <div class="flex flex-col relative border-l border-fz-gray-800 pl-8 ml-4">
+
+                <div class="mb-10 relative">
+                    <div class="absolute -left-[37px] top-1.5 w-2 h-2 rounded-full bg-fz-gray-500"></div>
+                    <span class="text-xs font-semibold tracking-widest text-fz-red uppercase mb-3 block">INPUT</span>
+                    <ul class="flex flex-col gap-2 text-fz-gray-300">
+                        <li class="flex items-center gap-2"><span class="w-1 h-1 bg-white rounded-full"></span> Income
+                        </li>
+                        <li class="flex items-center gap-2"><span class="w-1 h-1 bg-white rounded-full"></span> Expenses
+                        </li>
+                        <li class="flex items-center gap-2"><span class="w-1 h-1 bg-white rounded-full"></span> Goals
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="mb-10 relative">
+                    <div class="absolute -left-[37px] top-1.5 w-2 h-2 rounded-full bg-fz-gray-500"></div>
+                    <span
+                        class="text-xs font-semibold tracking-widest text-fz-red uppercase mb-3 block">CALCULATE</span>
+                    <ul class="flex flex-col gap-2 text-fz-gray-300">
+                        <li class="flex items-center gap-2"><span class="w-1 h-1 bg-white rounded-full"></span> Savings
+                        </li>
+                        <li class="flex items-center gap-2"><span class="w-1 h-1 bg-white rounded-full"></span> SIP</li>
+                        <li class="flex items-center gap-2"><span class="w-1 h-1 bg-white rounded-full"></span> EMI</li>
+                    </ul>
+                </div>
+
+                <div class="mb-10 relative">
+                    <div class="absolute -left-[37px] top-1.5 w-2 h-2 rounded-full bg-fz-gray-500"></div>
+                    <span class="text-xs font-semibold tracking-widest text-fz-red uppercase mb-3 block">ANALYZE</span>
+                    <ul class="flex flex-col gap-2 text-fz-gray-300">
+                        <li class="flex items-center gap-2"><span class="w-1 h-1 bg-white rounded-full"></span>
+                            Financial Analysis</li>
+                        <li class="flex items-center gap-2"><span class="w-1 h-1 bg-white rounded-full"></span> Spending
+                            Analysis</li>
+                        <li class="flex items-center gap-2"><span class="w-1 h-1 bg-white rounded-full"></span>
+                            Monthly/Yearly Analysis</li>
+                    </ul>
+                </div>
+
+                <div class="mb-10 relative">
+                    <div class="absolute -left-[39px] top-1 w-3 h-3 rounded-full bg-fz-red"></div>
+                    <span class="text-xs font-semibold tracking-widest text-fz-red uppercase mb-3 block">EVALUATE</span>
+                    <ul class="flex flex-col gap-2 text-fz-gray-300">
+                        <li class="flex items-center gap-2"><span class="w-1 h-1 bg-fz-red rounded-full"></span>
+                            Rule-Based Logic</li>
+                    </ul>
+                </div>
+
+                <div class="relative">
+                    <div class="absolute -left-[37px] top-1.5 w-2 h-2 rounded-full bg-fz-gray-500"></div>
+                    <span class="text-xs font-semibold tracking-widest text-fz-red uppercase mb-3 block">OUTPUT</span>
+                    <ul class="flex flex-col gap-2 text-fz-gray-300">
+                        <li class="flex items-center gap-2"><span class="w-1 h-1 bg-white rounded-full"></span>
+                            Dashboard</li>
+                        <li class="flex items-center gap-2"><span class="w-1 h-1 bg-white rounded-full"></span>
+                            Financial Insights</li>
+                        <li class="flex items-center gap-2"><span class="w-1 h-1 bg-white rounded-full"></span> Goal
+                            Progress</li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- 04 RULE-BASED LOGIC & DASHBOARD ROLE -->
+<section class="py-32 bg-fz-white border-b border-fz-gray-200 overflow-hidden">
+    <div class="max-w-[1200px] mx-auto px-6">
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-20">
+
+            <!-- Rule Engine -->
+            <div class="observe-me fz-reveal-left">
+                <h2 class="text-4xl font-semibold tracking-tighter text-fz-black mb-8">Rule-Based Logic</h2>
+                <div
+                    class="bg-fz-gray-50 border border-fz-gray-200 rounded-3xl p-8 md:p-12 h-full flex flex-col justify-between">
+                    <div>
+                        <p class="text-xl text-fz-gray-800 leading-relaxed mb-8 border-l-2 border-fz-red pl-6">
+                            FinZave uses predefined, transparent rules to evaluate financial conditions. It does not use
+                            a trained machine-learning model to generate recommendations.
+                        </p>
+
+                        <!-- Mini Flow -->
+                        <div
+                            class="flex items-center gap-3 text-xs font-semibold tracking-widest text-fz-gray-500 uppercase flex-wrap mb-12">
+                            <span>FINANCIAL DATA</span>
+                            <span>&rarr;</span>
+                            <span>CALCULATED METRICS</span>
+                            <span>&rarr;</span>
+                            <span class="text-fz-black">PREDEFINED RULES</span>
+                            <span>&rarr;</span>
+                            <span>CONDITION CHECK</span>
+                            <span>&rarr;</span>
+                            <span>MATCH</span>
+                            <span>&rarr;</span>
+                            <span class="text-fz-red">INSIGHT</span>
+                        </div>
+                    </div>
+
+                    <!-- Code Example -->
+                    <div class="bg-white border-2 border-fz-black rounded-2xl p-6 text-center shadow-xl mt-auto relative overflow-hidden flex flex-col justify-center min-h-[220px]">
+                        <div class="flex justify-center mb-4">
+                            <div class="p-3 bg-fz-black rounded-full shadow-md">
+                                <i data-lucide="workflow" class="w-5 h-5 text-white"></i>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-2 items-center relative z-10">
+                            <div class="inline-flex items-center gap-2 bg-fz-gray-50 border border-fz-gray-200 rounded-lg px-4 py-2 font-mono text-sm text-fz-black w-full justify-center">
+                                <span class="font-bold text-fz-gray-400">IF</span> Total Expenses &gt; 80%
+                            </div>
+                            <div class="h-4 w-px bg-fz-gray-300"></div>
+                            <div class="inline-flex items-center gap-2 bg-fz-red/10 border border-fz-red/30 rounded-lg px-4 py-2 font-mono text-sm text-fz-red font-medium w-full justify-center">
+                                <span class="font-bold">THEN</span> Issue Warning
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Role -->
+            <div class="observe-me fz-reveal-right" data-delay="100">
+                <h2 class="text-4xl font-semibold tracking-tighter text-fz-black mb-8">Dashboard Role</h2>
+                <div class="flex flex-col h-full justify-between">
+                    <p class="text-xl text-fz-gray-800 leading-relaxed mb-12">
+                        The dashboard acts as the visualization layer. It is where processing and analysis are outputted
+                        to the user.
+                    </p>
+
+                    <div
+                        class="flex items-center gap-3 text-xs font-semibold tracking-widest text-fz-gray-500 uppercase flex-wrap mb-12">
+                        <span>USER DATA</span>
+                        <span>&rarr;</span>
+                        <span>PROCESSING</span>
+                        <span>&rarr;</span>
+                        <span>ANALYSIS</span>
+                        <span>&rarr;</span>
+                        <span class="px-4 py-1.5 bg-fz-black text-white rounded-full flex items-center gap-2">
+                            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                            DASHBOARD
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-white border border-fz-gray-200 p-5 rounded-xl">
+                            <span
+                                class="block text-xs font-semibold tracking-widest text-fz-gray-400 uppercase mb-2">Display</span>
+                            <span class="block text-lg font-medium text-fz-black">Income</span>
+                        </div>
+                        <div class="bg-white border border-fz-gray-200 p-5 rounded-xl">
+                            <span
+                                class="block text-xs font-semibold tracking-widest text-fz-gray-400 uppercase mb-2">Display</span>
+                            <span class="block text-lg font-medium text-fz-black">Total Expenses</span>
+                        </div>
+                        <div class="bg-white border border-fz-gray-200 p-5 rounded-xl">
+                            <span
+                                class="block text-xs font-semibold tracking-widest text-fz-gray-400 uppercase mb-2">Display</span>
+                            <span class="block text-lg font-medium text-fz-black">Savings / Rate</span>
+                        </div>
+                        <div class="bg-white border border-fz-gray-200 p-5 rounded-xl">
+                            <span
+                                class="block text-xs font-semibold tracking-widest text-fz-gray-400 uppercase mb-2">Display</span>
+                            <span class="block text-lg font-medium text-fz-black">Goals</span>
+                        </div>
+                        <div class="bg-white border border-fz-gray-200 p-5 rounded-xl">
+                            <span
+                                class="block text-xs font-semibold tracking-widest text-fz-gray-400 uppercase mb-2">Visualization</span>
+                            <span class="block text-lg font-medium text-fz-black">Charts</span>
+                        </div>
+                        <div class="bg-fz-red/5 border border-fz-red/20 p-5 rounded-xl">
+                            <span
+                                class="block text-xs font-semibold tracking-widest text-fz-red uppercase mb-2">Evaluation</span>
+                            <span class="block text-lg font-medium text-fz-red">Insights</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- 05 CONTINUOUS WORKFLOW -->
+<section class="py-32 bg-fz-gray-50 text-center overflow-hidden">
+    <div class="max-w-4xl mx-auto px-6 flex flex-col items-center observe-me fz-reveal-up">
+        <h2 class="text-3xl font-semibold tracking-tighter text-fz-black mb-6">Continuous Financial Tracking</h2>
+        <p class="text-xl text-fz-gray-800 mb-16 max-w-[50ch]">
+            FinZave is designed for continuous financial tracking and improvement rather than a one-time calculation.
+        </p>
+
+        <div
+            class="flex items-center justify-center gap-3 md:gap-6 text-sm font-semibold tracking-widest text-fz-gray-800 uppercase flex-wrap">
+            <span class="px-5 py-2 bg-white border border-fz-gray-200 rounded-full shadow-sm">Input</span>
+            <span class="text-fz-gray-400">&rarr;</span>
+            <span class="px-5 py-2 bg-white border border-fz-gray-200 rounded-full shadow-sm">Analyze</span>
+            <span class="text-fz-gray-400">&rarr;</span>
+            <span class="px-5 py-2 bg-white border border-fz-gray-200 rounded-full shadow-sm">Insight</span>
+            <span class="text-fz-gray-400">&rarr;</span>
+            <span class="px-5 py-2 bg-white border border-fz-gray-200 rounded-full shadow-sm">Decision</span>
+            <span class="text-fz-red">&rarr;</span>
+            <span class="px-5 py-2 bg-fz-black text-white rounded-full shadow-lg">New Data</span>
+        </div>
+
+        <div class="mt-8 text-xs font-semibold tracking-widest text-fz-gray-400 uppercase">
+            &circlearrowright; Cycle repeats
+        </div>
+    </div>
+</section>
+
+{% endblock %}
