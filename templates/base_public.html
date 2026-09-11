@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}FinZave - Intelligent Personal Finance Assistant{% endblock %}</title>
+    
+    <!-- Fonts: Outfit (modern, clean, geometric sans-serif) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS (CDN for rapid prototyping without build tools) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        fz: {
+                            black: '#0a0a0a',
+                            white: '#ffffff',
+                            gray: {
+                                100: '#f4f4f5',
+                                200: '#e4e4e7',
+                                300: '#d4d4d8',
+                                800: '#27272a',
+                                900: '#18181b',
+                            },
+                            red: {
+                                DEFAULT: '#e11d48',
+                                hover: '#be123c',
+                            }
+                        }
+                    },
+                    boxShadow: {
+                        'glass': '0 4px 30px rgba(0, 0, 0, 0.05)',
+                        'glass-dark': '0 4px 30px rgba(0, 0, 0, 0.2)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Base reset and subtle smooth behaviors */
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background-color: theme('colors.fz.white');
+            color: theme('colors.fz.black');
+        }
+        
+        /* Glassmorphism utility classes */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: theme('boxShadow.glass');
+        }
+        
+        /* Hide scrollbar for clean horizontal scrolls */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="min-h-screen flex flex-col bg-white text-fz-black selection:bg-fz-red selection:text-white">
+
+    <!-- Public Navbar -->
+    <nav class="sticky top-0 z-50 w-full glass-panel border-b border-fz-gray-200/50">
+        <div class="max-w-[1400px] mx-auto px-6 h-[72px] flex items-center justify-between">
+            
+            <!-- Logo -->
+            <a href="{{ url_for('public.home') }}" class="flex items-center gap-2 group">
+                <div class="w-8 h-8 rounded-lg bg-fz-black text-white flex items-center justify-center font-bold text-xl tracking-tighter group-hover:bg-fz-red transition-colors duration-300">
+                    FZ
+                </div>
+                <span class="font-bold text-xl tracking-tight">FinZave</span>
+            </a>
+
+            <!-- Desktop Links -->
+            <div class="hidden lg:flex items-center gap-8 text-sm font-medium">
+                <a href="{{ url_for('public.about') }}" class="text-fz-gray-800 hover:text-fz-red transition-colors">About Us</a>
+                <a href="{{ url_for('public.services') }}" class="text-fz-gray-800 hover:text-fz-red transition-colors">Services</a>
+                <a href="{{ url_for('public.reviews') }}" class="text-fz-gray-800 hover:text-fz-red transition-colors">Reviews</a>
+            </div>
+
+            <!-- Desktop CTAs -->
+            <div class="hidden lg:flex items-center gap-4">
+                <a href="{{ url_for('public.login') }}" class="text-sm font-medium text-fz-black hover:text-fz-red transition-colors">Log in</a>
+                <a href="{{ url_for('public.signup') }}" class="text-sm font-medium bg-fz-black text-white px-5 py-2.5 rounded-full hover:bg-fz-red transition-colors hover:-translate-y-[1px] active:translate-y-0 duration-200">
+                    Get Started
+                </a>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <button id="mobile-menu-btn" class="lg:hidden p-2 text-fz-black" aria-label="Toggle menu">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Mobile Menu (Hidden by default) -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-white border-t border-fz-gray-200 px-6 py-4 flex flex-col gap-4 shadow-lg absolute w-full">
+            <a href="{{ url_for('public.about') }}" class="text-sm font-medium text-fz-gray-800 py-2 border-b border-fz-gray-100">About Us</a>
+            <a href="{{ url_for('public.services') }}" class="text-sm font-medium text-fz-gray-800 py-2 border-b border-fz-gray-100">Services</a>
+            <a href="{{ url_for('public.reviews') }}" class="text-sm font-medium text-fz-gray-800 py-2 border-b border-fz-gray-100">Reviews</a>
+            <div class="flex flex-col gap-3 pt-4">
+                <a href="{{ url_for('public.login') }}" class="text-sm font-medium text-center text-fz-black py-2.5 border border-fz-gray-200 rounded-full">Log in</a>
+                <a href="{{ url_for('public.signup') }}" class="text-sm font-medium text-center bg-fz-black text-white py-2.5 rounded-full">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Public Footer -->
+    <footer class="bg-fz-gray-100 border-t border-fz-gray-200 pt-16 pb-8 mt-24">
+        <div class="max-w-[1400px] mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+            <div class="col-span-1 md:col-span-2">
+                <div class="flex items-center gap-2 mb-6">
+                    <div class="w-6 h-6 rounded bg-fz-black text-white flex items-center justify-center font-bold text-xs tracking-tighter">
+                        FZ
+                    </div>
+                    <span class="font-bold tracking-tight">FinZave</span>
+                </div>
+                <p class="text-sm text-fz-gray-800 max-w-[45ch] leading-relaxed">
+                    Track, analyze, and understand your financial behaviour. 
+                    Intelligent insights to help you make better financial decisions.
+                </p>
+            </div>
+            
+            <div class="col-span-1">
+                <h4 class="font-semibold text-sm mb-4">Product</h4>
+                <ul class="flex flex-col gap-3 text-sm text-fz-gray-800">
+                    <li><a href="{{ url_for('public.services') }}#analysis" class="hover:text-fz-red transition-colors">Analysis</a></li>
+                    <li><a href="{{ url_for('public.services') }}#goals" class="hover:text-fz-red transition-colors">Goals</a></li>
+                    <li><a href="{{ url_for('public.services') }}#planning" class="hover:text-fz-red transition-colors">Planning</a></li>
+                </ul>
+            </div>
+            
+            <div class="col-span-1">
+                <h4 class="font-semibold text-sm mb-4">Company</h4>
+                <ul class="flex flex-col gap-3 text-sm text-fz-gray-800">
+                    <li><a href="{{ url_for('public.about') }}" class="hover:text-fz-red transition-colors">About Us</a></li>
+                    <li><a href="{{ url_for('public.reviews') }}" class="hover:text-fz-red transition-colors">Reviews</a></li>
+                    <li><a href="{{ url_for('public.login') }}" class="hover:text-fz-red transition-colors">Log in</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="max-w-[1400px] mx-auto px-6 pt-8 border-t border-fz-gray-200 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-fz-gray-800">
+            <p>&copy; 2026 FinZave. All rights reserved.</p>
+            <div class="flex gap-6">
+                <a href="#" class="hover:text-fz-red transition-colors">Privacy</a>
+                <a href="#" class="hover:text-fz-red transition-colors">Terms</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Mobile Menu Script -->
+    <script>
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+    </script>
+    
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,125 @@
+{% extends "base_public.html" %}
+{% block title %}FinZave - Intelligent Personal Finance Assistant{% endblock %}
+
+{% block content %}
+<!-- Editorial Hero Section -->
+<section class="relative pt-32 pb-40 overflow-hidden bg-fz-white flex flex-col items-center justify-center min-h-[90vh]">
+    <div class="max-w-[1000px] mx-auto px-6 text-center z-10">
+        
+        <h1 class="text-6xl md:text-8xl lg:text-[7rem] font-bold tracking-tighter leading-[0.95] mb-8 text-fz-black">
+            Understand your money. <br/>
+            <span class="text-fz-gray-300">Don't just track it.</span>
+        </h1>
+        
+        <p class="text-xl md:text-2xl text-fz-gray-800 leading-relaxed max-w-[30ch] mx-auto mb-12">
+            FinZave analyzes your financial behaviour, turning raw data into clear, actionable insights.
+        </p>
+        
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-6">
+            <a href="{{ url_for('public.signup') }}" class="inline-flex justify-center items-center px-10 py-4 bg-fz-black text-white text-lg font-medium rounded-full hover:bg-fz-red transition-all duration-300 hover:-translate-y-1 shadow-xl shadow-fz-black/5">
+                Start Your Journey
+            </a>
+            <a href="{{ url_for('public.services') }}" class="inline-flex justify-center items-center px-8 py-4 bg-transparent text-fz-black text-lg font-medium hover:text-fz-red transition-colors duration-200">
+                See how it works
+            </a>
+        </div>
+    </div>
+    
+    <!-- Subtle depth element: background gradient glow -->
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-tr from-fz-gray-100 to-white rounded-full blur-[100px] -z-10 opacity-50"></div>
+</section>
+
+<!-- The Narrative Section (Typography-Driven) -->
+<section class="py-32 bg-fz-black text-white relative">
+    <div class="max-w-[1200px] mx-auto px-6">
+        
+        <div class="mb-32 md:text-center max-w-3xl mx-auto">
+            <h2 class="text-3xl md:text-5xl font-semibold tracking-tight leading-tight mb-6">
+                Most expense trackers fail because they only look backward.
+            </h2>
+            <p class="text-lg text-fz-gray-300 leading-relaxed">
+                Recording transactions isn't enough. Knowing you spent ₹20,000 last month doesn't tell you if you're spending too much, or if you can afford your next major purchase. 
+                <br/><br/>
+                You don't need another spreadsheet. You need to understand your behaviour.
+            </p>
+        </div>
+
+        <!-- Staggered Editorial Steps -->
+        <div class="flex flex-col gap-0 border-t border-fz-gray-800">
+            
+            <!-- Step 01 -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 py-16 border-b border-fz-gray-800 group transition-colors hover:bg-white/[0.02]">
+                <div class="md:col-span-2">
+                    <span class="text-5xl font-light tracking-tighter text-fz-gray-800 group-hover:text-fz-red transition-colors duration-500">01</span>
+                </div>
+                <div class="md:col-span-4">
+                    <h3 class="text-3xl font-semibold tracking-tight">Track</h3>
+                </div>
+                <div class="md:col-span-6">
+                    <p class="text-lg text-fz-gray-300 leading-relaxed max-w-[40ch]">
+                        Effortlessly record fixed and variable income. Add expenses quickly with smart categorization based on transaction context.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Step 02 -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 py-16 border-b border-fz-gray-800 group transition-colors hover:bg-white/[0.02]">
+                <div class="md:col-span-2">
+                    <span class="text-5xl font-light tracking-tighter text-fz-gray-800 group-hover:text-fz-red transition-colors duration-500">02</span>
+                </div>
+                <div class="md:col-span-4">
+                    <h3 class="text-3xl font-semibold tracking-tight">Analyze</h3>
+                </div>
+                <div class="md:col-span-6">
+                    <p class="text-lg text-fz-gray-300 leading-relaxed max-w-[40ch]">
+                        The engine computes savings rates, trend slopes, and category weights instantly using rule-based architecture.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Step 03 -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 py-16 border-b border-fz-gray-800 group transition-colors hover:bg-white/[0.02]">
+                <div class="md:col-span-2">
+                    <span class="text-5xl font-light tracking-tighter text-fz-gray-800 group-hover:text-fz-red transition-colors duration-500">03</span>
+                </div>
+                <div class="md:col-span-4">
+                    <h3 class="text-3xl font-semibold tracking-tight">Understand</h3>
+                </div>
+                <div class="md:col-span-6">
+                    <p class="text-lg text-fz-gray-300 leading-relaxed max-w-[40ch]">
+                        Detect patterns. Are your expenses rising? Is discretionary spending eating into your savings capacity?
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Step 04 -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 py-16 border-b border-fz-gray-800 group transition-colors hover:bg-white/[0.02]">
+                <div class="md:col-span-2">
+                    <span class="text-5xl font-light tracking-tighter text-fz-gray-800 group-hover:text-fz-red transition-colors duration-500">04</span>
+                </div>
+                <div class="md:col-span-4">
+                    <h3 class="text-3xl font-semibold tracking-tight">Insights & Decisions</h3>
+                </div>
+                <div class="md:col-span-6">
+                    <p class="text-lg text-fz-gray-300 leading-relaxed max-w-[40ch]">
+                        Test your readiness. Before committing to a new EMI or SIP, FinZave evaluates affordability against your actual savings rate.
+                    </p>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-32 bg-fz-white text-center">
+    <div class="max-w-3xl mx-auto px-6">
+        <h2 class="text-4xl md:text-6xl font-semibold tracking-tighter text-fz-black mb-8">
+            Take control of your financial behaviour today.
+        </h2>
+        <a href="{{ url_for('public.signup') }}" class="inline-flex justify-center items-center px-10 py-4 bg-fz-black text-white text-lg font-medium rounded-full hover:bg-fz-red transition-all duration-300 hover:-translate-y-1 shadow-lg shadow-fz-black/10">
+            Start with FinZave
+        </a>
+    </div>
+</section>
+{% endblock %}

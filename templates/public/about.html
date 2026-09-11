@@ -1,0 +1,63 @@
+{% extends "base_public.html" %}
+{% block title %}About Us - FinZave{% endblock %}
+
+{% block content %}
+<section class="py-24 bg-fz-white">
+    <div class="max-w-[1400px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-16">
+        
+        <!-- Sticky Title Area -->
+        <div class="lg:col-span-5 relative">
+            <div class="lg:sticky lg:top-32">
+                <h1 class="text-4xl md:text-6xl font-bold tracking-tighter leading-tight text-fz-black mb-6">
+                    We built a finance assistant, not a ledger.
+                </h1>
+                <p class="text-lg text-fz-gray-800 leading-relaxed max-w-[35ch]">
+                    The core philosophy behind FinZave is simple: raw data isn't enough to change financial outcomes. 
+                </p>
+            </div>
+        </div>
+        
+        <!-- Content Area -->
+        <div class="lg:col-span-7 flex flex-col gap-20">
+            
+            <article>
+                <h2 class="text-2xl font-semibold tracking-tight text-fz-black mb-4">The Problem</h2>
+                <div class="text-fz-gray-800 leading-relaxed max-w-[65ch] flex flex-col gap-4">
+                    <p>
+                        Most existing personal finance applications focus primarily on recording transactions. They are digital ledgers. They tell you exactly how much you spent on groceries in October.
+                    </p>
+                    <p>
+                        But they fail to answer the questions that actually matter when managing your financial life: <em>Is my spending increasing relative to my income? How much of my discretionary income is being drained? Can I comfortably afford a new EMI?</em>
+                    </p>
+                </div>
+            </article>
+            
+            <div class="w-full h-px bg-fz-gray-200"></div>
+            
+            <article>
+                <h2 class="text-2xl font-semibold tracking-tight text-fz-black mb-4">Our Purpose</h2>
+                <div class="text-fz-gray-800 leading-relaxed max-w-[65ch] flex flex-col gap-4">
+                    <p>
+                        FinZave was designed to bridge the gap between tracking expenses and making informed decisions. By analyzing your fixed and variable income against your categorized expenses, FinZave computes your true savings capacity.
+                    </p>
+                    <p>
+                        We process this information through a transparent, rule-based algorithm to provide personalized insights—helping you understand the weight of your financial choices before you make them.
+                    </p>
+                </div>
+            </article>
+
+            <div class="w-full h-px bg-fz-gray-200"></div>
+            
+            <article>
+                <h2 class="text-2xl font-semibold tracking-tight text-fz-black mb-4">The Philosophy</h2>
+                <div class="text-fz-gray-800 leading-relaxed max-w-[65ch] flex flex-col gap-4">
+                    <p>
+                        No hidden magic. No overly complex AI models pretending to predict the stock market. We believe in practical, rule-based intelligence that respects your data and provides explainable, actionable insights into your spending behavior.
+                    </p>
+                </div>
+            </article>
+
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,219 @@
+{% extends "base_public.html" %}
+{% block title %}Services - FinZave{% endblock %}
+
+{% block content %}
+<!-- Services Hero -->
+<section class="pt-32 pb-24 bg-fz-white border-b border-fz-gray-200">
+    <div class="max-w-[1200px] mx-auto px-6 flex flex-col md:flex-row md:items-end justify-between gap-12">
+        <div class="max-w-2xl">
+            <h1 class="text-5xl md:text-7xl font-bold tracking-tighter leading-tight text-fz-black mb-6">
+                Tools that make your money easier to understand.
+            </h1>
+            <p class="text-xl text-fz-gray-800 leading-relaxed max-w-[35ch]">
+                FinZave provides deterministic, rule-based systems to analyze your financial behavior and plan your future commitments.
+            </p>
+        </div>
+        <div class="hidden md:block pb-4">
+            <!-- Scroll indicator -->
+            <div class="w-px h-24 bg-gradient-to-b from-fz-gray-300 to-transparent"></div>
+        </div>
+    </div>
+</section>
+
+<!-- 01: Core Service - Financial Analysis & Reports -->
+<section id="analysis" class="py-32 bg-fz-black text-white relative overflow-hidden">
+    <!-- Background subtle texture/glow -->
+    <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-fz-red/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+    
+    <div class="max-w-[1200px] mx-auto px-6">
+        <div class="flex flex-col gap-6 mb-16">
+            <span class="text-fz-red font-semibold tracking-widest text-sm uppercase">Core Platform</span>
+            <div class="flex flex-col md:flex-row md:items-end gap-8 justify-between border-b border-fz-gray-800 pb-12">
+                <h2 class="text-4xl md:text-6xl font-semibold tracking-tighter leading-none">
+                    Financial Analysis <br/>& Reports
+                </h2>
+                <div class="text-fz-gray-800 font-light text-6xl md:text-8xl tracking-tighter leading-none">01</div>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-16">
+            <div class="lg:col-span-5">
+                <p class="text-xl text-fz-gray-300 leading-relaxed mb-8">
+                    The analytical engine at the heart of FinZave. We aggregate your fixed and variable income against categorized expenses to extract your true savings rate and behavioral trends.
+                </p>
+                <a href="{{ url_for('public.signup') }}" class="inline-flex items-center gap-2 text-white hover:text-fz-red transition-colors font-medium border-b border-white/30 hover:border-fz-red pb-1">
+                    Try the analysis engine
+                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                </a>
+            </div>
+            
+            <div class="lg:col-span-6 lg:col-start-7">
+                <ul class="flex flex-col border-t border-fz-gray-800">
+                    <li class="py-6 border-b border-fz-gray-800 flex items-start gap-4 hover:bg-white/[0.02] transition-colors group">
+                        <div class="w-1.5 h-1.5 rounded-full bg-fz-gray-700 group-hover:bg-fz-red mt-2.5 transition-colors"></div>
+                        <div>
+                            <h4 class="text-lg font-medium text-white mb-2">Savings Rate & Spending Behavior</h4>
+                            <p class="text-fz-gray-400 text-sm leading-relaxed max-w-[45ch]">Understand exactly how much of your discretionary income is retained versus consumed, mapped across time.</p>
+                        </div>
+                    </li>
+                    <li class="py-6 border-b border-fz-gray-800 flex items-start gap-4 hover:bg-white/[0.02] transition-colors group">
+                        <div class="w-1.5 h-1.5 rounded-full bg-fz-gray-700 group-hover:bg-fz-red mt-2.5 transition-colors"></div>
+                        <div>
+                            <h4 class="text-lg font-medium text-white mb-2">Category-Wise Trends</h4>
+                            <p class="text-fz-gray-400 text-sm leading-relaxed max-w-[45ch]">Period comparisons reveal structural shifts in your fixed obligations and variable spending habits.</p>
+                        </div>
+                    </li>
+                    <li class="py-6 border-b border-fz-gray-800 flex items-start gap-4 hover:bg-white/[0.02] transition-colors group">
+                        <div class="w-1.5 h-1.5 rounded-full bg-fz-gray-700 group-hover:bg-fz-red mt-2.5 transition-colors"></div>
+                        <div>
+                            <h4 class="text-lg font-medium text-white mb-2">Rule-Based Deterministic Insights</h4>
+                            <p class="text-fz-gray-400 text-sm leading-relaxed max-w-[45ch]">Clear, explainable observations and recommendations based on mathematical rules, not opaque AI predictions.</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 02: Goal Tracking (Asymmetric Side-by-Side) -->
+<section id="goals" class="py-32 bg-fz-white border-b border-fz-gray-200">
+    <div class="max-w-[1200px] mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+        <!-- Text Content -->
+        <div class="order-2 md:order-1 pr-0 md:pr-12">
+            <div class="text-fz-gray-200 font-bold text-8xl md:text-9xl tracking-tighter leading-none mb-6 -ml-1">02</div>
+            <h2 class="text-4xl font-semibold tracking-tighter mb-6 text-fz-black">Goal Tracking</h2>
+            <p class="text-lg text-fz-gray-800 leading-relaxed mb-8 max-w-[40ch]">
+                Turn aspirations into measurable saving paths. Connect your monthly financial capacity with specific, timed targets.
+            </p>
+            <div class="space-y-6 border-l border-fz-red pl-6">
+                <div>
+                    <h4 class="text-sm font-semibold text-fz-black mb-1">Target & Progress</h4>
+                    <p class="text-sm text-fz-gray-800 max-w-[35ch]">Set a target amount and date. FinZave tracks your current saved amount against the remaining balance.</p>
+                </div>
+                <div>
+                    <h4 class="text-sm font-semibold text-fz-black mb-1">Required Monthly Saving</h4>
+                    <p class="text-sm text-fz-gray-800 max-w-[35ch]">Calculates exactly what you need to put away each month to hit your deadline.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Abstract Visual Representation -->
+        <div class="order-1 md:order-2 bg-fz-gray-100 aspect-square rounded-full flex flex-col items-center justify-center border border-fz-gray-200 relative p-12 text-center group">
+            <div class="w-full max-w-[200px] h-full flex flex-col justify-end gap-2 relative">
+                <!-- Abstract progress bars -->
+                <div class="w-full h-1 bg-fz-gray-300 rounded-full overflow-hidden">
+                    <div class="w-[70%] h-full bg-fz-black transition-all duration-1000 group-hover:w-[100%]"></div>
+                </div>
+                <div class="w-full flex justify-between text-xs text-fz-gray-800 font-medium">
+                    <span>Current</span>
+                    <span>Target</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 03 & 04: Calculators (Split Screen Layout) -->
+<section id="planning" class="grid grid-cols-1 lg:grid-cols-2 min-h-[80vh]">
+    <!-- EMI Calculator -->
+    <div class="bg-fz-gray-50 p-12 md:p-24 border-b lg:border-b-0 lg:border-r border-fz-gray-200 flex flex-col justify-between group">
+        <div class="mb-16">
+            <div class="text-fz-gray-300 font-bold text-6xl tracking-tighter leading-none mb-8 transition-transform group-hover:-translate-y-2">03</div>
+            <h2 class="text-3xl font-semibold tracking-tighter mb-4 text-fz-black">EMI Calculator</h2>
+            <p class="text-fz-gray-800 leading-relaxed mb-8 max-w-[35ch]">
+                Understand the commitment before taking it. FinZave breaks down your prospective loan to evaluate affordability against your savings rate.
+            </p>
+            <ul class="flex flex-col gap-3 text-sm text-fz-gray-800">
+                <li class="flex items-center gap-2"><span class="w-1 h-1 bg-fz-red rounded-full"></span> Loan amount & tenure</li>
+                <li class="flex items-center gap-2"><span class="w-1 h-1 bg-fz-red rounded-full"></span> Interest rate configuration</li>
+                <li class="flex items-center gap-2"><span class="w-1 h-1 bg-fz-red rounded-full"></span> Estimated EMI computation</li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- SIP Calculator -->
+    <div class="bg-fz-white p-12 md:p-24 flex flex-col justify-between group">
+        <div class="mb-16">
+            <div class="text-fz-gray-200 font-bold text-6xl tracking-tighter leading-none mb-8 transition-transform group-hover:-translate-y-2">04</div>
+            <h2 class="text-3xl font-semibold tracking-tighter mb-4 text-fz-black">SIP Calculator</h2>
+            <p class="text-fz-gray-800 leading-relaxed mb-8 max-w-[35ch]">
+                A pure calculation tool to project estimated maturity value. Input your investment amount and frequency to model potential returns.
+            </p>
+            <ul class="flex flex-col gap-3 text-sm text-fz-gray-800">
+                <li class="flex items-center gap-2"><span class="w-1 h-1 bg-fz-red rounded-full"></span> Monthly investment amount</li>
+                <li class="flex items-center gap-2"><span class="w-1 h-1 bg-fz-red rounded-full"></span> Tenure inputs</li>
+                <li class="flex items-center gap-2"><span class="w-1 h-1 bg-fz-red rounded-full"></span> Estimated maturity value</li>
+            </ul>
+        </div>
+        <div class="bg-fz-red/10 border border-fz-red/20 rounded-xl p-4">
+            <p class="text-xs text-fz-red leading-relaxed font-medium">
+                Note: This is purely a mathematical planning tool. FinZave does not provide investment recommendations or financial advice.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Why FinZave? (Differentiation Section) -->
+<section class="py-32 bg-fz-black text-white border-t border-fz-gray-900">
+    <div class="max-w-[1200px] mx-auto px-6">
+        
+        <div class="max-w-3xl mb-24">
+            <h2 class="text-4xl md:text-5xl font-semibold tracking-tighter leading-tight mb-6">
+                Why FinZave is different.
+            </h2>
+            <p class="text-xl text-fz-gray-300 leading-relaxed border-l-2 border-fz-red pl-6">
+                We believe a basic expense tracker isn't enough. <br/>FinZave bridges the gap between tracking data and making decisions.
+            </p>
+        </div>
+        
+        <!-- Typography-led Differentiation Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 border-t border-fz-gray-800 pt-16">
+            
+            <div class="flex flex-col">
+                <h3 class="text-sm font-semibold tracking-widest uppercase text-fz-red mb-4">Beyond Recording</h3>
+                <p class="text-fz-gray-300 text-sm leading-relaxed">
+                    While basic apps stop at logging transactions, FinZave's core is analysis. It calculates your true behavioral capacity instead of just providing a ledger.
+                </p>
+            </div>
+            
+            <div class="flex flex-col">
+                <h3 class="text-sm font-semibold tracking-widest uppercase text-fz-red mb-4">Explainable Logic</h3>
+                <p class="text-fz-gray-300 text-sm leading-relaxed">
+                    Insights are derived from deterministic, rule-based algorithms. No opaque "AI models" guessing your behavior—just pure, transparent mathematics.
+                </p>
+            </div>
+            
+            <div class="flex flex-col">
+                <h3 class="text-sm font-semibold tracking-widest uppercase text-fz-red mb-4">Actionable Goals</h3>
+                <p class="text-fz-gray-300 text-sm leading-relaxed">
+                    Goal tracking directly connects to your spending patterns, actively computing the required monthly saving needed to hit strict deadlines.
+                </p>
+            </div>
+            
+            <div class="flex flex-col">
+                <h3 class="text-sm font-semibold tracking-widest uppercase text-fz-red mb-4">Future Planning</h3>
+                <p class="text-fz-gray-300 text-sm leading-relaxed">
+                    Calculators for SIPs and EMIs aren't just standalone utilities; they exist to contextualize your prospective commitments against your historic data.
+                </p>
+            </div>
+            
+        </div>
+        
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="py-32 bg-fz-white text-center">
+    <div class="max-w-3xl mx-auto px-6">
+        <h2 class="text-4xl md:text-6xl font-semibold tracking-tighter text-fz-black mb-8">
+            Ready to understand your money?
+        </h2>
+        <a href="{{ url_for('public.signup') }}" class="inline-flex justify-center items-center px-10 py-4 bg-fz-black text-white text-lg font-medium rounded-full hover:bg-fz-red transition-all duration-300 hover:-translate-y-1 shadow-lg shadow-fz-black/10">
+            Start Your Journey
+        </a>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,112 @@
+{% extends "base_public.html" %}
+{% block title %}Sign up - FinZave{% endblock %}
+
+{% block content %}
+<section class="min-h-[80vh] flex items-center justify-center bg-fz-white py-12 px-6">
+    <div class="w-full max-w-md bg-fz-gray-100 border border-fz-gray-200 rounded-3xl p-8 md:p-12 shadow-sm">
+        
+        <div class="text-center mb-8">
+            <h1 class="text-2xl font-bold tracking-tight text-fz-black mb-2">Create an account</h1>
+            <p class="text-sm text-fz-gray-800">Start understanding your financial behaviour</p>
+        </div>
+
+        <form id="signup-form" class="flex flex-col gap-5">
+            <!-- Username Input -->
+            <div class="flex flex-col gap-2">
+                <label for="username" class="text-sm font-medium text-fz-black">Username</label>
+                <input type="text" id="username" name="username" required minlength="3" maxlength="64"
+                    class="w-full px-4 py-3 bg-white border border-fz-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-fz-black focus:border-transparent transition-all"
+                    placeholder="Choose a username">
+            </div>
+
+            <!-- Email Input -->
+            <div class="flex flex-col gap-2">
+                <label for="email" class="text-sm font-medium text-fz-black">Email address</label>
+                <input type="email" id="email" name="email" required
+                    class="w-full px-4 py-3 bg-white border border-fz-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-fz-black focus:border-transparent transition-all"
+                    placeholder="name@example.com">
+            </div>
+
+            <!-- Password Input -->
+            <div class="flex flex-col gap-2">
+                <label for="password" class="text-sm font-medium text-fz-black">Password</label>
+                <input type="password" id="password" name="password" required minlength="6"
+                    class="w-full px-4 py-3 bg-white border border-fz-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-fz-black focus:border-transparent transition-all"
+                    placeholder="Create a password">
+                <p class="text-xs text-fz-gray-800 mt-1">Must be at least 6 characters.</p>
+            </div>
+            
+            <!-- Error & Success Message Containers -->
+            <div id="error-message" class="hidden text-sm text-fz-red font-medium mt-1"></div>
+            <div id="success-message" class="hidden text-sm text-green-600 font-medium mt-1"></div>
+
+            <button type="submit" id="submit-btn"
+                class="mt-2 w-full flex justify-center items-center py-3.5 bg-fz-black text-white font-medium rounded-xl hover:bg-fz-red transition-all duration-300 shadow-sm disabled:opacity-70 disabled:cursor-not-allowed">
+                <span>Sign up</span>
+                <svg id="loading-spinner" class="hidden animate-spin ml-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </button>
+        </form>
+        
+        <div class="mt-8 text-center text-sm text-fz-gray-800">
+            Already have an account? 
+            <a href="{{ url_for('public.login') }}" class="font-medium text-fz-black hover:text-fz-red transition-colors">Log in</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.getElementById('signup-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const username = document.getElementById('username').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const errorDiv = document.getElementById('error-message');
+    const successDiv = document.getElementById('success-message');
+    const submitBtn = document.getElementById('submit-btn');
+    const spinner = document.getElementById('loading-spinner');
+    
+    // Reset state
+    errorDiv.classList.add('hidden');
+    successDiv.classList.add('hidden');
+    errorDiv.textContent = '';
+    submitBtn.disabled = true;
+    spinner.classList.remove('hidden');
+    
+    try {
+        const response = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (response.status === 201) {
+            successDiv.textContent = 'Account created successfully! Redirecting to login...';
+            successDiv.classList.remove('hidden');
+            setTimeout(() => {
+                window.location.href = '/login';
+            }, 1500);
+        } else {
+            errorDiv.textContent = data.error || 'Registration failed. Please try again.';
+            errorDiv.classList.remove('hidden');
+            submitBtn.disabled = false;
+        }
+    } catch (error) {
+        errorDiv.textContent = 'Network error. Please try again later.';
+        errorDiv.classList.remove('hidden');
+        submitBtn.disabled = false;
+    } finally {
+        spinner.classList.add('hidden');
+    }
+});
+</script>
+{% endblock %}
