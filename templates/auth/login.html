@@ -77,12 +77,10 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
         const data = await response.json();
         
         if (response.ok) {
-            // Save token
-            localStorage.setItem('access_token', data.access_token);
             // Redirect to dashboard (will implement dashboard later, for now just redirect to root or a placeholder)
             window.location.href = '/'; 
         } else {
-            errorDiv.textContent = data.error || 'Login failed. Please check your credentials.';
+            errorDiv.textContent = data.message || data.error || 'Login failed. Please check your credentials.';
             errorDiv.classList.remove('hidden');
         }
     } catch (error) {

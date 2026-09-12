@@ -3,13 +3,14 @@
 
 {% block content %}
 <!-- Editorial Hero Section -->
-<section class="relative pt-32 pb-40 overflow-hidden bg-fz-white flex flex-col items-center justify-center min-h-[90vh]">
+<section
+    class="relative pt-32 pb-40 overflow-hidden bg-fz-white flex flex-col items-center justify-center min-h-[90vh]">
     <div class="max-w-[1000px] mx-auto px-6 text-center z-10">
-        
+
         <h1 class="text-6xl md:text-8xl lg:text-[7rem] font-bold tracking-tighter leading-[0.95] mb-8 text-fz-black">
             <span class="inline-block opacity-0 fz-hero-word">Understand</span>
             <span class="inline-block opacity-0 fz-hero-word">your</span>
-            <span class="inline-block opacity-0 fz-hero-word">money.</span> <br/>
+            <span class="inline-block opacity-0 fz-hero-word">money.</span> <br />
             <span class="text-fz-gray-300">
                 <span class="inline-block opacity-0 fz-hero-word">Don't</span>
                 <span class="inline-block opacity-0 fz-hero-word">just</span>
@@ -17,30 +18,36 @@
                 <span class="inline-block opacity-0 fz-hero-word">it.</span>
             </span>
         </h1>
-        
-        <p class="text-xl md:text-2xl text-fz-gray-800 leading-relaxed max-w-[30ch] mx-auto mb-12 opacity-0 fz-hero-after">
+
+        <p
+            class="text-xl md:text-2xl text-fz-gray-800 leading-relaxed max-w-[30ch] mx-auto mb-12 opacity-0 fz-hero-after">
             FinZave analyzes your financial behaviour, turning raw data into clear, actionable insights.
         </p>
-        
+
         <div class="flex flex-col sm:flex-row items-center justify-center gap-6 opacity-0 fz-hero-after">
-            <a href="{{ url_for('public.signup') }}" class="inline-flex justify-center items-center px-10 py-4 bg-fz-black text-white text-lg font-medium rounded-full hover:bg-fz-red transition-all duration-300 hover:-translate-y-1 shadow-xl shadow-fz-black/5">
+            <a href="{{ url_for('public.signup') }}"
+                class="inline-flex justify-center items-center px-10 py-4 bg-fz-black text-white text-lg font-medium rounded-full hover:bg-fz-red transition-all duration-300 hover:-translate-y-1 shadow-xl shadow-fz-black/5">
                 Start Your Journey
             </a>
-            <a href="{{ url_for('public.services') }}" class="inline-flex justify-center items-center px-8 py-4 bg-transparent text-fz-black text-lg font-medium hover:text-fz-red transition-colors duration-200">
+            <a href="{{ url_for('public.services') }}"
+                class="inline-flex justify-center items-center px-8 py-4 bg-transparent text-fz-black text-lg font-medium hover:text-fz-red transition-colors duration-200">
                 See how it works
             </a>
         </div>
     </div>
-    
+
     <!-- Subtle depth element: background gradient glow -->
-    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-tr from-fz-gray-100 to-white rounded-full blur-[100px] -z-10 opacity-50"></div>
+    <div
+        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-tr from-fz-gray-100 to-white rounded-full blur-[100px] -z-10 opacity-50">
+    </div>
 </section>
 
 <!-- SECTION — THE PROBLEM -->
 <section class="py-32 bg-fz-white border-b border-fz-gray-200 overflow-hidden">
     <div class="max-w-[1200px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24">
         <div class="lg:col-span-5 observe-me fz-reveal-left">
-            <span class="inline-block px-3 py-1 bg-fz-gray-100 rounded-full text-xs font-semibold tracking-widest text-fz-gray-800 uppercase mb-8 border border-fz-gray-200">
+            <span
+                class="inline-block px-3 py-1 bg-fz-gray-100 rounded-full text-xs font-semibold tracking-widest text-fz-gray-800 uppercase mb-8 border border-fz-gray-200">
                 The Problem
             </span>
             <h2 class="text-4xl md:text-5xl font-semibold tracking-tighter text-fz-black leading-tight">
@@ -49,7 +56,8 @@
         </div>
         <div class="lg:col-span-7 flex flex-col justify-center observe-me fz-reveal-right" data-delay="100">
             <p class="text-xl md:text-2xl text-fz-gray-700 leading-relaxed max-w-[45ch]">
-                Traditional expense tracking records financial activity, but raw numbers do not always help you understand your spending, savings, or financial decisions. Recording is just the first step.
+                Traditional expense tracking records financial activity, but raw numbers do not always help you
+                understand your spending, savings, or financial decisions. Recording is just the first step.
             </p>
         </div>
     </div>
@@ -61,10 +69,11 @@
         <h2 class="text-3xl md:text-5xl font-semibold tracking-tighter mb-20 observe-me fz-reveal-up">
             More than a financial ledger.
         </h2>
-        
+
         <p class="text-lg text-fz-gray-400 mb-12 observe-me fz-reveal-up" data-delay="100">FinZave brings together:</p>
 
-        <div class="flex flex-wrap justify-center items-center gap-4 text-xl md:text-2xl font-medium tracking-tight mb-16 observe-me fz-reveal-up" data-delay="200">
+        <div class="flex flex-wrap justify-center items-center gap-4 text-xl md:text-2xl font-medium tracking-tight mb-16 observe-me fz-reveal-up"
+            data-delay="200">
             <span>Income</span>
             <span class="text-fz-red">+</span>
             <span>Expenses</span>
@@ -82,7 +91,8 @@
             <div class="w-px bg-gradient-to-b from-fz-red to-transparent"></div>
         </div>
 
-        <div class="inline-block px-8 py-4 border-2 border-fz-red bg-fz-red/10 rounded-full text-fz-red font-semibold text-xl tracking-wide shadow-[0_0_30px_rgba(239,68,68,0.15)] observe-me fz-reveal-up" data-delay="400">
+        <div class="inline-block px-8 py-4 border-2 border-fz-red bg-fz-red/10 rounded-full text-fz-red font-semibold text-xl tracking-wide shadow-[0_0_30px_rgba(239,68,68,0.15)] observe-me fz-reveal-up"
+            data-delay="400">
             Better Financial Understanding
         </div>
     </div>
@@ -91,12 +101,14 @@
 <!-- SECTION — HOW FINZAVE HELPS (Key Capabilities) -->
 <section class="py-32 bg-fz-white border-b border-fz-gray-200">
     <div class="max-w-[1200px] mx-auto px-6">
-        
+
         <div class="flex flex-col gap-0 border-t border-fz-gray-200">
             <!-- 01 -->
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-12 py-12 border-b border-fz-gray-200 group observe-me fz-reveal-up fz-scroll-row">
+            <div
+                class="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-12 py-12 border-b border-fz-gray-200 group observe-me fz-reveal-up fz-scroll-row">
                 <div class="md:col-span-2">
-                    <span class="text-3xl md:text-4xl font-light text-fz-black transition-colors duration-400 fz-scroll-num">01</span>
+                    <span
+                        class="text-3xl md:text-4xl font-light text-fz-black transition-colors duration-400 fz-scroll-num">01</span>
                 </div>
                 <div class="md:col-span-4 flex items-center">
                     <h3 class="text-2xl font-semibold text-fz-black tracking-tight">Track</h3>
@@ -107,11 +119,13 @@
                     </p>
                 </div>
             </div>
-            
+
             <!-- 02 -->
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-12 py-12 border-b border-fz-gray-200 group observe-me fz-reveal-up fz-scroll-row">
+            <div
+                class="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-12 py-12 border-b border-fz-gray-200 group observe-me fz-reveal-up fz-scroll-row">
                 <div class="md:col-span-2">
-                    <span class="text-3xl md:text-4xl font-light text-fz-black transition-colors duration-400 fz-scroll-num">02</span>
+                    <span
+                        class="text-3xl md:text-4xl font-light text-fz-black transition-colors duration-400 fz-scroll-num">02</span>
                 </div>
                 <div class="md:col-span-4 flex items-center">
                     <h3 class="text-2xl font-semibold text-fz-black tracking-tight">Understand</h3>
@@ -124,9 +138,11 @@
             </div>
 
             <!-- 03 -->
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-12 py-12 border-b border-fz-gray-200 group observe-me fz-reveal-up fz-scroll-row">
+            <div
+                class="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-12 py-12 border-b border-fz-gray-200 group observe-me fz-reveal-up fz-scroll-row">
                 <div class="md:col-span-2">
-                    <span class="text-3xl md:text-4xl font-light text-fz-black transition-colors duration-400 fz-scroll-num">03</span>
+                    <span
+                        class="text-3xl md:text-4xl font-light text-fz-black transition-colors duration-400 fz-scroll-num">03</span>
                 </div>
                 <div class="md:col-span-4 flex items-center">
                     <h3 class="text-2xl font-semibold text-fz-black tracking-tight">Analyze</h3>
@@ -139,9 +155,11 @@
             </div>
 
             <!-- 04 -->
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-12 py-12 border-b border-fz-gray-200 group observe-me fz-reveal-up fz-scroll-row">
+            <div
+                class="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-12 py-12 border-b border-fz-gray-200 group observe-me fz-reveal-up fz-scroll-row">
                 <div class="md:col-span-2">
-                    <span class="text-3xl md:text-4xl font-light text-fz-black transition-colors duration-400 fz-scroll-num">04</span>
+                    <span
+                        class="text-3xl md:text-4xl font-light text-fz-black transition-colors duration-400 fz-scroll-num">04</span>
                 </div>
                 <div class="md:col-span-4 flex items-center">
                     <h3 class="text-2xl font-semibold text-fz-black tracking-tight">Plan</h3>
@@ -154,9 +172,11 @@
             </div>
 
             <!-- 05 -->
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-12 py-12 border-b border-fz-gray-200 group observe-me fz-reveal-up fz-scroll-row">
+            <div
+                class="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-12 py-12 border-b border-fz-gray-200 group observe-me fz-reveal-up fz-scroll-row">
                 <div class="md:col-span-2">
-                    <span class="text-3xl md:text-4xl font-light text-fz-black transition-colors duration-400 fz-scroll-num">05</span>
+                    <span
+                        class="text-3xl md:text-4xl font-light text-fz-black transition-colors duration-400 fz-scroll-num">05</span>
                 </div>
                 <div class="md:col-span-4 flex items-center">
                     <h3 class="text-2xl font-semibold text-fz-black tracking-tight">Calculate</h3>
@@ -169,9 +189,11 @@
             </div>
 
             <!-- 06 -->
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-12 py-12 border-b border-fz-gray-200 group observe-me fz-reveal-up fz-scroll-row">
+            <div
+                class="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-12 py-12 border-b border-fz-gray-200 group observe-me fz-reveal-up fz-scroll-row">
                 <div class="md:col-span-2">
-                    <span class="text-3xl md:text-4xl font-light text-fz-black transition-colors duration-400 fz-scroll-num">06</span>
+                    <span
+                        class="text-3xl md:text-4xl font-light text-fz-black transition-colors duration-400 fz-scroll-num">06</span>
                 </div>
                 <div class="md:col-span-4 flex items-center">
                     <h3 class="text-2xl font-semibold text-fz-black tracking-tight">Decide</h3>
@@ -182,7 +204,7 @@
                     </p>
                 </div>
             </div>
-            
+
         </div>
     </div>
 </section>
@@ -193,14 +215,16 @@
         <h2 class="text-3xl md:text-4xl font-semibold tracking-tighter text-fz-black mb-20 observe-me fz-reveal-up">
             From tracking to understanding.
         </h2>
-        
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24 max-w-4xl mx-auto">
-            
+
             <!-- Traditional Tracking -->
             <div class="flex flex-col items-center observe-me fz-reveal-left">
-                <span class="text-xs font-semibold tracking-widest text-fz-gray-400 uppercase mb-10">Traditional Tracking</span>
-                
-                <div class="flex flex-col items-center text-sm font-semibold tracking-widest uppercase gap-4 text-fz-gray-500">
+                <span class="text-xs font-semibold tracking-widest text-fz-gray-400 uppercase mb-10">Traditional
+                    Tracking</span>
+
+                <div
+                    class="flex flex-col items-center text-sm font-semibold tracking-widest uppercase gap-4 text-fz-gray-500">
                     <div class="w-48 bg-white border border-fz-gray-200 rounded-xl p-4 shadow-sm">Record</div>
                     <div>&darr;</div>
                     <div class="w-48 bg-white border border-fz-gray-200 rounded-xl p-4 shadow-sm">View History</div>
@@ -211,8 +235,9 @@
             <div class="flex flex-col items-center relative observe-me fz-reveal-right" data-delay="100">
                 <div class="hidden md:block absolute top-0 -left-12 h-full w-px bg-fz-gray-200"></div>
                 <span class="text-xs font-semibold tracking-widest text-fz-red uppercase mb-10">FinZave</span>
-                
-                <div class="flex flex-col items-center text-sm font-semibold tracking-widest uppercase gap-4 text-fz-black">
+
+                <div
+                    class="flex flex-col items-center text-sm font-semibold tracking-widest uppercase gap-4 text-fz-black">
                     <div class="w-48 bg-white border-2 border-fz-black rounded-xl p-4 shadow-sm">Record</div>
                     <div>&darr;</div>
                     <div class="w-48 bg-white border-2 border-fz-black rounded-xl p-4 shadow-sm">Calculate</div>
@@ -221,9 +246,11 @@
                     <div>&darr;</div>
                     <div class="w-48 bg-white border-2 border-fz-black rounded-xl p-4 shadow-sm">Evaluate</div>
                     <div>&darr;</div>
-                    <div class="w-48 bg-white border-2 border-fz-red rounded-xl p-4 shadow-sm text-fz-red">Understand</div>
+                    <div class="w-48 bg-white border-2 border-fz-red rounded-xl p-4 shadow-sm text-fz-red">Understand
+                    </div>
                     <div>&darr;</div>
-                    <div class="w-48 bg-fz-black border-2 border-fz-black rounded-xl p-4 shadow-lg text-white">Decide</div>
+                    <div class="w-48 bg-fz-black border-2 border-fz-black rounded-xl p-4 shadow-lg text-white">Decide
+                    </div>
                 </div>
             </div>
 
@@ -237,31 +264,52 @@
         <h2 class="text-3xl md:text-5xl font-semibold tracking-tighter text-fz-black mb-16 observe-me fz-reveal-up">
             See how it works.
         </h2>
-        
-        <div class="flex flex-col md:flex-row items-center justify-center gap-3 text-xs font-semibold tracking-widest text-fz-gray-500 uppercase overflow-x-auto no-scrollbar pb-8 mb-12 fz-wf-sequence-container">
-            <span class="px-4 py-2 border border-fz-gray-200 rounded-full whitespace-nowrap opacity-0 fz-wf-step transition-all duration-500">Input</span>
-            <span class="text-fz-gray-300 hidden md:inline opacity-0 fz-wf-step transition-all duration-500 origin-left">&rarr;</span>
-            <span class="text-fz-gray-300 md:hidden opacity-0 fz-wf-step transition-all duration-500 origin-top">&darr;</span>
-            <span class="px-4 py-2 border border-fz-gray-200 rounded-full whitespace-nowrap opacity-0 fz-wf-step transition-all duration-500">Record</span>
-            <span class="text-fz-gray-300 hidden md:inline opacity-0 fz-wf-step transition-all duration-500 origin-left">&rarr;</span>
-            <span class="text-fz-gray-300 md:hidden opacity-0 fz-wf-step transition-all duration-500 origin-top">&darr;</span>
-            <span class="px-4 py-2 border border-fz-gray-200 rounded-full whitespace-nowrap opacity-0 fz-wf-step transition-all duration-500">Calculate</span>
-            <span class="text-fz-gray-300 hidden md:inline opacity-0 fz-wf-step transition-all duration-500 origin-left">&rarr;</span>
-            <span class="text-fz-gray-300 md:hidden opacity-0 fz-wf-step transition-all duration-500 origin-top">&darr;</span>
-            <span class="px-4 py-2 border border-fz-gray-200 rounded-full whitespace-nowrap opacity-0 fz-wf-step transition-all duration-500">Analyze</span>
-            <span class="text-fz-gray-300 hidden md:inline opacity-0 fz-wf-step transition-all duration-500 origin-left">&rarr;</span>
-            <span class="text-fz-gray-300 md:hidden opacity-0 fz-wf-step transition-all duration-500 origin-top">&darr;</span>
-            <span class="px-4 py-2 bg-fz-gray-100 text-fz-black rounded-full whitespace-nowrap border border-fz-gray-300 opacity-0 fz-wf-step transition-all duration-500">Evaluate</span>
-            <span class="text-fz-gray-300 hidden md:inline opacity-0 fz-wf-step transition-all duration-500 origin-left">&rarr;</span>
-            <span class="text-fz-gray-300 md:hidden opacity-0 fz-wf-step transition-all duration-500 origin-top">&darr;</span>
-            <span class="px-4 py-2 bg-fz-red text-white rounded-full whitespace-nowrap shadow-md shadow-fz-red/20 opacity-0 fz-wf-step transition-all duration-500">Insight</span>
-            <span class="text-fz-gray-300 hidden md:inline opacity-0 fz-wf-step transition-all duration-500 origin-left">&rarr;</span>
-            <span class="text-fz-gray-300 md:hidden opacity-0 fz-wf-step transition-all duration-500 origin-top">&darr;</span>
-            <span class="px-4 py-2 bg-fz-black text-white rounded-full whitespace-nowrap opacity-0 fz-wf-step transition-all duration-500">Decide</span>
+
+        <div
+            class="flex flex-col md:flex-row items-center justify-center gap-3 text-xs font-semibold tracking-widest text-fz-gray-500 uppercase overflow-x-auto no-scrollbar pb-8 mb-12 fz-wf-sequence-container">
+            <span
+                class="px-4 py-2 border border-fz-gray-200 rounded-full whitespace-nowrap opacity-0 fz-wf-step transition-all duration-500">Input</span>
+            <span
+                class="text-fz-black-300 hidden md:inline opacity-0 fz-wf-step transition-all duration-500 origin-left">&rarr;</span>
+            <span
+                class="text-fz-black-300 md:hidden opacity-0 fz-wf-step transition-all duration-500 origin-top">&darr;</span>
+            <span
+                class="px-4 py-2 border border-fz-gray-200 rounded-full whitespace-nowrap opacity-0 fz-wf-step transition-all duration-500">Record</span>
+            <span
+                class="text-fz-black-300 hidden md:inline opacity-0 fz-wf-step transition-all duration-500 origin-left">&rarr;</span>
+            <span
+                class="text-fz-black-300 md:hidden opacity-0 fz-wf-step transition-all duration-500 origin-top">&darr;</span>
+            <span
+                class="px-4 py-2 border border-fz-gray-200 rounded-full whitespace-nowrap opacity-0 fz-wf-step transition-all duration-500">Calculate</span>
+            <span
+                class="text-fz-black-300 hidden md:inline opacity-0 fz-wf-step transition-all duration-500 origin-left">&rarr;</span>
+            <span
+                class="text-fz-black-300 md:hidden opacity-0 fz-wf-step transition-all duration-500 origin-top">&darr;</span>
+            <span
+                class="px-4 py-2 border border-fz-gray-200 rounded-full whitespace-nowrap opacity-0 fz-wf-step transition-all duration-500">Analyze</span>
+            <span
+                class="text-fz-black-300 hidden md:inline opacity-0 fz-wf-step transition-all duration-500 origin-left">&rarr;</span>
+            <span
+                class="text-fz-black-300 md:hidden opacity-0 fz-wf-step transition-all duration-500 origin-top">&darr;</span>
+            <span
+                class="px-4 py-2 bg-fz-gray-100 text-fz-black rounded-full whitespace-nowrap border border-fz-gray-300 opacity-0 fz-wf-step transition-all duration-500">Evaluate</span>
+            <span
+                class="text-fz-black-300 hidden md:inline opacity-0 fz-wf-step transition-all duration-500 origin-left">&rarr;</span>
+            <span
+                class="text-fz-black-300 md:hidden opacity-0 fz-wf-step transition-all duration-500 origin-top">&darr;</span>
+            <span
+                class="px-4 py-2 bg-fz-red text-white rounded-full whitespace-nowrap shadow-md shadow-fz-red/20 opacity-0 fz-wf-step transition-all duration-500">Insight</span>
+            <span
+                class="text-fz-black-300 hidden md:inline opacity-0 fz-wf-step transition-all duration-500 origin-left">&rarr;</span>
+            <span
+                class="text-fz-black-300 md:hidden opacity-0 fz-wf-step transition-all duration-500 origin-top">&darr;</span>
+            <span
+                class="px-4 py-2 bg-fz-black text-white rounded-full whitespace-nowrap opacity-0 fz-wf-step transition-all duration-500">Decide</span>
         </div>
 
         <div class="observe-me fz-reveal-up" data-delay="200">
-            <a href="{{ url_for('public.workflow') }}" class="inline-flex items-center gap-2 text-sm font-semibold tracking-widest text-fz-black hover:text-fz-red uppercase transition-colors fz-underline-hover">
+            <a href="{{ url_for('public.workflow') }}"
+                class="inline-flex items-center gap-2 text-sm font-semibold tracking-widest text-fz-black hover:text-fz-red uppercase transition-colors fz-underline-hover">
                 Explore the Workflow &rarr;
             </a>
         </div>
@@ -279,16 +327,18 @@
                 FinZave provides mathematical calculators to project the numbers before you commit to them.
             </p>
         </div>
-        
+
         <div class="lg:col-span-7 flex flex-col gap-12">
-            
+
             <div class="border-l-2 border-fz-gray-800 pl-8 observe-me fz-reveal-right" data-delay="100">
                 <div class="flex items-center gap-3 mb-2 text-white">
                     <i data-lucide="refresh-cw" class="w-5 h-5 text-fz-red"></i>
                     <h3 class="text-xl font-semibold">SIP Calculator</h3>
                 </div>
-                <p class="text-fz-gray-400 mb-4">WHAT IT DOES: Projects compounding returns based on regular monthly contributions and estimated annual interest rates.</p>
-                <p class="text-fz-gray-300 text-sm">WHY IT IS USEFUL: Helps visualize the long-term impact of consistent savings over time.</p>
+                <p class="text-fz-gray-400 mb-4">WHAT IT DOES: Projects compounding returns based on regular monthly
+                    contributions and estimated annual interest rates.</p>
+                <p class="text-fz-gray-300 text-sm">WHY IT IS USEFUL: Helps visualize the long-term impact of consistent
+                    savings over time.</p>
             </div>
 
             <div class="border-l-2 border-fz-gray-800 pl-8 observe-me fz-reveal-right" data-delay="200">
@@ -296,8 +346,10 @@
                     <i data-lucide="calculator" class="w-5 h-5 text-fz-red"></i>
                     <h3 class="text-xl font-semibold">EMI Calculator</h3>
                 </div>
-                <p class="text-fz-gray-400 mb-4">WHAT IT DOES: Computes monthly loan repayment amounts based on the principal, tenure, and interest rate.</p>
-                <p class="text-fz-gray-300 text-sm">WHY IT IS USEFUL: Allows you to mathematically determine if a loan installment fits into your current savings capacity.</p>
+                <p class="text-fz-gray-400 mb-4">WHAT IT DOES: Computes monthly loan repayment amounts based on the
+                    principal, tenure, and interest rate.</p>
+                <p class="text-fz-gray-300 text-sm">WHY IT IS USEFUL: Allows you to mathematically determine if a loan
+                    installment fits into your current savings capacity.</p>
             </div>
 
         </div>
@@ -307,61 +359,73 @@
 <!-- SECTION — INSIGHTS / RULE ENGINE -->
 <section class="py-32 bg-fz-white border-b border-fz-gray-200 overflow-hidden">
     <div class="max-w-[1200px] mx-auto px-6">
-        
+
         <div class="max-w-3xl mx-auto text-center mb-24 observe-me fz-reveal-up">
             <h2 class="text-3xl md:text-5xl font-semibold tracking-tighter text-fz-black mb-8 leading-tight">
                 Numbers become useful when they make sense.
             </h2>
             <p class="text-xl text-fz-gray-700 leading-relaxed">
-                FinZave evaluates financial conditions using predefined rules and calculations to provide understandable insights.
+                FinZave evaluates financial conditions using predefined rules and calculations to provide understandable
+                insights.
             </p>
         </div>
 
         <div class="flex flex-col md:flex-row items-center justify-center gap-6 max-w-5xl mx-auto">
-            
+
             <!-- INPUT DATA -->
-            <div class="flex-1 w-full bg-fz-gray-50 border border-fz-gray-200 rounded-2xl p-8 text-center shadow-sm observe-me fz-reveal-up h-64 flex flex-col justify-center">
+            <div
+                class="flex-1 w-full bg-fz-gray-50 border border-fz-gray-200 rounded-2xl p-8 text-center shadow-sm observe-me fz-reveal-up h-64 flex flex-col justify-center">
                 <div class="flex justify-center mb-4">
                     <div class="p-3 bg-white rounded-full shadow-sm">
                         <i data-lucide="database" class="w-5 h-5 text-fz-gray-500"></i>
                     </div>
                 </div>
                 <span class="block text-xs font-semibold tracking-widest text-fz-gray-500 uppercase mb-6">Input</span>
-                <div class="inline-block bg-white border border-fz-gray-200 rounded-lg px-4 py-2 font-mono text-sm text-fz-black shadow-sm">
+                <div
+                    class="inline-block bg-white border border-fz-gray-200 rounded-lg px-4 py-2 font-mono text-sm text-fz-black shadow-sm">
                     Savings Rate: 12%
                 </div>
             </div>
 
             <!-- ARROW -->
-            <div class="hidden md:flex text-fz-gray-300 text-2xl font-light observe-me fz-reveal-up" data-delay="100">&rarr;</div>
-            <div class="md:hidden text-fz-gray-300 text-2xl font-light observe-me fz-reveal-up" data-delay="100">&darr;</div>
+            <div class="hidden md:flex text-fz-gray-300 text-2xl font-light observe-me fz-reveal-up" data-delay="100">
+                &rarr;</div>
+            <div class="md:hidden text-fz-gray-300 text-2xl font-light observe-me fz-reveal-up" data-delay="100">&darr;
+            </div>
 
             <!-- RULE ENGINE -->
-            <div class="flex-1.5 w-full bg-white border-2 border-fz-black rounded-2xl p-8 text-center shadow-xl observe-me fz-reveal-up h-64 flex flex-col justify-center relative z-10" data-delay="200">
+            <div class="flex-1.5 w-full bg-white border-2 border-fz-black rounded-2xl p-8 text-center shadow-xl observe-me fz-reveal-up h-64 flex flex-col justify-center relative z-10"
+                data-delay="200">
                 <div class="flex justify-center mb-4">
                     <div class="p-3 bg-fz-black rounded-full shadow-md">
                         <i data-lucide="workflow" class="w-5 h-5 text-white"></i>
                     </div>
                 </div>
-                <span class="block text-xs font-semibold tracking-widest text-fz-gray-500 uppercase mb-4">Rule Engine</span>
-                
+                <span class="block text-xs font-semibold tracking-widest text-fz-gray-500 uppercase mb-4">Rule
+                    Engine</span>
+
                 <div class="flex flex-col gap-2 items-center">
-                    <div class="inline-flex items-center gap-2 bg-fz-gray-50 border border-fz-gray-200 rounded-lg px-4 py-2 font-mono text-sm text-fz-black">
+                    <div
+                        class="inline-flex items-center gap-2 bg-fz-gray-50 border border-fz-gray-200 rounded-lg px-4 py-2 font-mono text-sm text-fz-black">
                         <span class="font-bold text-fz-gray-400">IF</span> Savings Rate &lt; 20%
                     </div>
                     <div class="h-4 w-px bg-fz-gray-300"></div>
-                    <div class="inline-flex items-center gap-2 bg-fz-red/10 border border-fz-red/30 rounded-lg px-4 py-2 font-mono text-sm text-fz-red font-medium">
+                    <div
+                        class="inline-flex items-center gap-2 bg-fz-red/10 border border-fz-red/30 rounded-lg px-4 py-2 font-mono text-sm text-fz-red font-medium">
                         <span class="font-bold">THEN</span> Generate Insight
                     </div>
                 </div>
             </div>
 
             <!-- ARROW -->
-            <div class="hidden md:flex text-fz-gray-300 text-2xl font-light observe-me fz-reveal-up" data-delay="300">&rarr;</div>
-            <div class="md:hidden text-fz-gray-300 text-2xl font-light observe-me fz-reveal-up" data-delay="300">&darr;</div>
+            <div class="hidden md:flex text-fz-gray-300 text-2xl font-light observe-me fz-reveal-up" data-delay="300">
+                &rarr;</div>
+            <div class="md:hidden text-fz-gray-300 text-2xl font-light observe-me fz-reveal-up" data-delay="300">&darr;
+            </div>
 
             <!-- INSIGHT -->
-            <div class="flex-1 w-full bg-fz-gray-50 border border-fz-gray-200 rounded-2xl p-8 text-center shadow-sm observe-me fz-reveal-up h-64 flex flex-col justify-center" data-delay="400">
+            <div class="flex-1 w-full bg-fz-gray-50 border border-fz-gray-200 rounded-2xl p-8 text-center shadow-sm observe-me fz-reveal-up h-64 flex flex-col justify-center"
+                data-delay="400">
                 <div class="flex justify-center mb-4">
                     <div class="p-3 bg-white rounded-full shadow-sm">
                         <i data-lucide="lightbulb" class="w-5 h-5 text-fz-gray-500"></i>
@@ -380,13 +444,15 @@
 <!-- SECTION — DASHBOARD PREVIEW -->
 <section class="py-32 bg-fz-gray-50 border-b border-fz-gray-200 overflow-hidden">
     <div class="max-w-[1200px] mx-auto px-6">
-        
-        <h2 class="text-3xl md:text-5xl font-semibold tracking-tighter text-fz-black text-center mb-20 observe-me fz-reveal-up">
+
+        <h2
+            class="text-3xl md:text-5xl font-semibold tracking-tighter text-fz-black text-center mb-20 observe-me fz-reveal-up">
             A clear view of your finances.
         </h2>
 
         <!-- Abstract Dashboard Wireframe -->
-        <div class="max-w-5xl mx-auto bg-white rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] border border-fz-gray-200 overflow-hidden observe-me fz-reveal-up" data-delay="100">
+        <div class="max-w-5xl mx-auto bg-white rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] border border-fz-gray-200 overflow-hidden observe-me fz-reveal-up"
+            data-delay="100">
             <!-- Mock Header -->
             <div class="border-b border-fz-gray-100 p-6 flex justify-between items-center bg-fz-white">
                 <div class="text-sm font-semibold tracking-widest uppercase text-fz-gray-800">Dashboard</div>
@@ -396,32 +462,40 @@
                     <div class="w-3 h-3 rounded-full bg-fz-gray-200"></div>
                 </div>
             </div>
-            
+
             <div class="p-8 md:p-12">
                 <!-- Top Metrics -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
                     <div class="p-6 bg-fz-gray-50 rounded-2xl border border-fz-gray-100">
-                        <span class="block text-xs font-semibold tracking-widest text-fz-gray-400 uppercase mb-2">Income</span>
+                        <span
+                            class="block text-xs font-semibold tracking-widest text-fz-gray-400 uppercase mb-2">Income</span>
                         <div class="w-24 h-4 bg-fz-gray-200 rounded-full mt-4"></div>
                     </div>
                     <div class="p-6 bg-fz-gray-50 rounded-2xl border border-fz-gray-100">
-                        <span class="block text-xs font-semibold tracking-widest text-fz-gray-400 uppercase mb-2">Total Expenses</span>
+                        <span class="block text-xs font-semibold tracking-widest text-fz-gray-400 uppercase mb-2">Total
+                            Expenses</span>
                         <div class="w-32 h-4 bg-fz-gray-200 rounded-full mt-4"></div>
                     </div>
                     <div class="p-6 bg-fz-gray-50 rounded-2xl border border-fz-gray-100">
-                        <span class="block text-xs font-semibold tracking-widest text-fz-gray-400 uppercase mb-2">Savings</span>
+                        <span
+                            class="block text-xs font-semibold tracking-widest text-fz-gray-400 uppercase mb-2">Savings</span>
                         <div class="w-20 h-4 bg-fz-gray-200 rounded-full mt-4"></div>
                     </div>
                     <div class="p-6 bg-fz-gray-50 rounded-2xl border border-fz-gray-100">
-                        <span class="block text-xs font-semibold tracking-widest text-fz-gray-400 uppercase mb-2">Savings Rate</span>
+                        <span
+                            class="block text-xs font-semibold tracking-widest text-fz-gray-400 uppercase mb-2">Savings
+                            Rate</span>
                         <div class="w-16 h-4 bg-fz-gray-200 rounded-full mt-4"></div>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <!-- Charts Area -->
-                    <div class="md:col-span-2 p-8 bg-fz-white border border-fz-gray-200 rounded-2xl flex flex-col justify-center min-h-[300px]">
-                        <span class="block text-xs font-semibold tracking-widest text-fz-gray-400 uppercase text-center mb-8">Financial Overview Charts</span>
+                    <div
+                        class="md:col-span-2 p-8 bg-fz-white border border-fz-gray-200 rounded-2xl flex flex-col justify-center min-h-[300px]">
+                        <span
+                            class="block text-xs font-semibold tracking-widest text-fz-gray-400 uppercase text-center mb-8">Financial
+                            Overview Charts</span>
                         <div class="flex items-end justify-center gap-4 h-32">
                             <div class="w-12 bg-fz-gray-100 rounded-t-md h-[40%]"></div>
                             <div class="w-12 bg-fz-black rounded-t-md h-[80%]"></div>
@@ -431,10 +505,11 @@
                             <div class="w-12 bg-fz-black rounded-t-md h-[90%]"></div>
                         </div>
                     </div>
-                    
+
                     <!-- Insights Area -->
                     <div class="p-8 bg-fz-red/5 border border-fz-red/20 rounded-2xl flex flex-col">
-                        <span class="block text-xs font-semibold tracking-widest text-fz-red uppercase mb-8">Rule-Based Insights</span>
+                        <span class="block text-xs font-semibold tracking-widest text-fz-red uppercase mb-8">Rule-Based
+                            Insights</span>
                         <div class="flex flex-col gap-4">
                             <div class="p-4 bg-white rounded-xl shadow-sm border border-fz-red/10">
                                 <div class="w-full h-3 bg-fz-gray-200 rounded-full mb-2"></div>
@@ -449,14 +524,14 @@
                 </div>
             </div>
         </div>
-        
+
     </div>
 </section>
 
 <!-- SECTION — WHO IT IS FOR & TRANSPARENCY -->
 <section class="py-32 bg-fz-white border-b border-fz-gray-200 overflow-hidden">
     <div class="max-w-[1200px] mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-20">
-        
+
         <div class="observe-me fz-reveal-left">
             <h2 class="text-3xl font-semibold tracking-tighter text-fz-black mb-8">
                 Built for everyday financial decisions.
@@ -484,7 +559,8 @@
             </ul>
         </div>
 
-        <div class="border-t md:border-t-0 md:border-l border-fz-gray-200 pt-16 md:pt-0 md:pl-20 observe-me fz-reveal-right" data-delay="100">
+        <div class="border-t md:border-t-0 md:border-l border-fz-gray-200 pt-16 md:pt-0 md:pl-20 observe-me fz-reveal-right"
+            data-delay="100">
             <h2 class="text-3xl font-semibold tracking-tighter text-fz-black mb-8">
                 Transparent by design.
             </h2>
@@ -493,10 +569,12 @@
                     FinZave relies strictly on the financial information you record.
                 </p>
                 <p>
-                    All calculations are based on clearly implemented financial mathematics, and our insights are generated using explicitly predefined logical rules.
+                    All calculations are based on clearly implemented financial mathematics, and our insights are
+                    generated using explicitly predefined logical rules.
                 </p>
                 <p>
-                    There is no black-box AI making assumptions about your money. You remain fully responsible for your financial decisions.
+                    There is no black-box AI making assumptions about your money. You remain fully responsible for your
+                    financial decisions.
                 </p>
             </div>
         </div>
@@ -508,17 +586,19 @@
 <section class="py-40 bg-fz-white text-center overflow-hidden">
     <div class="max-w-3xl mx-auto px-6 observe-me fz-reveal-up">
         <h2 class="text-5xl md:text-7xl font-bold tracking-tighter text-fz-black mb-8 leading-[0.95]">
-            Understand your money.<br/>
+            Understand your money.<br />
             Make better decisions.
         </h2>
         <p class="text-xl md:text-2xl text-fz-gray-600 mb-12">
             Start tracking, analyzing, and understanding your financial journey with FinZave.
         </p>
         <div class="flex flex-col sm:flex-row items-center justify-center gap-6">
-            <a href="{{ url_for('public.signup') }}" class="inline-flex justify-center items-center px-10 py-4 bg-fz-black text-white text-lg font-medium rounded-full hover:bg-fz-red transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-fz-black/10">
+            <a href="{{ url_for('public.signup') }}"
+                class="inline-flex justify-center items-center px-10 py-4 bg-fz-black text-white text-lg font-medium rounded-full hover:bg-fz-red transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-fz-black/10">
                 Get Started
             </a>
-            <a href="{{ url_for('public.workflow') }}" class="inline-flex justify-center items-center px-8 py-4 bg-transparent text-fz-black text-lg font-medium hover:text-fz-red transition-colors duration-200 fz-underline-hover">
+            <a href="{{ url_for('public.workflow') }}"
+                class="inline-flex justify-center items-center px-8 py-4 bg-transparent text-fz-black text-lg font-medium hover:text-fz-red transition-colors duration-200 fz-underline-hover">
                 Explore Workflow
             </a>
         </div>
@@ -533,6 +613,7 @@
     .fz-hero-word {
         will-change: transform, opacity;
     }
+
     .fz-hero-after {
         will-change: transform, opacity;
         transition: opacity 0.6s ease, transform 0.6s ease;
@@ -541,67 +622,67 @@
 </style>
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    
-    // 1. Hero Reveal
-    const heroWords = document.querySelectorAll('.fz-hero-word');
-    const heroAfters = document.querySelectorAll('.fz-hero-after');
-    
-    if (!prefersReducedMotion) {
-        heroWords.forEach((word, index) => {
-            word.style.transform = 'translateY(20px)';
-            word.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-            word.style.transitionDelay = `${index * 80}ms`;
-            
-            // Trigger reflow
-            void word.offsetWidth;
-            
-            requestAnimationFrame(() => {
-                word.style.opacity = '1';
-                word.style.transform = 'translateY(0)';
-            });
-        });
-        
-        // Reveal paragraph and CTAs slightly after words
-        const afterDelay = (heroWords.length * 80) + 100;
-        heroAfters.forEach((el, idx) => {
-            el.style.transitionDelay = `${afterDelay + (idx * 150)}ms`;
-            requestAnimationFrame(() => {
-                el.style.opacity = '1';
-                el.style.transform = 'translateY(0)';
-            });
-        });
-    } else {
-        heroWords.forEach(w => { w.style.opacity = '1'; w.style.transform = 'none'; });
-        heroAfters.forEach(e => { e.style.opacity = '1'; e.style.transform = 'none'; });
-    }
+    document.addEventListener("DOMContentLoaded", () => {
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // 2. Numbered Section (Black -> Red on viewport)
-    const numberRows = document.querySelectorAll('.fz-scroll-row');
-    if (numberRows.length > 0 && !prefersReducedMotion) {
-        // Using a tight root margin to detect when row is precisely in view
-        const numberObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                const numTarget = entry.target.querySelector('.fz-scroll-num');
-                if (!numTarget) return;
-                
-                if (entry.isIntersecting) {
-                    numTarget.classList.add('text-fz-red');
-                    numTarget.classList.remove('text-fz-black');
-                } else {
-                    numTarget.classList.remove('text-fz-red');
-                    numTarget.classList.add('text-fz-black');
-                }
+        // 1. Hero Reveal
+        const heroWords = document.querySelectorAll('.fz-hero-word');
+        const heroAfters = document.querySelectorAll('.fz-hero-after');
+
+        if (!prefersReducedMotion) {
+            heroWords.forEach((word, index) => {
+                word.style.transform = 'translateY(20px)';
+                word.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                word.style.transitionDelay = `${index * 80}ms`;
+
+                // Trigger reflow
+                void word.offsetWidth;
+
+                requestAnimationFrame(() => {
+                    word.style.opacity = '1';
+                    word.style.transform = 'translateY(0)';
+                });
             });
-        }, {
-            root: null,
-            rootMargin: '-20% 0px -40% 0px',
-            threshold: 0.1
-        });
-        
-        numberRows.forEach(row => numberObserver.observe(row));
-    }
-});
+
+            // Reveal paragraph and CTAs slightly after words
+            const afterDelay = (heroWords.length * 80) + 100;
+            heroAfters.forEach((el, idx) => {
+                el.style.transitionDelay = `${afterDelay + (idx * 150)}ms`;
+                requestAnimationFrame(() => {
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                });
+            });
+        } else {
+            heroWords.forEach(w => { w.style.opacity = '1'; w.style.transform = 'none'; });
+            heroAfters.forEach(e => { e.style.opacity = '1'; e.style.transform = 'none'; });
+        }
+
+        // 2. Numbered Section (Black -> Red on viewport)
+        const numberRows = document.querySelectorAll('.fz-scroll-row');
+        if (numberRows.length > 0 && !prefersReducedMotion) {
+            // Using a tight root margin to detect when row is precisely in view
+            const numberObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const numTarget = entry.target.querySelector('.fz-scroll-num');
+                    if (!numTarget) return;
+
+                    if (entry.isIntersecting) {
+                        numTarget.classList.add('text-fz-red');
+                        numTarget.classList.remove('text-fz-black');
+                    } else {
+                        numTarget.classList.remove('text-fz-red');
+                        numTarget.classList.add('text-fz-black');
+                    }
+                });
+            }, {
+                root: null,
+                rootMargin: '-20% 0px -40% 0px',
+                threshold: 0.1
+            });
+
+            numberRows.forEach(row => numberObserver.observe(row));
+        }
+    });
 </script>
 {% endblock %}

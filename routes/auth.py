@@ -1,11 +1,18 @@
 from flask import Blueprint, request, jsonify
 from extensions import db
 from models.user import User
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import (
+    create_access_token, jwt_required, get_jwt_identity,
+    set_access_cookies, unset_jwt_cookies
+)
+from extensions import limiter
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
 
+import re
+
 @auth_bp.route('/register', methods=['POST'])
+@limiter.limit("5 per minute")
 def register():
     data = request.get_json()
     if not data:
@@ -14,9 +21,27 @@ def register():
     username = data.get('username')
     email = data.get('email')
     password = data.get('password')
+    confirm_password = data.get('confirm_password')
+    terms_accepted = data.get('terms_accepted')
 
-    if not username or not email or not password:
+    if not username or not email or not password or not confirm_password:
         return jsonify({"message": "Missing required fields"}), 400
+        
+    if password != confirm_password:
+        return jsonify({"message": "Passwords do not match"}), 400
+        
+    if not terms_accepted:
+        return jsonify({"message": "You must accept the Terms & Conditions"}), 400
+
+    # Password Validation
+    if len(password) < 6:
+        return jsonify({"message": "Password must be at least 6 characters"}), 400
+    if not re.search(r'[A-Z]', password):
+        return jsonify({"message": "Password must contain at least 1 uppercase letter"}), 400
+    if not re.search(r'[a-z]', password):
+        return jsonify({"message": "Password must contain at least 1 lowercase letter"}), 400
+    if not re.search(r'[^a-zA-Z0-9]', password):
+        return jsonify({"message": "Password must contain at least 1 special character"}), 400
 
     if User.query.filter_by(username=username).first():
         return jsonify({"message": "Username already exists"}), 409
@@ -33,6 +58,7 @@ def register():
     return jsonify({"message": "User registered successfully"}), 201
 
 @auth_bp.route('/login', methods=['POST'])
+@limiter.limit("5 per minute")
 def login():
     data = request.get_json()
     if not data:
@@ -49,15 +75,23 @@ def login():
         return jsonify({"message": "Invalid credentials"}), 401
 
     access_token = create_access_token(identity=str(user.id))
-    return jsonify({
-        "access_token": access_token,
+    response = jsonify({
+        "message": "Login successful",
         "user": {
             "id": user.id,
             "username": user.username,
             "email": user.email,
             "role": user.role
         }
-    }), 200
+    })
+    set_access_cookies(response, access_token)
+    return response, 200
+
+@auth_bp.route('/logout', methods=['POST'])
+def logout():
+    response = jsonify({"message": "Logout successful"})
+    unset_jwt_cookies(response)
+    return response, 200
 
 @auth_bp.route('/me', methods=['GET'])
 @jwt_required()

@@ -1,7 +1,7 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
 from config import Config
-from extensions import db, jwt, cache
+from extensions import db, jwt, cache, limiter, migrate
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -14,6 +14,8 @@ def create_app(config_class=Config):
     db.init_app(app)
     jwt.init_app(app)
     cache.init_app(app)
+    limiter.init_app(app)
+    migrate.init_app(app, db)
 
     @app.route('/api/health', methods=['GET'])
     def health_check():

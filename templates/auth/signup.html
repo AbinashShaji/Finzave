@@ -30,18 +30,52 @@
             <!-- Password Input -->
             <div class="flex flex-col gap-2">
                 <label for="password" class="text-sm font-medium text-fz-black">Password</label>
-                <input type="password" id="password" name="password" required minlength="6"
-                    class="w-full px-4 py-3 bg-white border border-fz-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-fz-black focus:border-transparent transition-all"
-                    placeholder="Create a password">
-                <p class="text-xs text-fz-gray-800 mt-1">Must be at least 6 characters.</p>
+                <div class="relative">
+                    <input type="password" id="password" name="password" required minlength="6"
+                        class="w-full px-4 py-3 bg-white border border-fz-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-fz-black focus:border-transparent transition-all pr-12"
+                        placeholder="Create a password">
+                    <button type="button" id="toggle-password" class="absolute inset-y-0 right-0 flex items-center pr-4 text-fz-gray-500 hover:text-fz-black transition-colors focus:outline-none">
+                        <i data-lucide="eye" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                <p id="password-helper" class="text-xs text-fz-red mt-1 overflow-hidden transition-all duration-300 max-h-0 opacity-0">
+                    Password must be at least 6 characters and include one uppercase letter, one lowercase letter, and one special character.
+                </p>
+            </div>
+
+            <!-- Confirm Password Input -->
+            <div class="flex flex-col gap-2">
+                <label for="confirm-password" class="text-sm font-medium text-fz-black">Confirm Password</label>
+                <div class="relative">
+                    <input type="password" id="confirm-password" name="confirm-password" required minlength="6"
+                        class="w-full px-4 py-3 bg-white border border-fz-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-fz-black focus:border-transparent transition-all pr-12"
+                        placeholder="Confirm your password">
+                    <button type="button" id="toggle-confirm-password" class="absolute inset-y-0 right-0 flex items-center pr-4 text-fz-gray-500 hover:text-fz-black transition-colors focus:outline-none">
+                        <i data-lucide="eye" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                <p id="password-match-msg" class="text-xs font-medium text-fz-red mt-1 overflow-hidden transition-all duration-300 max-h-0 opacity-0">Passwords do not match.</p>
+            </div>
+
+            <!-- Terms Checkbox -->
+            <div class="flex flex-col gap-2 mt-2">
+                <label class="flex items-start gap-3 cursor-pointer group">
+                    <div class="relative flex items-center justify-center mt-0.5">
+                        <input type="checkbox" id="terms-checkbox" required class="peer appearance-none w-5 h-5 bg-white border-2 border-fz-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-fz-black focus:ring-offset-2 checked:bg-fz-black checked:border-fz-black transition-colors cursor-pointer shrink-0">
+                        <svg class="absolute w-3.5 h-3.5 text-white opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </div>
+                    <span class="text-sm text-fz-gray-800 select-none group-hover:text-fz-black transition-colors">
+                        I agree to the <a href="{{ url_for('public.terms') }}" target="_blank" class="text-fz-black font-semibold hover:text-fz-red underline underline-offset-2">Terms & Conditions</a>
+                    </span>
+                </label>
             </div>
             
             <!-- Error & Success Message Containers -->
             <div id="error-message" class="hidden text-sm text-fz-red font-medium mt-1"></div>
             <div id="success-message" class="hidden text-sm text-green-600 font-medium mt-1"></div>
 
-            <button type="submit" id="submit-btn"
-                class="mt-2 w-full flex justify-center items-center py-3.5 bg-fz-black text-white font-medium rounded-xl hover:bg-fz-red transition-all duration-300 shadow-sm disabled:opacity-70 disabled:cursor-not-allowed">
+            <button type="submit" id="submit-btn" disabled
+                class="mt-2 w-full flex justify-center items-center py-3.5 bg-fz-black text-white font-medium rounded-xl hover:bg-fz-red transition-all duration-300 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
                 <span>Sign up</span>
                 <svg id="loading-spinner" class="hidden animate-spin ml-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -60,53 +94,146 @@
 
 {% block extra_scripts %}
 <script>
-document.getElementById('signup-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const username = document.getElementById('username').value;
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const errorDiv = document.getElementById('error-message');
-    const successDiv = document.getElementById('success-message');
+document.addEventListener("DOMContentLoaded", () => {
+    const usernameInput = document.getElementById('username');
+    const emailInput = document.getElementById('email');
+    const pwInput = document.getElementById('password');
+    const confirmPwInput = document.getElementById('confirm-password');
+    const termsCheck = document.getElementById('terms-checkbox');
     const submitBtn = document.getElementById('submit-btn');
-    const spinner = document.getElementById('loading-spinner');
+    const matchMsg = document.getElementById('password-match-msg');
+    const form = document.getElementById('signup-form');
     
-    // Reset state
-    errorDiv.classList.add('hidden');
-    successDiv.classList.add('hidden');
-    errorDiv.textContent = '';
-    submitBtn.disabled = true;
-    spinner.classList.remove('hidden');
+    const helperText = document.getElementById('password-helper');
+
+    let isPasswordValid = false;
+    let isMatchValid = false;
     
-    try {
-        const response = await fetch('/api/auth/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ username, email, password })
+    // Toggle password visibility
+    const setupPasswordToggle = (inputId, btnId) => {
+        const input = document.getElementById(inputId);
+        const btn = document.getElementById(btnId);
+        btn.addEventListener('click', () => {
+            const isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+            btn.innerHTML = `<i data-lucide="${isPassword ? 'eye-off' : 'eye'}" class="w-5 h-5"></i>`;
+            if (window.lucide) {
+                window.lucide.createIcons({ nameAttr: 'data-lucide' });
+            }
         });
+    };
+    
+    setupPasswordToggle('password', 'toggle-password');
+    setupPasswordToggle('confirm-password', 'toggle-confirm-password');
+
+    const validateSignupForm = () => {
+        const p = pwInput.value;
+        const c = confirmPwInput.value;
         
-        const data = await response.json();
+        // Validation Checks
+        const hasLength = p.length >= 6;
+        const hasUpper = /[A-Z]/.test(p);
+        const hasLower = /[a-z]/.test(p);
+        const hasSpecial = /[^a-zA-Z0-9]/.test(p);
         
-        if (response.status === 201) {
-            successDiv.textContent = 'Account created successfully! Redirecting to login...';
-            successDiv.classList.remove('hidden');
-            setTimeout(() => {
-                window.location.href = '/login';
-            }, 1500);
+        isPasswordValid = hasLength && hasUpper && hasLower && hasSpecial;
+        
+        if (p.length > 0) {
+            if (isPasswordValid) {
+                helperText.classList.add('max-h-0', 'opacity-0');
+                helperText.classList.remove('max-h-20', 'opacity-100');
+            } else {
+                helperText.classList.remove('max-h-0', 'opacity-0');
+                helperText.classList.add('max-h-20', 'opacity-100');
+            }
         } else {
-            errorDiv.textContent = data.error || 'Registration failed. Please try again.';
+            helperText.classList.add('max-h-0', 'opacity-0');
+            helperText.classList.remove('max-h-20', 'opacity-100');
+        }
+
+        // Password match check
+        if (c.length > 0 || p.length > 0) {
+            if (p === c) {
+                matchMsg.classList.add('max-h-0', 'opacity-0');
+                matchMsg.classList.remove('max-h-20', 'opacity-100');
+                isMatchValid = p.length > 0;
+            } else {
+                if (c.length > 0) {
+                    matchMsg.classList.remove('max-h-0', 'opacity-0');
+                    matchMsg.classList.add('max-h-20', 'opacity-100');
+                }
+                isMatchValid = false;
+            }
+        } else {
+            matchMsg.classList.add('max-h-0', 'opacity-0');
+            matchMsg.classList.remove('max-h-20', 'opacity-100');
+            isMatchValid = false;
+        }
+
+        const isFormFilled = usernameInput.value.trim() !== '' && emailInput.value.trim() !== '';
+
+        submitBtn.disabled = !(isPasswordValid && isMatchValid && termsCheck.checked && isFormFilled);
+    };
+
+    pwInput.addEventListener('input', validateSignupForm);
+    confirmPwInput.addEventListener('input', validateSignupForm);
+    termsCheck.addEventListener('change', validateSignupForm);
+    usernameInput.addEventListener('input', validateSignupForm);
+    emailInput.addEventListener('input', validateSignupForm);
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        if (submitBtn.disabled) return;
+        
+        const username = usernameInput.value;
+        const email = emailInput.value;
+        const password = pwInput.value;
+        const confirm_password = confirmPwInput.value;
+        const terms_accepted = termsCheck.checked;
+        
+        const errorDiv = document.getElementById('error-message');
+        const successDiv = document.getElementById('success-message');
+        const spinner = document.getElementById('loading-spinner');
+        
+        // Reset state
+        errorDiv.classList.add('hidden');
+        successDiv.classList.add('hidden');
+        errorDiv.textContent = '';
+        submitBtn.disabled = true;
+        spinner.classList.remove('hidden');
+        
+        try {
+            const response = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, email, password, confirm_password, terms_accepted })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                successDiv.textContent = 'Account created successfully! Redirecting...';
+                successDiv.classList.remove('hidden');
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 1500);
+            } else {
+                errorDiv.textContent = data.message || data.error || 'Signup failed. Please try again.';
+                errorDiv.classList.remove('hidden');
+                submitBtn.disabled = false;
+                spinner.classList.add('hidden');
+            }
+        } catch (error) {
+            errorDiv.textContent = 'Network error. Please try again later.';
             errorDiv.classList.remove('hidden');
             submitBtn.disabled = false;
+        } finally {
+            spinner.classList.add('hidden');
         }
-    } catch (error) {
-        errorDiv.textContent = 'Network error. Please try again later.';
-        errorDiv.classList.remove('hidden');
-        submitBtn.disabled = false;
-    } finally {
-        spinner.classList.add('hidden');
-    }
+    });
 });
 </script>
 {% endblock %}

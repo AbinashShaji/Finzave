@@ -50,6 +50,14 @@ Phase 4.2 — Services Page Redesign COMPLETE
 - **Visual Features**: Showcased the SIP/EMI tools without overstating them as investment advice, built a minimalist visual wireframe to demonstrate the dashboard metrics, and clearly laid out target audience and transparency guidelines.
 - **Design Paradigm**: Utilized massive, asymmetric typography layouts, distinct thin dividers, white space, and strictly adhered to the `White + Black + Red` identity to cement FinZave as a premium, rule-based product rather than generic SaaS.
 
+## Phase 4.7 Signup Authentication Enhancements
+- **Confirm Password**: Added a "Confirm Password" field to the signup form requiring an exact match.
+- **Password Complexity Rules**: Enforced minimum 6 characters, at least 1 uppercase letter, at least 1 lowercase letter, and at least 1 special character. Visualized via a clean, error-only UX: no requirements are shown initially. If the password fails requirements, an inline red error fades in below the field. It smoothly hides once satisfied. Added password visibility toggles.
+- **Terms & Conditions Checkbox**: Added a required checkbox linking to the `/terms` page that must be accepted to register.
+- **Strict Dual Validation**: Implemented rigid real-time frontend JS validation (disabling submit buttons and showing clear red text for invalid rules/mismatches). Backend validation strictly mirrors these requirements, securely blocking invalid payloads by evaluating the regex rules, a `terms_accepted` boolean, AND verifying a `confirm_password` payload matches the original password.
+- **Files Modified**: `templates/auth/signup.html` (UI & frontend JS), `routes/auth.py` (backend regex validation).
+- **Implementation Notes**: The existing UI design was preserved without a visual redesign. The backend now verifies a `terms_accepted` field in the JSON payload along with the strict regex password checks.
+
 ## Architecture State
 Flask → Extensions → PostgreSQL (Auth Active) + Public UI 
 Tables: users, incomes, expenses, goals, analyses, reviews, feedback, settings
@@ -57,6 +65,12 @@ Tables: users, incomes, expenses, goals, analyses, reviews, feedback, settings
 ## Validation
 - Successfully ran Python testing script verifying all 6 new HTML routes return 200 OK.
 - Live server test of the `/services` route returned `200` post-refinement.
+
+## Phase 4.8 Pre-Next-Step Audit & Fixes (COMPLETED)
+- **Security & Authentication (PASS)**: JWT tokens are correctly migrated to `HttpOnly` cookies. CSRF protection is active. Rate limiting is enforcing limits correctly on auth routes.
+- **Tailwind Build (PASS)**: Browser-side CDN has been successfully replaced by a static CLI build (`output.css`).
+- **Database (PASS)**: `Flask-Migrate` is configured with an initial tracking state without data loss.
+- **Status**: **READY FOR NEXT PHASE**. Final verification confirms the core architecture is secure and performant.
 
 ## Next Phase
 Transactions
