@@ -1,0 +1,64 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Dashboard - FinZave Admin{% endblock %}
+{% block header_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white p-6 rounded-xl border border-fz-gray-200 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-medium text-fz-gray-500">Total Users</h3>
+            <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+                <i data-lucide="users" class="w-5 h-5"></i>
+            </div>
+        </div>
+        <p class="text-3xl font-bold" id="stat-users">-</p>
+    </div>
+    
+    <div class="bg-white p-6 rounded-xl border border-fz-gray-200 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-medium text-fz-gray-500">Total Reviews</h3>
+            <div class="w-10 h-10 rounded-full bg-yellow-50 flex items-center justify-center text-yellow-600">
+                <i data-lucide="star" class="w-5 h-5"></i>
+            </div>
+        </div>
+        <p class="text-3xl font-bold" id="stat-reviews">-</p>
+    </div>
+    
+    <div class="bg-white p-6 rounded-xl border border-fz-gray-200 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-medium text-fz-gray-500">Pending Feedback</h3>
+            <div class="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-fz-red">
+                <i data-lucide="message-square" class="w-5 h-5"></i>
+            </div>
+        </div>
+        <p class="text-3xl font-bold" id="stat-feedback">-</p>
+    </div>
+</div>
+
+<div class="bg-white rounded-xl border border-fz-gray-200 p-8 text-center py-20">
+    <div class="w-16 h-16 rounded-full bg-fz-gray-50 flex items-center justify-center mx-auto mb-4 text-fz-gray-400">
+        <i data-lucide="bar-chart-2" class="w-8 h-8"></i>
+    </div>
+    <h3 class="text-lg font-bold mb-2">Welcome to FinZave Admin</h3>
+    <p class="text-fz-gray-500 max-w-md mx-auto">Manage users, moderate reviews, and resolve feedback from this centralized dashboard.</p>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        try {
+            const res = await fetch('/api/admin/stats');
+            if (res.ok) {
+                const data = await res.json();
+                document.getElementById('stat-users').textContent = data.total_users;
+                document.getElementById('stat-reviews').textContent = data.total_reviews;
+                document.getElementById('stat-feedback').textContent = data.pending_feedback;
+            }
+        } catch (error) {
+            console.error('Error fetching stats:', error);
+        }
+    });
+</script>
+{% endblock %}

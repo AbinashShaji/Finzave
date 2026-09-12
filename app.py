@@ -24,9 +24,11 @@ def create_app(config_class=Config):
     # Register blueprints
     from routes.auth import auth_bp
     from routes.public import public_bp
+    from routes.admin import admin_bp
     
     app.register_blueprint(auth_bp)
     app.register_blueprint(public_bp)
+    app.register_blueprint(admin_bp)
 
     @app.errorhandler(404)
     def page_not_found(e):

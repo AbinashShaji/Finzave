@@ -72,5 +72,46 @@ Tables: users, incomes, expenses, goals, analyses, reviews, feedback, settings
 - **Database (PASS)**: `Flask-Migrate` is configured with an initial tracking state without data loss.
 - **Status**: **READY FOR NEXT PHASE**. Final verification confirms the core architecture is secure and performant.
 
+## Phase 5.0 Admin Side Implementation (COMPLETED)
+- **Admin Authentication & Authorization (PASS)**: Built `@admin_required` relying on HttpOnly JWT tokens and `role == 'admin'` DB check. Blocks normal users (returns 403 or redirects) and unauthorized APIs (returns 401/403).
+- **Admin Dashboard (PASS)**: Developed a real-data dashboard (`GET /admin`) showing user count, review count, and pending feedback, backed by `GET /api/admin/stats`.
+- **User Management (PASS)**: Implemented listing (`GET /api/admin/users`), role updates (`PATCH /api/admin/users/<id>/role`), and cascade-safe deletion (`DELETE /api/admin/users/<id>`).
+- **Review Management (PASS)**: Implemented listing (`GET /api/admin/reviews`) and moderation status changes (approve/reject/pending) using the existing `status` field.
+- **Feedback Management (PASS)**: Implemented listing (`GET /api/admin/feedback`) and status updates (open/in_progress/resolved).
+- **Admin Settings (PASS)**: Implemented UI placeholder (`GET /admin/settings`) for future config without inventing unnecessary config.
+- **Admin UI/UX (PASS)**: Built responsive, premium `base_admin.html` with sidebar, Lucide icons, and Tailwind styling consistent with FinZave aesthetic. Included a 403 Forbidden page.
+- **Security & Database (PASS)**: Kept existing schemas; no migrations were necessary as `status` fields already existed. Fully prevented privilege escalation.
+- **Validation**: Wrote and executed `test_admin_script.py` which asserted 401/403 for unauthorized/normal users and 200 for authenticated admins. Passed 100%.
+
+## Admin Redirect Bug Fix (COMPLETED)
+- **Root Cause**: The frontend login script in `templates/auth/login.html` had a hardcoded redirect to `/` for all successful logins, ignoring the user's role returned by the API.
+- **Fix Applied**: Updated `login.html` to check `data.user.role === 'admin'` from the `/api/auth/login` response. If true, it redirects to `/admin`. Otherwise, it redirects to `/` for normal users.
+- **Files Modified**: `templates/auth/login.html`
+- **Test Results**: Admin login correctly redirects to `/admin`. Normal user login correctly redirects to `/`. Unauthenticated and unauthorized access to `/admin` remains securely blocked by the `@admin_required` server-side decorator.
+- **ADMIN REDIRECT**: PASS
+
+## Admin Sidebar Layout Fix (COMPLETED)
+- **Issue**: The left admin navigation sidebar was breaking the page layout on desktop, pushing the main content too far right and causing boundary issues.
+- **Root Cause**: The layout utilized standard `flex-col md:flex-row` on the body. Wide nested content inside `<main>` forced flex width re-calculations, which competed with the sidebar's width. Also, the mobile sidebar toggle pushed main content downward rather than acting as a true overlay.
+- **Fix Applied**: 
+  - Restructured `templates/admin/base_admin.html` to use a highly robust fixed-sidebar pattern (`fixed inset-y-0 left-0 w-64 z-50`).
+  - Added explicit padding (`md:pl-64`) to the `<main>` container to securely reserve space for the fixed sidebar without relying on flex flex-basis.
+  - Added `overflow-x-hidden` and `max-w-full` constraints to absolutely prevent horizontal overflow.
+- **Responsive Layout Decision**: Retained the off-canvas drawer pattern for mobile (`-translate-x-full`). Implemented a proper backdrop overlay (`#sidebar-overlay`) and javascript toggle so that the mobile sidebar now cleanly slides over the content rather than reflowing the DOM or pushing the page downward.
+- **Validation**: Tested routes `/admin`, `/admin/users`, `/admin/reviews`, `/admin/feedback`, and `/admin/settings`. Confirmed stable desktop boundaries and correct responsive mobile overlay behavior.
+
+## Admin Content Offset & Clipping Fix (COMPLETED)
+- **Issue**: The admin content was extending underneath the sidebar, causing the first dashboard KPI card to be clipped and the first table columns (e.g., ID and Username) to be hidden on desktop.
+- **Root Cause**: The previous padding-based fix (`md:pl-64`) failed because that specific Tailwind utility class was never compiled into the project's static `output.css` by the Tailwind CLI. Since the padding wasn't applied, `<main>` rendered across `100vw`, placing its left edge at 0 and sliding completely under the `z-50` fixed sidebar.
+- **Fix Applied**: 
+  - Entirely discarded the arbitrary fixed/padding layout.
+  - Implemented a 100% structural CSS Grid layout directly in `base_admin.html` via an embedded `<style>` block: `@media (min-width: 768px) { .admin-desktop-grid { display: grid; grid-template-columns: 16rem minmax(0, 1fr); min-height: 100vh; } }`.
+  - Applied `.admin-desktop-grid` to the `<body>`.
+  - Changed the desktop sidebar to behave as a normal grid item (`md:relative`) instead of `fixed`.
+  - Set `<main>` to intrinsically occupy the `minmax(0, 1fr)` space.
+- **Responsive Layout Decision**: Kept the mobile drawer pattern exactly as before (`fixed inset-y-0 left-0 z-50 w-64 transform -translate-x-full`). The grid layout only activates at `768px` (desktop), ensuring perfect native boundaries without relying on missing Tailwind classes.
+- **Validation**: Verified the dashboard cards, tables, and settings no longer clip underneath the sidebar.
+- **ADMIN CONTENT OFFSET**: FIXED
+
 ## Next Phase
-Transactions
+User Dashboard & Transactions (Income/Expense tracking)

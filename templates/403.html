@@ -1,0 +1,22 @@
+{% extends "base_public.html" %}
+
+{% block title %}403 Forbidden - FinZave{% endblock %}
+
+{% block content %}
+<div class="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center">
+    <div class="w-20 h-20 bg-fz-red text-white flex items-center justify-center rounded-2xl mb-8 shadow-lg">
+        <i data-lucide="shield-alert" class="w-10 h-10"></i>
+    </div>
+    
+    <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4">Access Denied</h1>
+    <p class="text-lg text-fz-gray-500 max-w-[50ch] mb-8 leading-relaxed">
+        You do not have permission to access this page. If you believe this is an error, please contact support.
+    </p>
+    
+    <div class="flex flex-col sm:flex-row gap-4">
+        <a href="{{ url_for('public.home') }}" class="bg-fz-black text-white px-8 py-3.5 rounded-full font-medium hover:bg-fz-red transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
+            Return Home
+        </a>
+    </div>
+</div>
+{% endblock %}
