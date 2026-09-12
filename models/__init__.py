@@ -6,6 +6,7 @@ from .analysis import Analysis
 from .review import Review
 from .feedback import Feedback
 from .setting import Setting
+from .activity import UserActivity
 
 __all__ = [
     'User',
@@ -16,4 +17,5 @@ __all__ = [
     'Review',
     'Feedback',
     'Setting',
+    'UserActivity',
 ]

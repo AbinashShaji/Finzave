@@ -6,6 +6,7 @@ from flask_jwt_extended import (
     set_access_cookies, unset_jwt_cookies
 )
 from extensions import limiter
+from utils.activity import log_activity
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
 
@@ -73,8 +74,15 @@ def login():
     user = User.query.filter_by(username=username).first()
     if not user or not user.check_password(password):
         return jsonify({"message": "Invalid credentials"}), 401
+        
+    if user.is_blocked:
+        return jsonify({"message": "Your account has been blocked. Please contact support."}), 403
 
     access_token = create_access_token(identity=str(user.id))
+    
+    # Log successful login
+    log_activity('login', user.id)
+    
     response = jsonify({
         "message": "Login successful",
         "user": {
@@ -89,6 +97,7 @@ def login():
 
 @auth_bp.route('/logout', methods=['POST'])
 def logout():
+    log_activity('logout')
     response = jsonify({"message": "Logout successful"})
     unset_jwt_cookies(response)
     return response, 200

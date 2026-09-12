@@ -5,8 +5,15 @@
 
 {% block content %}
 <div class="bg-white rounded-xl border border-fz-gray-200 overflow-hidden shadow-sm">
-    <div class="p-6 border-b border-fz-gray-200 flex justify-between items-center">
-        <h2 class="text-lg font-bold">User Feedback</h2>
+    <div class="p-6 border-b border-fz-gray-200">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <h2 class="text-lg font-bold">Feedback Moderation</h2>
+            <div class="flex bg-fz-gray-100 p-1 rounded-lg">
+                <button onclick="setTab('pending')" id="tab-pending" class="px-4 py-2 text-sm font-medium rounded-md bg-white shadow-sm transition-all text-fz-black">All (Pending)</button>
+                <button onclick="setTab('unresolved')" id="tab-unresolved" class="px-4 py-2 text-sm font-medium rounded-md text-fz-gray-500 hover:text-fz-black transition-all">Accepted (Unresolved)</button>
+                <button onclick="setTab('resolved')" id="tab-resolved" class="px-4 py-2 text-sm font-medium rounded-md text-fz-gray-500 hover:text-fz-black transition-all">Resolved</button>
+            </div>
+        </div>
     </div>
     
     <div class="overflow-x-auto">
@@ -33,53 +40,75 @@
 
 {% block scripts %}
 <script>
+    let allFeedback = [];
+    let currentTab = 'pending';
+
     document.addEventListener("DOMContentLoaded", fetchFeedback);
+
+    function setTab(tabName) {
+        currentTab = tabName;
+        ['pending', 'unresolved', 'resolved'].forEach(t => {
+            const el = document.getElementById(`tab-${t}`);
+            if (t === currentTab) {
+                el.classList.add('bg-white', 'shadow-sm', 'text-fz-black');
+                el.classList.remove('text-fz-gray-500');
+            } else {
+                el.classList.remove('bg-white', 'shadow-sm', 'text-fz-black');
+                el.classList.add('text-fz-gray-500');
+            }
+        });
+        renderFeedback();
+    }
 
     async function fetchFeedback() {
         try {
             const res = await fetch('/api/admin/feedback');
             if (res.ok) {
-                const feedbacks = await res.json();
-                const tbody = document.getElementById('feedback-tbody');
-                
-                if (feedbacks.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-fz-gray-500">No feedback found.</td></tr>';
-                    return;
-                }
-
-                tbody.innerHTML = feedbacks.map(f => `
-                    <tr class="hover:bg-fz-gray-50 transition-colors">
-                        <td class="px-6 py-4 font-mono text-xs text-fz-gray-500">#${f.id}</td>
-                        <td class="px-6 py-4 font-medium">${f.username}</td>
-                        <td class="px-6 py-4">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
-                                ${f.type}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 max-w-xs truncate text-fz-gray-600" title="${f.content || ''}">${f.content || '-'}</td>
-                        <td class="px-6 py-4">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                f.status === 'resolved' ? 'bg-green-100 text-green-800' : 
-                                (f.status === 'in_progress' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800')
-                            }">
-                                ${f.status.replace('_', ' ')}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 text-right">
-                            <select onchange="updateStatus(${f.id}, this.value)" class="text-xs border border-fz-gray-200 rounded px-2 py-1 mr-2 focus:ring-1 focus:ring-fz-black focus:border-fz-black outline-none">
-                                <option value="open" ${f.status === 'open' ? 'selected' : ''}>Open</option>
-                                <option value="in_progress" ${f.status === 'in_progress' ? 'selected' : ''}>In Progress</option>
-                                <option value="resolved" ${f.status === 'resolved' ? 'selected' : ''}>Resolved</option>
-                            </select>
-                            <button onclick="deleteFeedback(${f.id})" class="text-fz-red hover:text-red-700 font-medium text-xs bg-red-50 hover:bg-red-100 px-3 py-1 rounded transition-colors">Delete</button>
-                        </td>
-                    </tr>
-                `).join('');
+                allFeedback = await res.json();
+                renderFeedback();
             }
         } catch (error) {
             console.error('Error fetching feedback:', error);
             document.getElementById('feedback-tbody').innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-red-500">Error loading feedback.</td></tr>';
         }
+    }
+    
+    function renderFeedback() {
+        const tbody = document.getElementById('feedback-tbody');
+        const filtered = allFeedback.filter(f => f.status === currentTab);
+        
+        if (filtered.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-fz-gray-500">No feedback found in this category.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = filtered.map(f => `
+            <tr class="hover:bg-fz-gray-50 transition-colors">
+                <td class="px-6 py-4 font-mono text-xs text-fz-gray-500">#${f.id}</td>
+                <td class="px-6 py-4 font-medium">${f.username}</td>
+                <td class="px-6 py-4">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
+                        ${f.type}
+                    </span>
+                </td>
+                <td class="px-6 py-4 max-w-xs truncate text-fz-gray-600" title="${f.content || ''}">${f.content || '-'}</td>
+                <td class="px-6 py-4">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        f.status === 'resolved' ? 'bg-green-100 text-green-800' : 
+                        (f.status === 'unresolved' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800')
+                    }">
+                        ${f.status === 'resolved' ? 'Resolved' : (f.status === 'unresolved' ? 'Unresolved' : 'Pending')}
+                    </span>
+                </td>
+                <td class="px-6 py-4 text-right">
+                    ${f.status === 'pending' ? `<button onclick="updateStatus(${f.id}, 'unresolved')" class="text-blue-600 hover:text-blue-800 font-medium text-xs bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded transition-colors mr-2">Accept</button>` : ''}
+                    ${f.status === 'unresolved' ? `<button onclick="updateStatus(${f.id}, 'resolved')" class="text-green-600 hover:text-green-800 font-medium text-xs bg-green-50 hover:bg-green-100 px-3 py-1 rounded transition-colors mr-2">Resolve</button>` : ''}
+                    ${f.status === 'resolved' ? `<button onclick="updateStatus(${f.id}, 'unresolved')" class="text-orange-600 hover:text-orange-800 font-medium text-xs bg-orange-50 hover:bg-orange-100 px-3 py-1 rounded transition-colors mr-2">Mark Unresolved</button>` : ''}
+                    
+                    <button onclick="deleteFeedback(${f.id})" class="text-fz-red hover:text-red-700 font-medium text-xs bg-red-50 hover:bg-red-100 px-3 py-1 rounded transition-colors">Delete</button>
+                </td>
+            </tr>
+        `).join('');
     }
 
     async function updateStatus(feedbackId, newStatus) {

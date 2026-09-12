@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for
+from flask import Blueprint, render_template, redirect, url_for, jsonify
 
 public_bp = Blueprint('public', __name__)
 
@@ -17,6 +17,21 @@ def services():
 @public_bp.route('/reviews')
 def reviews():
     return render_template('public/reviews.html')
+
+@public_bp.route('/api/reviews', methods=['GET'])
+def get_public_reviews():
+    from models.review import Review
+    live_reviews = Review.query.filter_by(status='live').order_by(Review.created_at.desc()).all()
+    result = []
+    for r in live_reviews:
+        result.append({
+            "id": r.id,
+            "username": r.user.username if r.user else "Anonymous",
+            "rating": r.rating,
+            "content": r.content,
+            "created_at": r.created_at.isoformat() if r.created_at else None
+        })
+    return jsonify(result), 200
 
 @public_bp.route('/login')
 def login():

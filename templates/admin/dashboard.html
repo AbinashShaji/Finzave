@@ -1,10 +1,11 @@
 {% extends "admin/base_admin.html" %}
 
 {% block title %}Dashboard - FinZave Admin{% endblock %}
-{% block header_title %}Dashboard{% endblock %}
+{% block header_title %}Product Analytics{% endblock %}
 
 {% block content %}
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+<!-- KPI Section -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
     <div class="bg-white p-6 rounded-xl border border-fz-gray-200 shadow-sm">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-sm font-medium text-fz-gray-500">Total Users</h3>
@@ -12,53 +13,283 @@
                 <i data-lucide="users" class="w-5 h-5"></i>
             </div>
         </div>
-        <p class="text-3xl font-bold" id="stat-users">-</p>
+        <p class="text-3xl font-bold" id="stat-total-users">-</p>
     </div>
     
     <div class="bg-white p-6 rounded-xl border border-fz-gray-200 shadow-sm">
         <div class="flex items-center justify-between mb-4">
-            <h3 class="text-sm font-medium text-fz-gray-500">Total Reviews</h3>
-            <div class="w-10 h-10 rounded-full bg-yellow-50 flex items-center justify-center text-yellow-600">
-                <i data-lucide="star" class="w-5 h-5"></i>
+            <h3 class="text-sm font-medium text-fz-gray-500">Active Users (7d)</h3>
+            <div class="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center text-green-600">
+                <i data-lucide="activity" class="w-5 h-5"></i>
             </div>
         </div>
-        <p class="text-3xl font-bold" id="stat-reviews">-</p>
+        <p class="text-3xl font-bold" id="stat-active-users">-</p>
     </div>
     
     <div class="bg-white p-6 rounded-xl border border-fz-gray-200 shadow-sm">
         <div class="flex items-center justify-between mb-4">
-            <h3 class="text-sm font-medium text-fz-gray-500">Pending Feedback</h3>
-            <div class="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-fz-red">
-                <i data-lucide="message-square" class="w-5 h-5"></i>
+            <h3 class="text-sm font-medium text-fz-gray-500">Inactive Users</h3>
+            <div class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400">
+                <i data-lucide="user-minus" class="w-5 h-5"></i>
             </div>
         </div>
-        <p class="text-3xl font-bold" id="stat-feedback">-</p>
+        <p class="text-3xl font-bold text-fz-gray-500" id="stat-inactive-users">-</p>
+    </div>
+
+    <div class="bg-white p-6 rounded-xl border border-fz-gray-200 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-medium text-fz-gray-500">Currently Online</h3>
+            <div class="w-10 h-10 rounded-full bg-fz-red bg-opacity-10 flex items-center justify-center text-fz-red">
+                <i data-lucide="zap" class="w-5 h-5"></i>
+            </div>
+        </div>
+        <p class="text-3xl font-bold" id="stat-online-users">-</p>
     </div>
 </div>
 
-<div class="bg-white rounded-xl border border-fz-gray-200 p-8 text-center py-20">
-    <div class="w-16 h-16 rounded-full bg-fz-gray-50 flex items-center justify-center mx-auto mb-4 text-fz-gray-400">
-        <i data-lucide="bar-chart-2" class="w-8 h-8"></i>
+<!-- Charts Section -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <div class="bg-white p-6 rounded-xl border border-fz-gray-200 shadow-sm flex flex-col">
+        <h3 class="text-lg font-bold mb-4">Engagement Trend (7d)</h3>
+        <div id="trendChartContainer" class="relative h-64 flex-grow">
+            <canvas id="trendChart"></canvas>
+        </div>
+        <div id="trendEmpty" class="hidden h-64 flex items-center justify-center text-fz-gray-500">
+            Not enough activity data yet.
+        </div>
     </div>
-    <h3 class="text-lg font-bold mb-2">Welcome to FinZave Admin</h3>
-    <p class="text-fz-gray-500 max-w-md mx-auto">Manage users, moderate reviews, and resolve feedback from this centralized dashboard.</p>
+    <div class="bg-white p-6 rounded-xl border border-fz-gray-200 shadow-sm flex flex-col">
+        <h3 class="text-lg font-bold mb-4">Most-Used Modules</h3>
+        <div id="moduleChartContainer" class="relative h-64 flex-grow">
+            <canvas id="moduleChart"></canvas>
+        </div>
+        <div id="moduleEmpty" class="hidden h-64 flex items-center justify-center text-fz-gray-500">
+            Not enough activity data yet.
+        </div>
+    </div>
+</div>
+
+<!-- Feedback & Reviews Section -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <!-- Recent Feedback -->
+    <div class="bg-white p-6 rounded-xl border border-fz-gray-200 shadow-sm">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-bold">Recent Feedback</h3>
+            <a href="{{ url_for('admin.feedback') }}" class="text-sm text-fz-red hover:underline">View all</a>
+        </div>
+        <div class="space-y-4" id="recent-feedback-list">
+            <p class="text-fz-gray-500 text-sm">Loading feedback...</p>
+        </div>
+    </div>
+
+    <!-- Recent Reviews -->
+    <div class="bg-white p-6 rounded-xl border border-fz-gray-200 shadow-sm">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-bold">Recent Reviews</h3>
+            <a href="{{ url_for('admin.reviews') }}" class="text-sm text-fz-red hover:underline">View all</a>
+        </div>
+        <div class="space-y-4" id="recent-reviews-list">
+            <p class="text-fz-gray-500 text-sm">Loading reviews...</p>
+        </div>
+    </div>
+</div>
+
+<!-- User Insights -->
+<div class="bg-white p-6 rounded-xl border border-fz-gray-200 shadow-sm mb-8">
+    <h3 class="text-lg font-bold mb-4">User Insights</h3>
+    <ul class="space-y-2 list-disc list-inside text-fz-gray-600" id="user-insights-list">
+        <li>Loading insights...</li>
+    </ul>
+</div>
+
+<!-- Recent Activity -->
+<div class="bg-white p-6 rounded-xl border border-fz-gray-200 shadow-sm mb-8">
+    <h3 class="text-lg font-bold mb-4">Recent Activity</h3>
+    <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm whitespace-nowrap">
+            <thead class="bg-fz-gray-50 border-b border-fz-gray-200 text-fz-gray-500 uppercase font-semibold text-xs tracking-wider">
+                <tr>
+                    <th class="px-4 py-3">User</th>
+                    <th class="px-4 py-3">Action</th>
+                    <th class="px-4 py-3 text-right">Time</th>
+                </tr>
+            </thead>
+            <tbody id="activity-tbody" class="divide-y divide-fz-gray-100">
+                <tr>
+                    <td colspan="3" class="px-4 py-6 text-center text-fz-gray-500">Loading activity...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", async () => {
         try {
             const res = await fetch('/api/admin/stats');
             if (res.ok) {
                 const data = await res.json();
-                document.getElementById('stat-users').textContent = data.total_users;
-                document.getElementById('stat-reviews').textContent = data.total_reviews;
-                document.getElementById('stat-feedback').textContent = data.pending_feedback;
+                
+                // KPIs
+                document.getElementById('stat-total-users').textContent = data.kpis.total_users;
+                document.getElementById('stat-active-users').textContent = data.kpis.active_users;
+                document.getElementById('stat-inactive-users').textContent = data.kpis.inactive_users;
+                document.getElementById('stat-online-users').innerHTML = data.kpis.online_users > 0 
+                    ? `<span class="inline-block w-2 h-2 bg-fz-red rounded-full mr-1 animate-pulse"></span> ${data.kpis.online_users}`
+                    : '0';
+
+                // Recent Feedback
+                const feedbackContainer = document.getElementById('recent-feedback-list');
+                if (data.recent_feedback && data.recent_feedback.length > 0) {
+                    feedbackContainer.innerHTML = data.recent_feedback.map(f => `
+                        <div class="border-b border-fz-gray-100 pb-3 last:border-0 last:pb-0">
+                            <p class="text-sm font-medium text-fz-black">${f.username} submitted feedback: <span class="font-normal text-fz-gray-600">"${f.content || 'No content'}"</span></p>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="text-xs text-fz-gray-400">${new Date(f.time).toLocaleString()}</span>
+                                <span class="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-gray-100 text-gray-600">${f.status}</span>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    feedbackContainer.innerHTML = '<p class="text-fz-gray-500 text-sm">No recent feedback.</p>';
+                }
+
+                // Recent Reviews
+                const reviewsContainer = document.getElementById('recent-reviews-list');
+                if (data.recent_reviews && data.recent_reviews.length > 0) {
+                    reviewsContainer.innerHTML = data.recent_reviews.map(r => `
+                        <div class="border-b border-fz-gray-100 pb-3 last:border-0 last:pb-0">
+                            <p class="text-sm font-medium text-fz-black">${r.username} submitted a ${r.rating}-star review.</p>
+                            <p class="text-sm text-fz-gray-600 truncate">"${r.content || ''}"</p>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="text-xs text-fz-gray-400">${new Date(r.time).toLocaleString()}</span>
+                                <span class="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-gray-100 text-gray-600">${r.status}</span>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    reviewsContainer.innerHTML = '<p class="text-fz-gray-500 text-sm">No recent reviews.</p>';
+                }
+
+                // User Insights
+                const insightsContainer = document.getElementById('user-insights-list');
+                if (data.user_insights && data.user_insights.length > 0) {
+                    insightsContainer.innerHTML = data.user_insights.map(i => `<li>${i}</li>`).join('');
+                } else {
+                    insightsContainer.innerHTML = '<li>No insights available.</li>';
+                }
+
+                // Recent Activity
+                const tbody = document.getElementById('activity-tbody');
+                if (data.recent_activity && data.recent_activity.length > 0) {
+                    tbody.innerHTML = data.recent_activity.map(a => `
+                        <tr class="hover:bg-fz-gray-50 transition-colors">
+                            <td class="px-4 py-3 font-medium">${a.username}</td>
+                            <td class="px-4 py-3">
+                                <span class="inline-flex px-2 py-0.5 rounded text-xs bg-fz-gray-100 border border-fz-gray-200">
+                                    Opened ${a.action.replace('_', ' ')}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-right text-fz-gray-500 text-xs">${new Date(a.time).toLocaleString()}</td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="3" class="px-4 py-6 text-center text-fz-gray-500">No recent activity.</td></tr>';
+                }
+
+                // Init Charts
+                initCharts(data.engagement_trend, data.module_usage);
             }
         } catch (error) {
             console.error('Error fetching stats:', error);
         }
     });
+
+    function initCharts(trendData, moduleData) {
+        Chart.defaults.font.family = "'Outfit', sans-serif";
+        Chart.defaults.color = '#737373';
+        
+        // Engagement Trend Chart (Line)
+        if (!trendData || trendData.length === 0) {
+            document.getElementById('trendChartContainer').classList.add('hidden');
+            document.getElementById('trendEmpty').classList.remove('hidden');
+        } else {
+            const trendCtx = document.getElementById('trendChart').getContext('2d');
+            new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: trendData.map(d => new Date(d.date).toLocaleDateString(undefined, {month: 'short', day: 'numeric'})),
+                    datasets: [{
+                        label: 'Activity Events',
+                        data: trendData.map(d => d.count),
+                        borderColor: '#0f0f0f', // fz-black
+                        backgroundColor: 'rgba(15, 15, 15, 0.05)',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#ff2d20', // fz-red
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#0f0f0f',
+                            padding: 12,
+                            titleFont: { size: 13 },
+                            bodyFont: { size: 13 }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { borderDash: [2, 4], color: '#e5e5e5' }, ticks: { precision: 0 } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // Module Usage Chart (Bar)
+        if (!moduleData || moduleData.length === 0) {
+            document.getElementById('moduleChartContainer').classList.add('hidden');
+            document.getElementById('moduleEmpty').classList.remove('hidden');
+        } else {
+            const modCtx = document.getElementById('moduleChart').getContext('2d');
+            new Chart(modCtx, {
+                type: 'bar',
+                data: {
+                    labels: moduleData.map(d => d.module.replace('_', ' ')),
+                    datasets: [{
+                        label: 'Events',
+                        data: moduleData.map(d => d.count),
+                        backgroundColor: '#ff2d20', // fz-red
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#0f0f0f',
+                            padding: 12,
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { borderDash: [2, 4], color: '#e5e5e5' }, ticks: { precision: 0 } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+    }
 </script>
 {% endblock %}

@@ -115,3 +115,64 @@ Tables: users, incomes, expenses, goals, analyses, reviews, feedback, settings
 
 ## Next Phase
 User Dashboard & Transactions (Income/Expense tracking)
+
+## Phase 5.1 Final Admin Enhancements (COMPLETED)
+- **Database Schema (PASS)**: Migrated DB via Alembic to add `is_blocked` to `User` and created `UserActivity` table for non-financial product interaction tracking.
+- **Activity Tracking Architecture (PASS)**: Created `utils.activity.log_activity` that logs string actions (e.g., 'login', 'logout') per `user_id`. Automatically hooked into authentication and setup for future modules.
+- **Engagement Definitions (PASS)**:
+  - **Online**: Active within the last 15 minutes.
+  - **Active User**: Activity recorded within the last 7 days.
+  - **Inactive User**: No activity in the last 7 days.
+  - **Account Status**: Active (unblocked) vs Blocked.
+- **Admin Dashboard & Analytics (PASS)**: Updated `/api/admin/stats` to compute Active/Inactive/Online counts and group 7-day trailing data for Engagement Trend & Most-Used Modules. UI updated to visually present these as KPIs and cleanly integrated Chart.js for visualizations (Line chart for trends, Bar chart for modules) without adding heavy static dependencies.
+- **User Management & Block Workflow (PASS)**: Replaced admin role-switching in `/admin/users` with Block/Unblock actions. Added `is_blocked` checks in `/api/auth/login` to strictly prevent blocked users from authenticating. UI now displays clear Status badges and precise Last Active timestamps or "Online" pulse indicators.
+- **Review Lifecycle (PASS)**: Transitioned to a rigid 3-tab moderation workflow (Pending, Accepted, Live). The `/api/reviews` public endpoint is updated to fetch ONLY `status='live'` reviews, ensuring moderation remains secure.
+- **Feedback Lifecycle (PASS)**: Transitioned to a rigid 3-tab resolution workflow (Pending, Unresolved/Accepted, Resolved) mapping strictly to backend statuses.
+- **Admin Settings (PASS)**: Implemented the requested static 3-section layout: Admin Profile (fetched live from `/api/auth/me`), Content Moderation rules, and System Information (querying Flask environment, active database connection, and Alembic migration version via `/api/admin/system`).
+- **Security & UI/UX (PASS)**: Maintained HttpOnly JWT authentication and CSRF. Ensured all new charts and tabs maintain the high-end `base_admin.html` FinZave design language. Verified responsiveness and zero horizontal overflow on charts.
+- **ADMIN ENHANCEMENT COMPLETE**: YES
+- **ADMIN AUDIT**: PASS
+- **MEMORY.MD UPDATED & VERIFIED**: YES
+
+## Phase 5.2 Admin Dashboard Redesign (Insights & Architecture)
+- **Moderation Summary Removed**: The old count-only moderation summary block was completely removed from the dashboard API and UI to focus on product intelligence.
+- **KPI Section Retained**: Kept Total Users, Active Users (7d), Inactive Users, and Currently Online (15m). Definitions strictly follow activity data, where Active/Inactive are independent of account Blocked status.
+- **Engagement & Module Charts Redefined**: 
+  - `login` and `logout` events are explicitly filtered out from the dataset.
+  - The Line Chart (Engagement Trend) and Bar Chart (Most-Used Modules) now only represent actual product usage (e.g., dashboard, analysis, calculators).
+  - Empty states ("Not enough activity data yet") correctly hide the canvas elements if there is insufficient historical data, avoiding misleading single-point charts.
+- **Recent Feedback & Reviews Added**: Introduced new dedicated containers to display the 5 most recent feedback submissions and 5 most recent reviews, including the username, text snippet, timestamp, and current status, with quick links to the respective management pages.
+- **User Insights Section Added**: Replaced the moderation summary with a dynamically generated, human-readable insights list based on real data (e.g., identifying the most-used module, counting active users this week, and surfacing recent moderation activity).
+- **Recent Activity Maintained & Secured**: Retained the recent activity log for the last 10 non-sensitive events. Privacy boundaries strictly respected (tracks *what* feature was used, not *what financial data* was entered).
+- **Responsive Layout**: Ensured the new containers naturally flow within the CSS Grid, maintaining desktop boundaries and correct scaling for the Chart.js canvases across all breakpoints.
+- **Testing**: Validated KPI recalculation, chart filtering (no 'login'), empty-data rendering, dynamic insight generation, and responsive bounds.
+
+## Phase 5.3 Admin Profile Navigation & Avatar Fix (COMPLETED)
+- **Settings Renamed to Profile**: The generic "Settings" page was renamed to "Profile" (`templates/admin/profile.html`) to accurately reflect its scope. 
+- **Navigation Updates**:
+  - The sidebar label and icon were updated from "Settings" (gear icon) to "Profile" (user icon).
+  - The URL route was updated to `/admin/profile`.
+  - Added a safe redirect from the legacy `/admin/settings` route to ensure no broken links.
+- **Top-Right Avatar Overhaul**: 
+  - The static "A" text icon was replaced with a fully clickable, polished circular avatar (`<a>` tag) that serves as a direct shortcut to the Profile page.
+  - Implemented dynamic JS fetching (`/api/auth/me`) within `base_admin.html` to populate the avatar with the actual logged-in admin's initial, maintaining the fallback "A".
+  - Styled with proper ring transitions and hover effects while perfectly preserving the existing header layout bounds.
+- **Verification**: Confirmed no duplicate pages exist, the route securely redirect functions, and responsive behavior remains intact across devices.
+
+## Phase 5.4 User Management Fixes (COMPLETED)
+- **Table Alignment Fixed**: The 'Last Active' column and overall table structural shifts were corrected by defining explicit constraints (`w-1/5`, `truncate`, `whitespace-nowrap`) and correcting a latent colspan mismatch.
+- **Block/Unblock UI Bug Fixed**: Transitioned the frontend logic to mutate an internal JavaScript state array (`usersData`) upon receiving successful `POST` responses, rather than relying on a subsequent `GET /api/admin/users` fetch which was failing due to aggressive browser caching. The UI now updates instantly and reliably toggles between "Block" and "Unblock".
+- **Custom Modals Implemented (True Overlay)**: Completely removed generic browser `confirm()` dialogs. Implemented a single, reusable custom Admin Modal matching the FinZave aesthetic. 
+  - Overcame Tailwind compilation / layout container constraints by migrating the modal DOM node to a dedicated `{% block modals %}` root node, appending it directly to the document body.
+  - Applied explicit inline `position: fixed` CSS and `z-index: 99999` to guarantee it functions as a TRUE viewport overlay, preventing it from rendering as an inline section.
+  - Bypassed missing Tailwind classes by strictly enforcing primary button colors and table action buttons (including the green Unblock) using direct inline CSS styles (`style="background-color: #..."`), ensuring the primary modal actions are fully visible and clearly styled.
+  - Implemented background scroll-locking (`document.body.style.overflow = 'hidden'`) while the modal is open.
+  - The modal dynamically injects the target username.
+  - Distinct visual treatments are applied for `Block User` (orange, reversible) and `Delete User` (red, permanent).
+- **Status & Activity Visualization**: Refined `formatLastActive` to display human-readable times ("Online", "Today, 10:42 PM", "Yesterday", "Never") and improved status pill badges. **Alignment Fix**: Implemented a strict fixed-width structural flex container for the "Online" pulsing dot, guaranteeing text alignment is perfectly flush with "Never" and timestamp entries.
+- **Action Column Styling**: Reverted row-level action buttons (Block/Unblock/Delete) from bulky bordered buttons to minimalist, center-aligned text links. Ensured strict inline color targeting (Green for Unblock, Red for Delete, Dark for Block) with clean hover underlines, preserving the refined FinZave table aesthetic without clutter.
+- **CSRF & Error Handling Architecture**: Addressed a "Missing or invalid token" API bug during state-changing admin actions. Correctly implemented CSRF validation by dynamically reading the HttpOnly `csrf_access_token` cookie from the client and embedding it into the `X-CSRF-TOKEN` header of the `fetch()` requests, conforming to the strict `flask-jwt-extended` security design. Replaced generic browser `alert()` popups with elegant, inline error rendering directly inside the Admin modal.
+- **Verification**: Confirmed security was unaffected, responsive bounds were respected, and modal behaviors (Escape key, backdrop click, disabled loading states) function smoothly.
+
+## Next Phase
+User Dashboard & Transactions (Income/Expense tracking)

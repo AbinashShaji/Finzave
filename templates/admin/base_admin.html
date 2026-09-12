@@ -60,8 +60,8 @@
                 <a href="{{ url_for('admin.feedback') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-fz-gray-800 {% if request.endpoint == 'admin.feedback' %}bg-fz-gray-800 text-white{% else %}text-fz-gray-400{% endif %}">
                     <i data-lucide="message-square" class="w-5 h-5"></i> Feedback
                 </a>
-                <a href="{{ url_for('admin.settings') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-fz-gray-800 {% if request.endpoint == 'admin.settings' %}bg-fz-gray-800 text-white{% else %}text-fz-gray-400{% endif %}">
-                    <i data-lucide="settings" class="w-5 h-5"></i> Settings
+                <a href="{{ url_for('admin.profile') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-fz-gray-800 {% if request.endpoint == 'admin.profile' %}bg-fz-gray-800 text-white{% else %}text-fz-gray-400{% endif %}">
+                    <i data-lucide="user" class="w-5 h-5"></i> Profile
                 </a>
             </nav>
         </div>
@@ -78,9 +78,9 @@
         <header class="bg-white border-b border-fz-gray-200 h-[72px] hidden md:flex flex-shrink-0 items-center justify-between px-8 sticky top-0 z-20">
             <h1 class="text-xl font-bold tracking-tight">{% block header_title %}Dashboard{% endblock %}</h1>
             <div class="flex items-center gap-4">
-                <div class="w-9 h-9 rounded-full bg-fz-black text-white flex items-center justify-center text-sm font-semibold">
+                <a href="{{ url_for('admin.profile') }}" title="Admin Profile" class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full bg-fz-black text-white text-sm font-semibold hover:bg-fz-red hover:shadow-md transition-all duration-300 ring-2 ring-transparent hover:ring-fz-red/30 focus:outline-none" id="header-avatar">
                     A
-                </div>
+                </a>
             </div>
         </header>
 
@@ -88,6 +88,8 @@
             {% block content %}{% endblock %}
         </div>
     </main>
+
+    {% block modals %}{% endblock %}
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
@@ -105,6 +107,19 @@
             if (btn && sidebar && overlay) {
                 btn.addEventListener('click', toggleMenu);
                 overlay.addEventListener('click', toggleMenu);
+            }
+
+            // Fetch admin user dynamically for the header avatar if present
+            const avatarEl = document.getElementById('header-avatar');
+            if (avatarEl) {
+                fetch('/api/auth/me')
+                    .then(res => res.ok ? res.json() : null)
+                    .then(user => {
+                        if (user && user.username) {
+                            avatarEl.textContent = user.username.charAt(0).toUpperCase();
+                        }
+                    })
+                    .catch(err => console.error('Error fetching admin avatar:', err));
             }
         });
 

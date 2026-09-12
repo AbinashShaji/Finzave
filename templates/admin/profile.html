@@ -1,0 +1,182 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Profile - FinZave Admin{% endblock %}
+{% block header_title %}Profile{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6 pb-12">
+    
+    <!-- Section 1: Admin Profile -->
+    <div class="bg-white rounded-xl border border-fz-gray-200 overflow-hidden shadow-sm">
+        <div class="p-6 border-b border-fz-gray-200 flex justify-between items-center">
+            <div>
+                <h2 class="text-lg font-bold">Admin Profile</h2>
+                <p class="text-sm text-fz-gray-500 mt-1">Your administrator account details.</p>
+            </div>
+        </div>
+        
+        <div class="p-6">
+            <div class="flex items-center gap-6 mb-8">
+                <div class="w-16 h-16 rounded-full bg-fz-black text-white flex items-center justify-center text-xl font-bold uppercase" id="prof-avatar">
+                    A
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg" id="prof-username">Loading...</h3>
+                    <p class="text-fz-gray-500 text-sm" id="prof-role">Administrator</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                    <input type="text" id="prof-user-input" disabled class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-gray-500 cursor-not-allowed">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="text" id="prof-email-input" disabled class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-gray-500 cursor-not-allowed">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Account Created</label>
+                    <input type="text" id="prof-created-input" disabled class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-gray-500 cursor-not-allowed">
+                </div>
+            </div>
+            
+            <div class="pt-6 mt-6 border-t border-gray-100 flex justify-end">
+                <p class="text-sm text-fz-gray-500 italic">For security, password changes must be requested via database administrator.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 2: Content Moderation Rules -->
+    <div class="bg-white rounded-xl border border-fz-gray-200 overflow-hidden shadow-sm">
+        <div class="p-6 border-b border-fz-gray-200">
+            <h2 class="text-lg font-bold">Content Moderation</h2>
+            <p class="text-sm text-fz-gray-500 mt-1">Read-only rules and workflow descriptions for moderation.</p>
+        </div>
+        
+        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Reviews -->
+            <div>
+                <h3 class="text-md font-bold mb-3 text-fz-black flex items-center gap-2">
+                    <i data-lucide="star" class="w-4 h-4"></i> Reviews Workflow
+                </h3>
+                <ol class="relative border-l border-fz-gray-200 ml-3 space-y-4">
+                    <li class="pl-4">
+                        <div class="absolute w-2 h-2 bg-yellow-500 rounded-full mt-1.5 -left-1 border border-white"></div>
+                        <h4 class="text-sm font-bold text-gray-900">Pending</h4>
+                        <p class="text-xs text-gray-500">Newly submitted by user. Awaiting review.</p>
+                    </li>
+                    <li class="pl-4">
+                        <div class="absolute w-2 h-2 bg-blue-500 rounded-full mt-1.5 -left-1 border border-white"></div>
+                        <h4 class="text-sm font-bold text-gray-900">Accepted</h4>
+                        <p class="text-xs text-gray-500">Approved by admin, but not yet published.</p>
+                    </li>
+                    <li class="pl-4">
+                        <div class="absolute w-2 h-2 bg-green-500 rounded-full mt-1.5 -left-1 border border-white"></div>
+                        <h4 class="text-sm font-bold text-gray-900">Live</h4>
+                        <p class="text-xs text-gray-500">Published and visible on the public site.</p>
+                    </li>
+                </ol>
+            </div>
+            <!-- Feedback -->
+            <div>
+                <h3 class="text-md font-bold mb-3 text-fz-black flex items-center gap-2">
+                    <i data-lucide="message-square" class="w-4 h-4"></i> Feedback Workflow
+                </h3>
+                <ol class="relative border-l border-fz-gray-200 ml-3 space-y-4">
+                    <li class="pl-4">
+                        <div class="absolute w-2 h-2 bg-yellow-500 rounded-full mt-1.5 -left-1 border border-white"></div>
+                        <h4 class="text-sm font-bold text-gray-900">Pending</h4>
+                        <p class="text-xs text-gray-500">Newly submitted. Requires investigation.</p>
+                    </li>
+                    <li class="pl-4">
+                        <div class="absolute w-2 h-2 bg-blue-500 rounded-full mt-1.5 -left-1 border border-white"></div>
+                        <h4 class="text-sm font-bold text-gray-900">Unresolved (Accepted)</h4>
+                        <p class="text-xs text-gray-500">In progress or accepted for future implementation.</p>
+                    </li>
+                    <li class="pl-4">
+                        <div class="absolute w-2 h-2 bg-green-500 rounded-full mt-1.5 -left-1 border border-white"></div>
+                        <h4 class="text-sm font-bold text-gray-900">Resolved</h4>
+                        <p class="text-xs text-gray-500">Issue is fixed or request is closed.</p>
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 3: System Information -->
+    <div class="bg-white rounded-xl border border-fz-gray-200 overflow-hidden shadow-sm">
+        <div class="p-6 border-b border-fz-gray-200">
+            <h2 class="text-lg font-bold">System Information</h2>
+            <p class="text-sm text-fz-gray-500 mt-1">Application diagnostics and statuses.</p>
+        </div>
+        
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span class="text-sm text-gray-500 font-medium">Application Version</span>
+                    <span class="text-sm font-bold text-gray-900" id="sys-version">-</span>
+                </div>
+                <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span class="text-sm text-gray-500 font-medium">Database Status</span>
+                    <span class="text-sm font-bold text-green-600" id="sys-db">-</span>
+                </div>
+                <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span class="text-sm text-gray-500 font-medium">Migration Version</span>
+                    <span class="text-sm font-mono text-gray-900" id="sys-migration">-</span>
+                </div>
+                <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span class="text-sm text-gray-500 font-medium">Flask Environment</span>
+                    <span class="text-sm font-bold text-gray-900" id="sys-env">-</span>
+                </div>
+                <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span class="text-sm text-gray-500 font-medium">Flask Version</span>
+                    <span class="text-sm font-bold text-gray-900" id="sys-flask">-</span>
+                </div>
+                <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span class="text-sm text-gray-500 font-medium">Python Version</span>
+                    <span class="text-sm font-bold text-gray-900" id="sys-py">-</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        // Fetch Admin Profile
+        try {
+            const res = await fetch('/api/auth/me');
+            if (res.ok) {
+                const user = await res.json();
+                document.getElementById('prof-username').textContent = user.username;
+                document.getElementById('prof-user-input').value = user.username;
+                document.getElementById('prof-email-input').value = user.email;
+                document.getElementById('prof-created-input').value = new Date(user.created_at).toLocaleString();
+                document.getElementById('prof-avatar').textContent = user.username.charAt(0).toUpperCase();
+            }
+        } catch (e) {
+            console.error('Error fetching admin profile', e);
+        }
+
+        // Fetch System Info
+        try {
+            const res = await fetch('/api/admin/system');
+            if (res.ok) {
+                const sys = await res.json();
+                document.getElementById('sys-version').textContent = sys.app_version;
+                document.getElementById('sys-db').textContent = sys.database_status;
+                document.getElementById('sys-migration').textContent = sys.migration_version || 'Unknown';
+                document.getElementById('sys-env').textContent = sys.flask_env;
+                document.getElementById('sys-flask').textContent = sys.flask_version;
+                document.getElementById('sys-py').textContent = sys.python_version;
+            }
+        } catch (e) {
+            console.error('Error fetching system info', e);
+        }
+    });
+</script>
+{% endblock %}
