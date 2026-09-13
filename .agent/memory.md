@@ -174,5 +174,53 @@ User Dashboard & Transactions (Income/Expense tracking)
 - **CSRF & Error Handling Architecture**: Addressed a "Missing or invalid token" API bug during state-changing admin actions. Correctly implemented CSRF validation by dynamically reading the HttpOnly `csrf_access_token` cookie from the client and embedding it into the `X-CSRF-TOKEN` header of the `fetch()` requests, conforming to the strict `flask-jwt-extended` security design. Replaced generic browser `alert()` popups with elegant, inline error rendering directly inside the Admin modal.
 - **Verification**: Confirmed security was unaffected, responsive bounds were respected, and modal behaviors (Escape key, backdrop click, disabled loading states) function smoothly.
 
+## Phase 6.0 Transactions Module Implementation (COMPLETED)
+- **Layout & Overlap Fix (PASS)**: Resolved a critical issue where the mobile sidebar overlay styling (`fixed inset-y-0`) was persisting on desktop and overlapping the action buttons (`Add Income`, `Add Expense`). Enforced a strict CSS Grid layout (`position: relative !important`) for the sidebar on desktop via an embedded `<style>` block in `base_app.html`.
+- **Add Income Workflow (PASS)**: Built the missing `income-modal` UI in `transactions.html`. Supports `Fixed` and `Variable` income types. Enforces strict client-side validation and securely posts to `POST /app/api/transactions/income`.
+- **Add Expense Workflow (PASS)**: Fully connected the existing `expense-modal` to `POST /app/api/transactions/expense`. Retained the rule-based auto-categorization script (e.g., "swiggy" -> "Food").
+- **CSV Import & Secure Validation (PASS)**: 
+  - Created a 2-step `csv-modal` UI for CSV imports.
+  - **Preview Step**: Sends CSV to `POST /api/transactions/upload-csv`, which parses the file using Pandas and returns `valid_records` and `invalid_records`. These are rendered in a distinct status table.
+  - **Security Decision**: The browser is NOT trusted to send `valid_records` back for confirmation. Instead, the confirmation step requires the user to submit the original CSV file again to `POST /api/transactions/confirm-csv`, forcing the server to re-parse and strictly validate the contents prior to importing. This guarantees no malicious payload injection from the client side.
+- **Cache Invalidation (PASS)**: Integrated `cache.clear()` across all mutation endpoints (`income`, `expense`, `confirm-csv`) to ensure the dashboard and analysis views reflect up-to-date calculations instantly.
+- **Data Isolation (PASS)**: Kept HttpOnly JWT + CSRF architectures. `user_id` is derived securely from `get_jwt_identity()`.
+
+## Phase 6.1 Fixed Income Architecture Redesign (COMPLETED)
+- **Concept Transition**: Transitioned the "Fixed Income" concept from a monthly manual transaction to a persistent recurring configuration.
+- **Database Approach (No Schema Change)**: Safely reused the existing `Income` model. `income_type='Fixed'` now represents a versioned configuration where `date` acts as the `effective_date`. This avoids schema migrations and duplicate monthly rows.
+- **Centralized Calculation**: Created `utils/finance.py` with `get_monthly_income()`. This helper securely queries the active Fixed Income (the latest version where `effective_date <= end_of_month`) and combines it with the sum of all Variable Income for that specific month. `routes/dashboard.py` now uses this centralized calculation, maintaining perfect historical accuracy without double counting.
+- **Versioned Fixed Income Workflow**: 
+  - Restructured the backend, UI, and calculation engine to handle *multiple concurrent sources* (e.g., Salary + Rental) and their historical versions over time.
+  - **Duplicate Validation**: A Fixed Income is only considered a duplicate if ALL of the following match: `effective_date`, `amount`, and `Category/Source` (mapped to `description`). Same-date additions of different amounts or sources are permitted. Rejecting exact duplicates uses a `409 Conflict`.
+  - **Add Fixed Income**: Creates a distinct new recurring income version.
+  - **Update Fixed Income**: UI provides a list of all historical Fixed Income versions. Selecting one allows targeted edits via a new `PUT /api/transactions/income/<id>` endpoint, explicitly validating duplicates while excluding the record being updated.
+  - **Calculation Integrity (`utils/finance.py`)**: For any period (e.g., calculating Dashboard, Analysis, Planning), the engine fetches all Fixed Incomes where `effective_date <= period_end`. It normalizes the source name, selects ONLY the latest version for *each* distinct source, and sums them. This ensures multiple sources coexist correctly and historical periods retain their precise past values without being overridden by newer versions.
+- **Transactions UI Update**: Replaced the generic "Add Income" flow with separate "Fixed Income" and "Variable Income" interactions. The UI now displays the active recurring salary in a distinct "Fixed Income" card, preserving the FinZave aesthetic with distinct modals.
+- **Security Check**: Enforced identical CSRF validation and user isolation. Duplicate fixed-income updates on the exact same date overwrite the row rather than creating duplicate versions.
+- **Duplicate Logic Bugfix & Error Handling**: Fixed a critical bug in the backend duplicate detection logic where `func.lower()` was not applied to the `description` column, causing a mismatch with the aggregation logic. Updated the frontend error handler to correctly parse and display `data.msg` alongside `data.error`, ensuring that backend JWT/CSRF errors correctly render in the UI instead of defaulting to a generic "Failed to save" error. Added missing API validations for incoming request bodies to catch `NoneType` errors gracefully.
+
+## Phase 6.2 Income CRUD Completion (COMPLETED)
+- **Variable Income Actions**: Implemented Edit and Delete functionality for Variable Income records. Added a robust frontend modal workflow to update amount, date, and description securely.
+- **Fixed Income Deletion**: Added Delete functionality to the existing Update Fixed Income modal. Deleting a specific version (e.g., Salary ₹60,000) correctly removes only that version without affecting earlier versions (e.g., Salary ₹50,000) or other sources (e.g., Rental ₹15,000).
+- **Backend Refactoring**: Modified the `PUT /api/transactions/income/<id>` endpoint to accurately handle Variable Income edits while retaining the strict duplicate validation logic for Fixed Income. Created a targeted `DELETE /api/transactions/income/<id>` endpoint with identical JWT user-ownership validation.
+- **UI Enhancements**: Added custom, non-native confirmation modals (`#delete-income-modal`) styled in the FinZave aesthetic. Integrated all mutation actions to natively trigger the `loadIncome()` function, providing a seamless SPA experience without full page reloads.
+- **Cache & Engine Integrity**: Enforced `cache.clear()` across all edit and delete mutations. The underlying `get_active_fixed_incomes` algorithm automatically recalibrates upon deletion to apply the next valid historical fixed-income version.
+
+## Phase 6.3 Expense Categorization Architecture (COMPLETED)
+- **Concept Transition**: Removed the frontend Javascript auto-categorization feature. Categorization is now strictly manual via a standardized dropdown to prevent miscategorizations (e.g., "Swiggy" automatically mapped to Food, which the user requested to be removed for now).
+- **Centralized Source of Truth**: Defined `EXPENSE_CATEGORIES` centrally in `models/expense.py` as a strict list (Food & Dining, Transportation, Shopping, Rent & Housing, Utilities, Healthcare, Education, Entertainment, Bills & Subscriptions, Travel, Personal Care, Investments, Insurance, Family, EMI, Other).
+- **Backend Validation (`routes/transactions.py`)**: `POST /api/transactions/expense` now explicitly validates that `data['category']` exists within the `EXPENSE_CATEGORIES` list, returning a `400` if invalid or missing, ensuring the database remains perfectly standardized.
+- **CSV Import Validation (`utils/csv_processor.py`)**: Enhanced the CSV parser to perform a case-insensitive validation against `EXPENSE_CATEGORIES`. If a match is found, it normalizes the category string before insertion. If no match is found, the row is marked as invalid with an explicit "Invalid category" error, preventing data pollution.
+- **UI Enhancements (`templates/app/transactions.html`)**: Replaced the free-text input with a native HTML `<select>` dropdown populated dynamically via Jinja `render_template`. Restored the description field to a standard free-text input.
+
+## Phase 6.4 Expense History / All Expenses (COMPLETED)
+- **All Expenses Page (`/app/expenses`)**: Created a dedicated view for complete expense history, decoupled from the main dashboard/transactions view. Built `templates/app/expenses.html` using the consistent FinZave layout and CSS conventions.
+- **Backend Pagination & Filtering**: Upgraded `GET /api/transactions/expense` to natively accept `limit`, `start_date`, `end_date`, and `category` parameters. The backend now responds with `{"data": [...], "total_count": int}` format to enable correct UI state tracking while limiting the payload.
+- **Transactions UI Update**: Modernized the `loadExpenses()` routine in `transactions.html` to fetch only the 5 most recent expenses via `?limit=5`. Added a dynamic "View All Expenses" link that only appears when `total_count > 5`.
+- **Expense CRUD Integration**: Fully integrated Edit and Delete functionalities directly into the All Expenses data table. Added centered modals matching the FinZave aesthetic. Built corresponding `PUT` and `DELETE` endpoints for `/api/transactions/expense/<id>` protected by JWT and ownership validation.
+- **Dynamic CSV Export**: Developed `GET /api/transactions/expense/export`. This endpoint accepts the same filter query parameters as the view and independently queries the database to generate a matching CSV payload, ensuring total data integrity regardless of frontend state.
+- **Security Check**: Enforced server-side category validation on PUT operations using `EXPENSE_CATEGORIES`. Maintained `cache.clear()` integration for all mutation endpoints to guarantee Dashboard/Analysis sync. Re-verified CSRF integration for asynchronous requests.
+- **App Sidebar Layout Fix**: Replaced the hacked CSS grid layout in `base_app.html` with a pure structural layout (`fixed` sidebar + `margin-left: 16rem` on main content). This ensures the navigation sidebar and Logout button remain permanently visible and accessible, while the main content area (e.g., Transactions, All Expenses) scrolls entirely independently without dragging the sidebar upward.
+
 ## Next Phase
-User Dashboard & Transactions (Income/Expense tracking)
+User Dashboard & Analysis Engine (Data visualization and rule-based insights)

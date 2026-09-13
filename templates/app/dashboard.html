@@ -1,0 +1,171 @@
+{% extends "app/base_app.html" %}
+
+{% block title %}FinZave - Dashboard{% endblock %}
+{% block header_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto space-y-8">
+    
+    <!-- Top KPIs -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Total Income -->
+        <div class="bg-white p-6 rounded-2xl border border-fz-gray-200 shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-semibold text-fz-gray-600 uppercase tracking-wider">Total Income</h3>
+                <div class="w-10 h-10 rounded-full bg-green-50 text-green-600 flex items-center justify-center">
+                    <i data-lucide="trending-up" class="w-5 h-5"></i>
+                </div>
+            </div>
+            <div class="text-3xl font-bold text-fz-black" id="kpi-income">₹0</div>
+            <p class="text-sm text-fz-gray-500 mt-2">This month</p>
+        </div>
+        
+        <!-- Total Expenses -->
+        <div class="bg-white p-6 rounded-2xl border border-fz-gray-200 shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-semibold text-fz-gray-600 uppercase tracking-wider">Total Expenses</h3>
+                <div class="w-10 h-10 rounded-full bg-red-50 text-fz-red flex items-center justify-center">
+                    <i data-lucide="trending-down" class="w-5 h-5"></i>
+                </div>
+            </div>
+            <div class="text-3xl font-bold text-fz-black" id="kpi-expenses">₹0</div>
+            <p class="text-sm text-fz-gray-500 mt-2">This month</p>
+        </div>
+
+        <!-- Savings -->
+        <div class="bg-white p-6 rounded-2xl border border-fz-gray-200 shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-semibold text-fz-gray-600 uppercase tracking-wider">Savings</h3>
+                <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
+                    <i data-lucide="piggy-bank" class="w-5 h-5"></i>
+                </div>
+            </div>
+            <div class="text-3xl font-bold text-fz-black" id="kpi-savings">₹0</div>
+            <p class="text-sm text-fz-gray-500 mt-2">This month</p>
+        </div>
+
+        <!-- Savings Rate -->
+        <div class="bg-white p-6 rounded-2xl border border-fz-gray-200 shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-semibold text-fz-gray-600 uppercase tracking-wider">Savings Rate</h3>
+                <div class="w-10 h-10 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center">
+                    <i data-lucide="percent" class="w-5 h-5"></i>
+                </div>
+            </div>
+            <div class="text-3xl font-bold text-fz-black" id="kpi-rate">0%</div>
+            <p class="text-sm text-fz-gray-500 mt-2">This month</p>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Left Column: Insights and Charts -->
+        <div class="lg:col-span-2 space-y-8">
+            <!-- Insights Section -->
+            <div class="bg-fz-black text-white p-8 rounded-2xl shadow-lg relative overflow-hidden">
+                <div class="relative z-10">
+                    <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+                        <i data-lucide="sparkles" class="w-6 h-6 text-fz-red"></i> 
+                        Financial Insights
+                    </h2>
+                    <div id="insights-container" class="space-y-4">
+                        <div class="animate-pulse bg-fz-gray-800 h-12 rounded-lg w-full"></div>
+                        <div class="animate-pulse bg-fz-gray-800 h-12 rounded-lg w-3/4"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spending Chart -->
+            <div class="bg-white p-6 rounded-2xl border border-fz-gray-200 shadow-sm">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-lg font-bold text-fz-black">Category Breakdown</h2>
+                    <a href="{{ url_for('app.analysis') }}" class="text-sm font-medium text-fz-red hover:underline">View Analysis</a>
+                </div>
+                <div class="w-full h-[300px] relative">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Recent Transactions -->
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-2xl border border-fz-gray-200 shadow-sm h-full flex flex-col">
+                <div class="p-6 border-b border-fz-gray-200 flex items-center justify-between">
+                    <h2 class="text-lg font-bold text-fz-black">Recent Activity</h2>
+                    <a href="{{ url_for('app.transactions') }}" class="text-sm font-medium text-fz-red hover:underline">View All</a>
+                </div>
+                <div class="p-6 flex-1 overflow-y-auto" id="recent-transactions">
+                    <!-- Dynamic transactions -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        try {
+            const res = await fetch('/app/dashboard/data');
+            if (res.ok) {
+                const data = await res.json();
+                
+                document.getElementById('kpi-income').textContent = `₹${data.total_income.toLocaleString()}`;
+                document.getElementById('kpi-expenses').textContent = `₹${data.total_expenses.toLocaleString()}`;
+                
+                const savingsEl = document.getElementById('kpi-savings');
+                savingsEl.textContent = `₹${data.savings.toLocaleString()}`;
+                if (data.savings < 0) {
+                    savingsEl.classList.remove('text-fz-black');
+                    savingsEl.classList.add('text-fz-red');
+                }
+                
+                document.getElementById('kpi-rate').textContent = data.savings_rate !== null ? `${data.savings_rate.toFixed(1)}%` : 'N/A';
+                
+                // Fetch recent transactions (mock integration for now until /api/transactions is fully connected in dashboard_data)
+                // We'll fetch them from the endpoints we made.
+                const expensesRes = await fetch('/app/api/transactions/expense');
+                if (expensesRes.ok) {
+                    const expenses = await expensesRes.json();
+                    const container = document.getElementById('recent-transactions');
+                    container.innerHTML = '';
+                    
+                    if (expenses.length === 0) {
+                        container.innerHTML = '<p class="text-sm text-fz-gray-500 text-center py-8">No recent transactions</p>';
+                    } else {
+                        expenses.slice(0, 5).forEach(ex => {
+                            container.innerHTML += `
+                                <div class="flex items-center justify-between py-3 border-b border-fz-gray-100 last:border-0">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-full bg-red-50 text-fz-red flex items-center justify-center">
+                                            <i data-lucide="arrow-down-right" class="w-5 h-5"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-fz-black truncate w-32">${ex.category}</p>
+                                            <p class="text-xs text-fz-gray-500">${new Date(ex.date).toLocaleDateString()}</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-sm font-semibold text-fz-black">-₹${ex.amount.toLocaleString()}</span>
+                                </div>
+                            `;
+                        });
+                        lucide.createIcons();
+                    }
+                }
+                
+                // Clear loading insights for now, since we haven't integrated the full Rule Engine into the API yet
+                const insightsContainer = document.getElementById('insights-container');
+                insightsContainer.innerHTML = `
+                    <div class="bg-fz-gray-800 bg-opacity-50 p-4 rounded-xl border border-fz-gray-700">
+                        <p class="text-sm text-gray-300">More data needed to generate rule-based insights for this period. Add more transactions to see trends.</p>
+                    </div>
+                `;
+            }
+        } catch (err) {
+            console.error("Failed to load dashboard data", err);
+        }
+    });
+</script>
+{% endblock %}

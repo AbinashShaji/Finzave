@@ -1,7 +1,30 @@
 from datetime import date, datetime, timezone
+from typing import TYPE_CHECKING
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Integer, String, Float, Date, DateTime, ForeignKey
 from extensions import db
+
+if TYPE_CHECKING:
+    from models.user import User
+
+EXPENSE_CATEGORIES = [
+    "Food & Dining",
+    "Transportation",
+    "Shopping",
+    "Rent & Housing",
+    "Utilities",
+    "Healthcare",
+    "Education",
+    "Entertainment",
+    "Bills & Subscriptions",
+    "Travel",
+    "Personal Care",
+    "Investments",
+    "Insurance",
+    "Family",
+    "EMI",
+    "Other"
+]
 
 class Expense(db.Model):
     __tablename__ = 'expenses'

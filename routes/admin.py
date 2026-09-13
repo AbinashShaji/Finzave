@@ -19,7 +19,7 @@ def admin_required():
                     return jsonify(message="Missing or invalid token"), 401
                 return redirect(url_for('public.login'))
             
-            user_id = get_jwt_identity()
+            user_id = int(get_jwt_identity())
             user = db.session.get(User, int(user_id))
             
             if not user or user.role != 'admin':
