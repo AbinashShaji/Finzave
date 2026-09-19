@@ -7,7 +7,7 @@ class Goal(db.Model):
     __tablename__ = 'goals'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id', ondelete='CASCADE'), index=True)
     goal_name: Mapped[str] = mapped_column(String(100), nullable=False)
     target_amount: Mapped[float] = mapped_column(Float, nullable=False)
     current_saved: Mapped[float] = mapped_column(Float, default=0.0)

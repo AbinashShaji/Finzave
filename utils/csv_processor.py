@@ -20,6 +20,9 @@ def process_expense_csv(file_stream: bytes) -> dict:
         logger.error(f"CSV Parse Error: {str(e)}")
         return {"success": False, "error": "Invalid CSV file format."}
         
+    if len(df) > 1000:
+        return {"success": False, "error": "Maximum of 1000 rows allowed per upload."}
+        
     # Check headers (case insensitive)
     df.columns = df.columns.str.lower().str.strip()
     

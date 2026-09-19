@@ -11,6 +11,7 @@ from datetime import datetime
 from sqlalchemy import func
 import csv
 from io import StringIO
+from utils.cache_keys import invalidate_user_financial_cache
 
 @app_bp.route('/transactions')
 @jwt_required()
@@ -61,7 +62,7 @@ def handle_income():
                 db.session.add(income)
             
             db.session.commit()
-            cache.clear()
+            invalidate_user_financial_cache(user_id)
             return jsonify({"message": "Income updated successfully"}), 201
         except Exception as e:
             db.session.rollback()
@@ -127,7 +128,7 @@ def handle_income_by_id(income_id):
                 
             db.session.delete(income)
             db.session.commit()
-            cache.clear()
+            invalidate_user_financial_cache(user_id)
             return jsonify({"message": "Income record deleted successfully"}), 200
         except Exception as e:
             db.session.rollback()
@@ -162,7 +163,7 @@ def handle_income_by_id(income_id):
         income.description = desc
         
         db.session.commit()
-        cache.clear()
+        invalidate_user_financial_cache(user_id)
         return jsonify({"message": "Income updated successfully"}), 200
     except Exception as e:
         db.session.rollback()
@@ -188,13 +189,14 @@ def handle_expense():
             )
             db.session.add(expense)
             db.session.commit()
-            cache.clear()
+            invalidate_user_financial_cache(user_id)
             return jsonify({"message": "Expense added successfully"}), 201
         except Exception as e:
             return jsonify({"error": str(e)}), 400
             
     # GET with filters
-    limit = request.args.get('limit', type=int)
+    limit = request.args.get('limit', default=100, type=int)
+    limit = max(1, min(500, limit))
     start_date = request.args.get('start_date')
     end_date = request.args.get('end_date')
     category = request.args.get('category')
@@ -222,11 +224,7 @@ def handle_expense():
     query = query.order_by(Expense.date.desc(), Expense.id.desc())
 
     total_count = query.count()
-
-    if limit:
-        expenses = query.limit(limit).all()
-    else:
-        expenses = query.all()
+    expenses = query.limit(limit).all()
 
     result = [{
         "id": e.id,
@@ -254,7 +252,7 @@ def handle_expense_by_id(expense_id):
                 
             db.session.delete(expense)
             db.session.commit()
-            cache.clear()
+            invalidate_user_financial_cache(user_id)
             return jsonify({"message": "Expense record deleted successfully"}), 200
         except Exception as e:
             db.session.rollback()
@@ -279,7 +277,7 @@ def handle_expense_by_id(expense_id):
         expense.category = data['category']
         
         db.session.commit()
-        cache.clear()
+        invalidate_user_financial_cache(user_id)
         return jsonify({"message": "Expense updated successfully"}), 200
     except Exception as e:
         db.session.rollback()
@@ -338,8 +336,8 @@ def upload_csv():
         return jsonify({"error": "No file part"}), 400
         
     file = request.files['file']
-    if file.filename == '':
-        return jsonify({"error": "No selected file"}), 400
+    if file.filename == '' or not file.filename.lower().endswith('.csv'):
+        return jsonify({"error": "No selected file or invalid extension. Must be a .csv file."}), 400
         
     file_bytes = file.read()
     result = process_expense_csv(file_bytes)
@@ -361,8 +359,8 @@ def confirm_csv():
         return jsonify({"error": "No file part"}), 400
         
     file = request.files['file']
-    if file.filename == '':
-        return jsonify({"error": "No selected file"}), 400
+    if file.filename == '' or not file.filename.lower().endswith('.csv'):
+        return jsonify({"error": "No selected file or invalid extension. Must be a .csv file."}), 400
         
     file_bytes = file.read()
     result = process_expense_csv(file_bytes)
@@ -385,7 +383,7 @@ def confirm_csv():
             )
             db.session.add(expense)
         db.session.commit()
-        cache.clear()
+        invalidate_user_financial_cache(user_id)
         return jsonify({"message": f"{len(records)} expenses imported successfully"}), 201
     except Exception as e:
         db.session.rollback()

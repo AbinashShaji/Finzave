@@ -1,0 +1,139 @@
+{% extends "app/base_app.html" %}
+
+{% block title %}FinZave - Settings{% endblock %}
+{% block header_title %}Account Settings{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-8">
+
+    <!-- Profile Information -->
+    <div class="bg-white p-6 md:p-8 rounded-2xl border border-fz-gray-200 shadow-sm">
+        <div class="flex items-center gap-3 mb-6 border-b border-fz-gray-100 pb-4">
+            <i data-lucide="user" class="w-6 h-6 text-fz-black"></i>
+            <h2 class="text-xl font-bold text-fz-black">Profile Information</h2>
+        </div>
+        
+        <div class="flex flex-col md:flex-row gap-8 items-start">
+            <div class="flex flex-col items-center gap-4">
+                <div class="w-24 h-24 rounded-full bg-fz-black text-white flex items-center justify-center text-3xl font-bold">
+                    U
+                </div>
+                <button class="text-sm font-semibold text-fz-black hover:text-fz-red transition-colors">Change Avatar</button>
+            </div>
+            
+            <form class="flex-1 space-y-5 w-full">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="block text-sm font-medium text-fz-gray-600 mb-1">Username</label>
+                        <input type="text" class="w-full px-4 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fz-black text-fz-gray-500 bg-fz-gray-50 cursor-not-allowed" value="demo_user" disabled>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-fz-gray-600 mb-1">Email Address</label>
+                        <input type="email" class="w-full px-4 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fz-black" placeholder="user@example.com" disabled>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-fz-gray-600 mb-1">Full Name</label>
+                    <input type="text" class="w-full px-4 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fz-black" placeholder="Your Full Name" disabled>
+                </div>
+                <div class="flex justify-end pt-2">
+                    <button type="button" class="bg-fz-black text-white px-5 py-2 rounded-lg font-medium hover:bg-fz-red transition-colors opacity-50 cursor-not-allowed">Save Profile</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Password & Security -->
+    <div class="bg-white p-6 md:p-8 rounded-2xl border border-fz-gray-200 shadow-sm">
+        <div class="flex items-center gap-3 mb-6 border-b border-fz-gray-100 pb-4">
+            <i data-lucide="shield" class="w-6 h-6 text-fz-black"></i>
+            <h2 class="text-xl font-bold text-fz-black">Password & Security</h2>
+        </div>
+        
+        <form class="space-y-5">
+            <div>
+                <label class="block text-sm font-medium text-fz-gray-600 mb-1">Current Password</label>
+                <input type="password" class="w-full px-4 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fz-black" placeholder="••••••••" disabled>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                    <label class="block text-sm font-medium text-fz-gray-600 mb-1">New Password</label>
+                    <input type="password" class="w-full px-4 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fz-black" placeholder="••••••••" disabled>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-fz-gray-600 mb-1">Confirm New Password</label>
+                    <input type="password" class="w-full px-4 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fz-black" placeholder="••••••••" disabled>
+                </div>
+            </div>
+            <div class="flex justify-end pt-2">
+                <button type="button" class="bg-fz-black text-white px-5 py-2 rounded-lg font-medium hover:bg-fz-red transition-colors opacity-50 cursor-not-allowed">Update Password</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Preferences & Notifications -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        
+        <!-- App Preferences -->
+        <div class="bg-white p-6 rounded-2xl border border-fz-gray-200 shadow-sm">
+            <h2 class="text-lg font-bold text-fz-black mb-4 border-b border-fz-gray-100 pb-2">Preferences</h2>
+            <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-semibold text-fz-black">Currency</p>
+                        <p class="text-xs text-fz-gray-500">Default currency for reports.</p>
+                    </div>
+                    <select class="bg-white border border-fz-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none disabled:opacity-50" disabled>
+                        <option>INR (₹)</option>
+                        <option>USD ($)</option>
+                    </select>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-semibold text-fz-black">Dark Mode</p>
+                        <p class="text-xs text-fz-gray-500">Toggle dark theme.</p>
+                    </div>
+                    <div class="w-11 h-6 bg-fz-gray-200 rounded-full flex items-center p-1 opacity-50 cursor-not-allowed">
+                        <div class="w-4 h-4 bg-white rounded-full shadow-md transform"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification Settings -->
+        <div class="bg-white p-6 rounded-2xl border border-fz-gray-200 shadow-sm">
+            <h2 class="text-lg font-bold text-fz-black mb-4 border-b border-fz-gray-100 pb-2">Notifications</h2>
+            <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-semibold text-fz-black">Email Alerts</p>
+                        <p class="text-xs text-fz-gray-500">Monthly reports and goals.</p>
+                    </div>
+                    <div class="w-11 h-6 bg-fz-red rounded-full flex items-center p-1 opacity-50 cursor-not-allowed justify-end">
+                        <div class="w-4 h-4 bg-white rounded-full shadow-md"></div>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-semibold text-fz-black">Rule Engine Insights</p>
+                        <p class="text-xs text-fz-gray-500">Alerts for high spending.</p>
+                    </div>
+                    <div class="w-11 h-6 bg-fz-red rounded-full flex items-center p-1 opacity-50 cursor-not-allowed justify-end">
+                        <div class="w-4 h-4 bg-white rounded-full shadow-md"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        lucide.createIcons();
+    });
+</script>
+{% endblock %}

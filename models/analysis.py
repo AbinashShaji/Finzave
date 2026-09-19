@@ -7,7 +7,7 @@ class Analysis(db.Model):
     __tablename__ = 'analyses'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id', ondelete='CASCADE'), index=True)
     period: Mapped[str] = mapped_column(String(50), nullable=False) # e.g., '2026-09' or 'Q3 2026'
     metrics: Mapped[dict] = mapped_column(JSON, nullable=False, default={})
     insights: Mapped[dict] = mapped_column(JSON, nullable=False, default={})

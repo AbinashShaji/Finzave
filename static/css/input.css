@@ -6,8 +6,8 @@
   body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: theme('colors.fz.white');
-    color: theme('colors.fz.black');
+    background-color: #ffffff;
+    color: #0a0a0a;
   }
 }
 
@@ -17,7 +17,7 @@
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: theme('boxShadow.glass');
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
   }
   
   .no-scrollbar::-webkit-scrollbar {
@@ -81,7 +81,7 @@
   }
   .fz-number-row-active .fz-number-transition,
   .fz-number-transition:hover {
-    color: theme('colors.fz.red.DEFAULT') !important;
+    color: #e11d48 !important;
   }
 
   .fz-card-hover {
@@ -89,7 +89,7 @@
   }
   .fz-card-hover:hover {
     transform: translateY(-2px);
-    border-color: theme('colors.fz.gray.300');
+    border-color: #d4d4d8;
   }
   
   .page-transition-enter {
@@ -118,6 +118,6 @@
   .fz-wf-step-active {
     transform: scale(1.05) !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    border-color: theme('colors.fz.gray.300');
+    border-color: #d4d4d8;
   }
 }

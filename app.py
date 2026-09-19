@@ -41,6 +41,28 @@ def create_app(config_class=Config):
             return jsonify({"msg": error_string}), 401
         return redirect(url_for('public.login'))
 
+    from models.user import User
+
+    @jwt.user_lookup_loader
+    def user_lookup_callback(_jwt_header, jwt_data):
+        identity = jwt_data["sub"]
+        return db.session.get(User, int(identity))
+
+    @app.before_request
+    def check_if_blocked():
+        from flask_jwt_extended import verify_jwt_in_request, current_user
+        try:
+            # Check if there is a valid JWT. If so, it will load current_user
+            verify_jwt_in_request(optional=True)
+            if current_user and current_user.is_blocked:
+                # Force logout behavior for APIs or Redirect
+                if request.path.startswith('/api') or request.path.startswith('/app/api'):
+                    return jsonify({"msg": "Your account has been blocked. Please contact support."}), 403
+                from flask import redirect, url_for
+                return redirect(url_for('public.login'))
+        except Exception:
+            pass
+
     # Register blueprints
     from routes.auth import auth_bp
     from routes.public import public_bp

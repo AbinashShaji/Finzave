@@ -1,0 +1,126 @@
+{% extends "app/base_app.html" %}
+
+{% block title %}FinZave - Reports{% endblock %}
+{% block header_title %}Reports Dashboard{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto space-y-6">
+
+    {% if not has_data %}
+    <div class="flex flex-col items-center justify-center p-12 bg-white rounded-2xl border border-dashed border-fz-gray-300 text-center">
+        <div class="w-16 h-16 bg-fz-gray-50 rounded-full flex items-center justify-center mb-4">
+            <i data-lucide="file-text" class="w-8 h-8 text-fz-gray-400"></i>
+        </div>
+        <h3 class="text-lg font-bold text-fz-black mb-2">No Report Data</h3>
+        <p class="text-sm text-fz-gray-500 max-w-sm mb-6">Add transactions to generate financial reports and summaries.</p>
+        <a href="{{ url_for('app.transactions') }}" class="bg-fz-black text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-fz-red transition-colors">
+            Add Transactions
+        </a>
+    </div>
+    {% else %}
+
+    <!-- Header & Controls -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-fz-gray-200">
+        <div>
+            <h2 class="text-xl font-bold text-fz-black">Period Summaries</h2>
+            <p class="text-sm text-fz-gray-500 mt-1">Generate and export your financial statements.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <select class="bg-white border border-fz-gray-200 text-fz-black text-sm rounded-lg px-4 py-2 font-medium focus:outline-none focus:ring-1 focus:ring-fz-black shadow-sm cursor-pointer">
+                {% for p in periods|reverse %}
+                    <option value="{{ p.period_id }}">{{ p.period_id }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <!-- Main Report Card -->
+    <div class="bg-white rounded-2xl border border-fz-gray-200 shadow-sm overflow-hidden flex flex-col">
+        <!-- Summary Header -->
+        <div class="bg-fz-black p-6 md:p-8 text-white grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            <div>
+                <span class="block text-xs font-bold text-fz-gray-400 uppercase tracking-wider mb-1">Total Income</span>
+                <span class="text-2xl font-bold">₹{{ "{:,.2f}".format(current_period.total_income) }}</span>
+            </div>
+            <div>
+                <span class="block text-xs font-bold text-fz-gray-400 uppercase tracking-wider mb-1">Total Expenses</span>
+                <span class="text-2xl font-bold">₹{{ "{:,.2f}".format(current_period.total_expenses) }}</span>
+            </div>
+            <div>
+                <span class="block text-xs font-bold text-fz-gray-400 uppercase tracking-wider mb-1">Net Savings</span>
+                <span class="text-2xl font-bold {% if current_period.savings >= 0 %}text-green-400{% else %}text-red-400{% endif %}">₹{{ "{:,.2f}".format(current_period.savings) }}</span>
+            </div>
+            <div>
+                <span class="block text-xs font-bold text-fz-gray-400 uppercase tracking-wider mb-1">Financial Score</span>
+                <span class="text-2xl font-bold text-blue-400">{{ health_data.score }} / 100</span>
+            </div>
+        </div>
+
+        <!-- Detailed Breakdown -->
+        <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-fz-gray-100 p-6 md:p-8">
+            
+            <!-- Income Column -->
+            <div class="pb-6 md:pb-0 md:pr-8">
+                <h4 class="text-base font-bold text-fz-black mb-4 flex items-center gap-2">
+                    <i data-lucide="arrow-down-left" class="w-5 h-5 text-green-600"></i> Income Breakdown
+                </h4>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center text-sm border-b border-fz-gray-50 pb-2">
+                        <span class="text-fz-gray-600 font-medium">Fixed Income</span>
+                        <span class="font-bold text-fz-black">₹{{ "{:,.2f}".format(current_period.fixed_income) }}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm border-b border-fz-gray-50 pb-2">
+                        <span class="text-fz-gray-600 font-medium">Variable Income</span>
+                        <span class="font-bold text-fz-black">₹{{ "{:,.2f}".format(current_period.variable_income) }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expense Column -->
+            <div class="pt-6 md:pt-0 md:pl-8">
+                <h4 class="text-base font-bold text-fz-black mb-4 flex items-center gap-2">
+                    <i data-lucide="arrow-up-right" class="w-5 h-5 text-fz-red"></i> Expense Breakdown
+                </h4>
+                <div class="space-y-3">
+                    {% if current_period.categories %}
+                        {% for cat, amt in current_period.categories.items() %}
+                        <div class="flex justify-between items-center text-sm border-b border-fz-gray-50 pb-2">
+                            <span class="text-fz-gray-600 font-medium">{{ cat }}</span>
+                            <span class="font-bold text-fz-black">₹{{ "{:,.2f}".format(amt) }}</span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-sm text-fz-gray-500">No expenses recorded for this period.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Actions Footer -->
+        <div class="bg-fz-gray-50 p-4 border-t border-fz-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <span class="text-sm text-fz-gray-500 font-medium flex items-center gap-2">
+                <i data-lucide="download-cloud" class="w-4 h-4 text-green-600"></i> Export ready.
+            </span>
+            <div class="flex items-center gap-3 w-full sm:w-auto">
+                <a href="/app/api/reports/export/csv" class="flex-1 sm:flex-none bg-white border border-fz-gray-200 text-fz-black px-4 py-2 rounded-lg text-sm font-semibold hover:bg-fz-gray-100 transition-colors flex items-center justify-center gap-2">
+                    <i data-lucide="download" class="w-4 h-4"></i> CSV Data
+                </a>
+                <!-- PDF generation marked as future -->
+                <button class="flex-1 sm:flex-none bg-fz-gray-200 text-fz-gray-500 px-4 py-2 rounded-lg text-sm font-semibold cursor-not-allowed flex items-center justify-center gap-2" title="PDF generation is a future enhancement" disabled>
+                    <i data-lucide="file-text" class="w-4 h-4"></i> PDF Report
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        lucide.createIcons();
+    });
+</script>
+{% endblock %}

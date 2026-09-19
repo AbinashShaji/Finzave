@@ -1,13 +1,13 @@
 from datetime import datetime, timezone
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import Integer, String, DateTime, ForeignKey, Boolean
+from sqlalchemy import Integer, String, Boolean, DateTime, ForeignKey
 from extensions import db
 
 class Setting(db.Model):
     __tablename__ = 'settings'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), unique=True, index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id', ondelete='CASCADE'), unique=True, index=True)
     currency: Mapped[str] = mapped_column(String(10), default='USD')
     theme: Mapped[str] = mapped_column(String(20), default='light')
     email_notifications: Mapped[bool] = mapped_column(Boolean, default=True)

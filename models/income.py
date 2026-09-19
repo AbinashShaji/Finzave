@@ -1,13 +1,14 @@
 from datetime import date, datetime, timezone
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import Integer, String, Float, Date, DateTime, ForeignKey
+from sqlalchemy import Integer, String, Float, Date, DateTime, ForeignKey, Index
 from extensions import db
 
 class Income(db.Model):
     __tablename__ = 'incomes'
+    __table_args__ = (Index('ix_income_user_date', 'user_id', 'date'),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id', ondelete='CASCADE'), index=True)
     amount: Mapped[float] = mapped_column(Float, nullable=False)
     income_type: Mapped[str] = mapped_column(String(50), nullable=False) # Fixed / Variable
     date: Mapped[date] = mapped_column(Date, nullable=False)

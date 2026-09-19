@@ -7,7 +7,7 @@ class Feedback(db.Model):
     __tablename__ = 'feedback'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id', ondelete='CASCADE'), index=True)
     feedback_type: Mapped[str] = mapped_column(String(50), nullable=False) # App Review / Bug Report / Suggestions
     content: Mapped[str] = mapped_column(Text, nullable=False)
     status: Mapped[str] = mapped_column(String(20), default='open') # open, in_progress, resolved
