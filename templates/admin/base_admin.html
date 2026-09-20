@@ -89,6 +89,18 @@
         </div>
     </main>
 
+    <!-- Global Confirm Modal -->
+    <div id="global-confirm-modal" class="fixed inset-0 bg-black bg-opacity-50 z-[100] hidden flex-col items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-sm p-6 shadow-xl transform scale-95 opacity-0 transition-all duration-200" id="global-confirm-modal-content">
+            <h3 class="text-lg font-bold text-fz-black mb-2" id="global-confirm-title">Confirm Action</h3>
+            <p class="text-sm text-fz-gray-600 mb-6" id="global-confirm-msg">Are you sure you want to proceed?</p>
+            <div class="flex justify-end gap-3">
+                <button id="global-confirm-cancel" class="px-4 py-2 text-sm font-semibold text-fz-gray-600 hover:text-fz-black hover:bg-fz-gray-100 rounded-lg transition-colors">Cancel</button>
+                <button id="global-confirm-ok" class="px-4 py-2 text-sm font-semibold text-white bg-fz-red hover:bg-red-600 rounded-lg shadow-sm transition-colors">Confirm</button>
+            </div>
+        </div>
+    </div>
+
     {% block modals %}{% endblock %}
 
     <script>
@@ -121,6 +133,44 @@
                     })
                     .catch(err => console.error('Error fetching admin avatar:', err));
             }
+        });
+
+        let currentConfirmCallback = null;
+        
+        function showConfirmModal(title, message, onConfirm) {
+            document.getElementById('global-confirm-title').textContent = title;
+            document.getElementById('global-confirm-msg').textContent = message;
+            currentConfirmCallback = onConfirm;
+            
+            const modal = document.getElementById('global-confirm-modal');
+            const content = document.getElementById('global-confirm-modal-content');
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeConfirmModal() {
+            const modal = document.getElementById('global-confirm-modal');
+            const content = document.getElementById('global-confirm-modal-content');
+            
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                currentConfirmCallback = null;
+            }, 200);
+        }
+
+        document.getElementById('global-confirm-cancel')?.addEventListener('click', closeConfirmModal);
+        document.getElementById('global-confirm-ok')?.addEventListener('click', () => {
+            if (currentConfirmCallback) currentConfirmCallback();
+            closeConfirmModal();
         });
 
         async function logout() {

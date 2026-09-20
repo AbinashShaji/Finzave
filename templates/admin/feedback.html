@@ -10,14 +10,14 @@
             <h2 class="text-lg font-bold">Feedback Moderation</h2>
             <div class="flex bg-fz-gray-100 p-1 rounded-lg">
                 <button onclick="setTab('pending')" id="tab-pending" class="px-4 py-2 text-sm font-medium rounded-md bg-white shadow-sm transition-all text-fz-black">All (Pending)</button>
-                <button onclick="setTab('unresolved')" id="tab-unresolved" class="px-4 py-2 text-sm font-medium rounded-md text-fz-gray-500 hover:text-fz-black transition-all">Accepted (Unresolved)</button>
+                <button onclick="setTab('in_progress')" id="tab-in_progress" class="px-4 py-2 text-sm font-medium rounded-md text-fz-gray-500 hover:text-fz-black transition-all">In Progress</button>
                 <button onclick="setTab('resolved')" id="tab-resolved" class="px-4 py-2 text-sm font-medium rounded-md text-fz-gray-500 hover:text-fz-black transition-all">Resolved</button>
             </div>
         </div>
     </div>
     
     <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm whitespace-nowrap">
+        <table class="w-full text-left text-sm">
             <thead class="bg-fz-gray-50 border-b border-fz-gray-200 text-fz-gray-500 uppercase font-semibold text-xs tracking-wider">
                 <tr>
                     <th scope="col" class="px-6 py-4">ID</th>
@@ -40,14 +40,18 @@
 
 {% block scripts %}
 <script>
-    let allFeedback = [];
+    let allFeedback = []; // will store paginated items
+    let currentPage = 1;
+    let totalPages = 1;
     let currentTab = 'pending';
 
-    document.addEventListener("DOMContentLoaded", fetchFeedback);
+    // Call fetch on load
+    fetchFeedback();
 
-    function setTab(tabName) {
-        currentTab = tabName;
-        ['pending', 'unresolved', 'resolved'].forEach(t => {
+    function setTab(tab) {
+        currentTab = tab;
+        currentPage = 1;
+        ['pending', 'in_progress', 'resolved'].forEach(t => {
             const el = document.getElementById(`tab-${t}`);
             if (t === currentTab) {
                 el.classList.add('bg-white', 'shadow-sm', 'text-fz-black');
@@ -57,14 +61,15 @@
                 el.classList.add('text-fz-gray-500');
             }
         });
-        renderFeedback();
+        fetchFeedback();
     }
 
     async function fetchFeedback() {
         try {
-            const res = await fetch('/api/admin/feedback');
+            const res = await fetch(`/api/admin/feedback?status=${currentTab}&per_page=1000`);
             if (res.ok) {
-                allFeedback = await res.json();
+                const data = await res.json();
+                allFeedback = data.items;
                 renderFeedback();
             }
         } catch (error) {
@@ -73,37 +78,53 @@
         }
     }
     
+    function escapeHTML(str) {
+        if (!str) return '';
+        return str.replace(/[&<>'"]/g, 
+            tag => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                "'": '&#39;',
+                '"': '&quot;'
+            }[tag] || tag)
+        );
+    }
+    
     function renderFeedback() {
         const tbody = document.getElementById('feedback-tbody');
-        const filtered = allFeedback.filter(f => f.status === currentTab);
         
-        if (filtered.length === 0) {
+        if (allFeedback.length === 0) {
             tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-fz-gray-500">No feedback found in this category.</td></tr>';
             return;
         }
 
-        tbody.innerHTML = filtered.map(f => `
+        tbody.innerHTML = allFeedback.map(f => `
             <tr class="hover:bg-fz-gray-50 transition-colors">
                 <td class="px-6 py-4 font-mono text-xs text-fz-gray-500">#${f.id}</td>
-                <td class="px-6 py-4 font-medium">${f.username}</td>
+                <td class="px-6 py-4 font-medium">${escapeHTML(f.username)}</td>
                 <td class="px-6 py-4">
                     <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
-                        ${f.type}
+                        ${escapeHTML(f.type)}
                     </span>
                 </td>
-                <td class="px-6 py-4 max-w-xs truncate text-fz-gray-600" title="${f.content || ''}">${f.content || '-'}</td>
+                <td class="px-6 py-4">
+                    <div class="whitespace-normal break-words max-w-md text-fz-gray-600">
+                        ${escapeHTML(f.content) || '-'}
+                    </div>
+                </td>
                 <td class="px-6 py-4">
                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         f.status === 'resolved' ? 'bg-green-100 text-green-800' : 
-                        (f.status === 'unresolved' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800')
+                        (f.status === 'in_progress' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800')
                     }">
-                        ${f.status === 'resolved' ? 'Resolved' : (f.status === 'unresolved' ? 'Unresolved' : 'Pending')}
+                        ${f.status === 'resolved' ? 'Resolved' : (f.status === 'in_progress' ? 'In Progress' : 'Pending')}
                     </span>
                 </td>
                 <td class="px-6 py-4 text-right">
-                    ${f.status === 'pending' ? `<button onclick="updateStatus(${f.id}, 'unresolved')" class="text-blue-600 hover:text-blue-800 font-medium text-xs bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded transition-colors mr-2">Accept</button>` : ''}
-                    ${f.status === 'unresolved' ? `<button onclick="updateStatus(${f.id}, 'resolved')" class="text-green-600 hover:text-green-800 font-medium text-xs bg-green-50 hover:bg-green-100 px-3 py-1 rounded transition-colors mr-2">Resolve</button>` : ''}
-                    ${f.status === 'resolved' ? `<button onclick="updateStatus(${f.id}, 'unresolved')" class="text-orange-600 hover:text-orange-800 font-medium text-xs bg-orange-50 hover:bg-orange-100 px-3 py-1 rounded transition-colors mr-2">Mark Unresolved</button>` : ''}
+                    ${f.status === 'pending' ? `<button onclick="updateStatus(${f.id}, 'in_progress')" class="text-blue-600 hover:text-blue-800 font-medium text-xs bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded transition-colors mr-2">Mark In Progress</button>` : ''}
+                    ${f.status === 'in_progress' ? `<button onclick="updateStatus(${f.id}, 'resolved')" class="text-green-600 hover:text-green-800 font-medium text-xs bg-green-50 hover:bg-green-100 px-3 py-1 rounded transition-colors mr-2">Resolve</button>` : ''}
+                    ${f.status === 'resolved' ? `<button onclick="updateStatus(${f.id}, 'in_progress')" class="text-orange-600 hover:text-orange-800 font-medium text-xs bg-orange-50 hover:bg-orange-100 px-3 py-1 rounded transition-colors mr-2">Mark In Progress</button>` : ''}
                     
                     <button onclick="deleteFeedback(${f.id})" class="text-fz-red hover:text-red-700 font-medium text-xs bg-red-50 hover:bg-red-100 px-3 py-1 rounded transition-colors">Delete</button>
                 </td>
@@ -111,11 +132,18 @@
         `).join('');
     }
 
+
+
     async function updateStatus(feedbackId, newStatus) {
         try {
+            const csrfToken = getCookie('csrf_access_token');
             const res = await fetch(`/api/admin/feedback/${feedbackId}/status`, {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken 
+                },
+                credentials: 'same-origin',
                 body: JSON.stringify({ status: newStatus })
             });
             if (res.ok) {
@@ -131,21 +159,33 @@
         }
     }
 
-    async function deleteFeedback(feedbackId) {
-        if (!confirm('Are you sure you want to delete this feedback?')) return;
-        
-        try {
-            const res = await fetch(`/api/admin/feedback/${feedbackId}`, { method: 'DELETE' });
-            if (res.ok) {
-                fetchFeedback();
-            } else {
-                const err = await res.json();
-                alert(err.message || 'Failed to delete feedback');
+    function deleteFeedback(feedbackId) {
+        showConfirmModal('Delete Feedback', 'Are you sure you want to delete this feedback? This action cannot be undone.', async () => {
+            try {
+                const csrfToken = getCookie('csrf_access_token');
+                const res = await fetch(`/api/admin/feedback/${feedbackId}`, { 
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    credentials: 'same-origin'
+                });
+                if (res.ok) {
+                    fetchFeedback();
+                } else {
+                    const err = await res.json();
+                    alert(err.message || 'Failed to delete feedback');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Error deleting feedback');
             }
-        } catch (e) {
-            console.error(e);
-            alert('Error deleting feedback');
-        }
+        });
+    }
+
+    function getCookie(name) {
+        let matches = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"));
+        return matches ? decodeURIComponent(matches[1]) : undefined;
     }
 </script>
 {% endblock %}

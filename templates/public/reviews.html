@@ -10,9 +10,12 @@
         <p class="text-lg text-fz-gray-800 leading-relaxed mb-12">
             See how FinZave is helping people understand their financial behaviour.
         </p>
-
+    </div>
+    
+    <div class="w-full max-w-6xl mx-auto px-6">
+        {% if not paginated_reviews.items %}
         <!-- Empty State / Development State -->
-        <div class="bg-fz-gray-100 border border-fz-gray-200 rounded-3xl p-12 flex flex-col items-center observe-me fz-reveal-up" data-delay="100">
+        <div class="bg-fz-gray-100 border border-fz-gray-200 rounded-3xl p-12 flex flex-col items-center observe-me fz-reveal-up text-center" data-delay="100">
             <svg class="w-10 h-10 text-fz-gray-300 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
@@ -21,6 +24,48 @@
                 We rely on real feedback. Once users begin sharing their experiences and ratings on the platform, they will appear here.
             </p>
         </div>
+        {% else %}
+        <!-- Reviews Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-left observe-me fz-reveal-up w-full">
+            {% for r in paginated_reviews.items %}
+            <div class="bg-white border border-fz-gray-200 p-6 rounded-3xl shadow-sm hover:shadow-md transition-shadow flex flex-col h-full">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="font-bold text-fz-black text-lg">{{ r.user.username if r.user else "Anonymous" }}</div>
+                    <div class="flex gap-0.5">
+                        {% set rating_val = r.rating if r.rating else 0 %}
+                        {% for i in range(5) %}
+                            {% if i < rating_val %}
+                            <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                            {% else %}
+                            <svg class="w-4 h-4 text-gray-300 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <p class="text-fz-gray-600 line-clamp-4 flex-1 leading-relaxed">{{ r.content }}</p>
+                <div class="text-xs font-medium text-fz-gray-400 mt-6">{{ r.created_at.strftime('%b %d, %Y') if r.created_at else '' }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if paginated_reviews.pages > 1 %}
+        <div class="mt-12 flex justify-center gap-4">
+            {% if paginated_reviews.has_prev %}
+                <a href="{{ url_for('public.reviews', page=paginated_reviews.prev_num) }}" class="px-6 py-2 bg-fz-gray-100 text-fz-black font-medium rounded hover:bg-fz-gray-200 transition-colors">Previous</a>
+            {% else %}
+                <span class="px-6 py-2 bg-fz-gray-50 text-fz-gray-400 font-medium rounded cursor-not-allowed">Previous</span>
+            {% endif %}
+            
+            <span class="px-4 py-2 font-medium text-fz-gray-600">Page {{ paginated_reviews.page }} of {{ paginated_reviews.pages }}</span>
+            
+            {% if paginated_reviews.has_next %}
+                <a href="{{ url_for('public.reviews', page=paginated_reviews.next_num) }}" class="px-6 py-2 bg-fz-gray-100 text-fz-black font-medium rounded hover:bg-fz-gray-200 transition-colors">Next</a>
+            {% else %}
+                <span class="px-6 py-2 bg-fz-gray-50 text-fz-gray-400 font-medium rounded cursor-not-allowed">Next</span>
+            {% endif %}
+        </div>
+        {% endif %}
     </div>
 </section>
 {% endblock %}

@@ -17,7 +17,7 @@
     </div>
     
     <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm whitespace-nowrap">
+        <table class="w-full text-left text-sm">
             <thead class="bg-fz-gray-50 border-b border-fz-gray-200 text-fz-gray-500 uppercase font-semibold text-xs tracking-wider">
                 <tr>
                     <th scope="col" class="px-6 py-4">ID</th>
@@ -40,13 +40,17 @@
 
 {% block scripts %}
 <script>
-    let allReviews = [];
+    let allReviews = []; // will store paginated items
     let currentTab = 'pending';
+    let currentPage = 1;
+    let totalPages = 1;
 
-    document.addEventListener("DOMContentLoaded", fetchReviews);
+    // Call fetch on load
+    fetchReviews();
 
-    function setTab(tabName) {
-        currentTab = tabName;
+    function setTab(tab) {
+        currentTab = tab;
+        currentPage = 1;
         // Update tab styling
         ['pending', 'accepted', 'live'].forEach(t => {
             const el = document.getElementById(`tab-${t}`);
@@ -58,14 +62,15 @@
                 el.classList.add('text-fz-gray-500');
             }
         });
-        renderReviews();
+        fetchReviews();
     }
 
     async function fetchReviews() {
         try {
-            const res = await fetch('/api/admin/reviews');
+            const res = await fetch(`/api/admin/reviews?status=${currentTab}&per_page=1000`);
             if (res.ok) {
-                allReviews = await res.json();
+                const data = await res.json();
+                allReviews = data.items;
                 renderReviews();
             }
         } catch (error) {
@@ -74,25 +79,41 @@
         }
     }
     
+    function escapeHTML(str) {
+        if (!str) return '';
+        return str.replace(/[&<>'"]/g, 
+            tag => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                "'": '&#39;',
+                '"': '&quot;'
+            }[tag] || tag)
+        );
+    }
+    
     function renderReviews() {
         const tbody = document.getElementById('reviews-tbody');
-        const filtered = allReviews.filter(r => r.status === currentTab);
         
-        if (filtered.length === 0) {
+        if (allReviews.length === 0) {
             tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-fz-gray-500">No reviews found in this category.</td></tr>';
             return;
         }
 
-        tbody.innerHTML = filtered.map(r => `
+        tbody.innerHTML = allReviews.map(r => `
             <tr class="hover:bg-fz-gray-50 transition-colors">
                 <td class="px-6 py-4 font-mono text-xs text-fz-gray-500">#${r.id}</td>
-                <td class="px-6 py-4 font-medium">${r.username}</td>
+                <td class="px-6 py-4 font-medium">${escapeHTML(r.username)}</td>
                 <td class="px-6 py-4">
                     <div class="flex text-yellow-400">
                         ${Array(5).fill(0).map((_, i) => `<svg class="w-4 h-4 ${i < r.rating ? 'fill-current' : 'text-gray-300'}" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>`).join('')}
                     </div>
                 </td>
-                <td class="px-6 py-4 max-w-xs truncate text-fz-gray-600" title="${r.content || ''}">${r.content || '-'}</td>
+                <td class="px-6 py-4">
+                    <div class="whitespace-normal break-words max-w-md text-fz-gray-600">
+                        ${escapeHTML(r.content) || '-'}
+                    </div>
+                </td>
                 <td class="px-6 py-4">
                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         r.status === 'live' ? 'bg-green-100 text-green-800' : 
@@ -112,11 +133,18 @@
         `).join('');
     }
 
+
+
     async function updateStatus(reviewId, newStatus) {
         try {
+            const csrfToken = getCookie('csrf_access_token');
             const res = await fetch(`/api/admin/reviews/${reviewId}/status`, {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken 
+                },
+                credentials: 'same-origin',
                 body: JSON.stringify({ status: newStatus })
             });
             if (res.ok) {
@@ -132,21 +160,33 @@
         }
     }
 
-    async function deleteReview(reviewId) {
-        if (!confirm('Are you sure you want to delete this review?')) return;
-        
-        try {
-            const res = await fetch(`/api/admin/reviews/${reviewId}`, { method: 'DELETE' });
-            if (res.ok) {
-                fetchReviews();
-            } else {
-                const err = await res.json();
-                alert(err.message || 'Failed to delete review');
+    function deleteReview(reviewId) {
+        showConfirmModal('Delete Review', 'Are you sure you want to delete this review? This action cannot be undone.', async () => {
+            try {
+                const csrfToken = getCookie('csrf_access_token');
+                const res = await fetch(`/api/admin/reviews/${reviewId}`, { 
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    credentials: 'same-origin'
+                });
+                if (res.ok) {
+                    fetchReviews();
+                } else {
+                    const err = await res.json();
+                    alert(err.message || 'Failed to delete review');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Error deleting review');
             }
-        } catch (e) {
-            console.error(e);
-            alert('Error deleting review');
-        }
+        });
+    }
+
+    function getCookie(name) {
+        let matches = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"));
+        return matches ? decodeURIComponent(matches[1]) : undefined;
     }
 </script>
 {% endblock %}

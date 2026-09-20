@@ -241,18 +241,23 @@ def delete_user(user_id):
 @admin_bp.route('/api/admin/reviews', methods=['GET'])
 @admin_required()
 def get_reviews():
-    reviews_list = Review.query.order_by(Review.created_at.desc()).all()
-    result = []
-    for r in reviews_list:
-        result.append({
-            "id": r.id,
-            "username": r.user.username if r.user else "Anonymous",
-            "rating": r.rating,
-            "content": r.content,
-            "status": r.status,
-            "created_at": r.created_at.isoformat() if r.created_at else None
-        })
-    return jsonify(result), 200
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 20, type=int)
+    status_filter = request.args.get('status')
+    
+    from sqlalchemy.orm import joinedload
+    query = Review.query.options(joinedload(Review.user))
+    if status_filter:
+        query = query.filter_by(status=status_filter)
+        
+    paginated = query.order_by(Review.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
+    
+    return jsonify({
+        "items": [r.to_dict() for r in paginated.items],
+        "page": paginated.page,
+        "pages": paginated.pages,
+        "total": paginated.total
+    }), 200
 
 @admin_bp.route('/api/admin/reviews/<int:review_id>/status', methods=['PATCH'])
 @admin_required()
@@ -284,25 +289,30 @@ def delete_review(review_id):
 @admin_bp.route('/api/admin/feedback', methods=['GET'])
 @admin_required()
 def get_feedbacks():
-    feedbacks_list = Feedback.query.order_by(Feedback.created_at.desc()).all()
-    result = []
-    for f in feedbacks_list:
-        result.append({
-            "id": f.id,
-            "username": f.user.username if f.user else "Unknown",
-            "type": f.feedback_type,
-            "content": f.content,
-            "status": f.status,
-            "created_at": f.created_at.isoformat() if f.created_at else None
-        })
-    return jsonify(result), 200
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 20, type=int)
+    status_filter = request.args.get('status')
+    
+    from sqlalchemy.orm import joinedload
+    query = Feedback.query.options(joinedload(Feedback.user))
+    if status_filter:
+        query = query.filter_by(status=status_filter)
+        
+    paginated = query.order_by(Feedback.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
+    
+    return jsonify({
+        "items": [f.to_dict() for f in paginated.items],
+        "page": paginated.page,
+        "pages": paginated.pages,
+        "total": paginated.total
+    }), 200
 
 @admin_bp.route('/api/admin/feedback/<int:feedback_id>/status', methods=['PATCH'])
 @admin_required()
 def update_feedback_status(feedback_id):
     data = request.get_json()
     new_status = data.get('status')
-    if new_status not in ['pending', 'unresolved', 'resolved']:
+    if new_status not in ['pending', 'in_progress', 'resolved']:
         return jsonify(message="Invalid status"), 400
         
     feedback = db.session.get(Feedback, feedback_id)

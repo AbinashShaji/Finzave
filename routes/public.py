@@ -16,22 +16,29 @@ def services():
 
 @public_bp.route('/reviews')
 def reviews():
-    return render_template('public/reviews.html')
+    from flask import request
+    from models.review import Review
+    from sqlalchemy.orm import joinedload
+    page = request.args.get('page', 1, type=int)
+    paginated_reviews = Review.query.options(joinedload(Review.user)).filter_by(status='live').order_by(Review.created_at.desc()).paginate(page=page, per_page=12, error_out=False)
+    return render_template('public/reviews.html', paginated_reviews=paginated_reviews)
 
 @public_bp.route('/api/reviews', methods=['GET'])
 def get_public_reviews():
+    from flask import request
     from models.review import Review
-    live_reviews = Review.query.filter_by(status='live').order_by(Review.created_at.desc()).all()
-    result = []
-    for r in live_reviews:
-        result.append({
-            "id": r.id,
-            "username": r.user.username if r.user else "Anonymous",
-            "rating": r.rating,
-            "content": r.content,
-            "created_at": r.created_at.isoformat() if r.created_at else None
-        })
-    return jsonify(result), 200
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 20, type=int)
+    
+    from sqlalchemy.orm import joinedload
+    paginated = Review.query.options(joinedload(Review.user)).filter_by(status='live').order_by(Review.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
+    
+    return jsonify({
+        "items": [r.to_dict() for r in paginated.items],
+        "page": paginated.page,
+        "pages": paginated.pages,
+        "total": paginated.total
+    }), 200
 
 @public_bp.route('/login')
 def login():
