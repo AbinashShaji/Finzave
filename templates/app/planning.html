@@ -41,6 +41,8 @@
 
                 <!-- Result Area -->
                 <div class="bg-fz-black text-white rounded-xl p-5 mt-auto">
+                    <div id="sip-insight-container" class="hidden"></div>
+                    
                     <p class="text-xs text-fz-gray-400 font-medium uppercase tracking-wider mb-1">Estimated Future Value</p>
                     <p class="text-3xl font-bold mb-4" id="sip-future-value">₹0</p>
                     
@@ -85,6 +87,8 @@
 
                 <!-- Result Area -->
                 <div class="bg-fz-gray-50 border border-fz-gray-200 rounded-xl p-5 mt-auto text-fz-black">
+                    <div id="emi-insight-container" class="hidden"></div>
+                    
                     <p class="text-xs text-fz-gray-500 font-bold uppercase tracking-wider mb-1">Monthly EMI Payment</p>
                     <p class="text-3xl font-bold mb-4 text-fz-red" id="emi-monthly">₹0</p>
                     
@@ -145,13 +149,43 @@
             document.getElementById(id).addEventListener('input', calculateEMI);
         });
     });
+    
+    function displayInsight(type, insight) {
+        const container = document.getElementById(`${type}-insight-container`);
+        if (!insight) {
+            container.className = 'hidden';
+            container.innerHTML = '';
+            return;
+        }
+
+        let iconName = insight.status === 'WARNING' ? 'alert-triangle' : 'check-circle';
+        let colors = '';
+        
+        if (type === 'sip') {
+            colors = insight.status === 'WARNING' ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-green-500/10 border-green-500/20 text-green-400';
+        } else {
+            colors = insight.status === 'WARNING' ? 'bg-red-50 border-red-200 text-red-700' : 'bg-green-50 border-green-200 text-green-700';
+        }
+
+        container.className = `mb-4 p-3 rounded-lg text-sm font-medium border ${colors}`;
+        container.innerHTML = `
+            <div class="flex items-start gap-2">
+                <i data-lucide="${iconName}" class="w-4 h-4 mt-0.5 flex-shrink-0"></i>
+                <span>${insight.message}</span>
+            </div>
+        `;
+        lucide.createIcons({ root: container });
+    }
 
     async function calculateSIP() {
         const monthly = document.getElementById('sip-monthly').value;
         const rate = document.getElementById('sip-rate').value;
         const years = document.getElementById('sip-years').value;
         
-        if (!monthly || !rate || !years) return;
+        if (!monthly || !rate || !years) {
+            displayInsight('sip', null);
+            return;
+        }
 
         try {
             const csrfToken = getCookie('csrf_access_token');
@@ -165,9 +199,13 @@
                 document.getElementById('sip-future-value').textContent = `₹${Math.round(data.future_value).toLocaleString()}`;
                 document.getElementById('sip-invested').textContent = `₹${Math.round(data.total_invested).toLocaleString()}`;
                 document.getElementById('sip-returns').textContent = `₹${Math.round(data.est_returns).toLocaleString()}`;
+                displayInsight('sip', data.insight);
+            } else {
+                displayInsight('sip', { status: 'WARNING', message: 'Failed to retrieve insights from the server.' });
             }
         } catch (err) {
             console.error(err);
+            displayInsight('sip', { status: 'WARNING', message: 'Network error occurred while fetching insights.' });
         }
     }
 
@@ -176,7 +214,10 @@
         const rate = document.getElementById('emi-rate').value;
         const years = document.getElementById('emi-years').value;
         
-        if (!principal || !rate || !years) return;
+        if (!principal || !rate || !years) {
+            displayInsight('emi', null);
+            return;
+        }
 
         try {
             const csrfToken = getCookie('csrf_access_token');
@@ -190,9 +231,13 @@
                 document.getElementById('emi-monthly').textContent = `₹${Math.round(data.monthly_emi).toLocaleString()}`;
                 document.getElementById('emi-total-principal').textContent = `₹${Math.round(principal).toLocaleString()}`;
                 document.getElementById('emi-interest').textContent = `₹${Math.round(data.total_interest).toLocaleString()}`;
+                displayInsight('emi', data.insight);
+            } else {
+                displayInsight('emi', { status: 'WARNING', message: 'Failed to retrieve insights from the server.' });
             }
         } catch (err) {
             console.error(err);
+            displayInsight('emi', { status: 'WARNING', message: 'Network error occurred while fetching insights.' });
         }
     }
 

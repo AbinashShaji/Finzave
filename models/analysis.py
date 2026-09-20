@@ -11,6 +11,7 @@ class Analysis(db.Model):
     period: Mapped[str] = mapped_column(String(50), nullable=False) # e.g., '2026-09' or 'Q3 2026'
     metrics: Mapped[dict] = mapped_column(JSON, nullable=False, default={})
     insights: Mapped[dict] = mapped_column(JSON, nullable=False, default={})
+    health_score: Mapped[dict] = mapped_column(JSON, nullable=False, default={})
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 

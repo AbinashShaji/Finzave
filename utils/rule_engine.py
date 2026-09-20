@@ -48,7 +48,7 @@ class FinancialPeriod:
 def percentage_change(current: float, previous: float) -> Optional[float]:
     if previous == 0:
         return None
-    return ((current - previous) / previous)
+    return ((current - previous) / abs(previous))
 
 def classify_trend(change: float) -> str:
     if change < -TREND_CHANGE_PERCENTAGE:

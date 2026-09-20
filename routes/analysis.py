@@ -2,69 +2,67 @@ from flask import render_template
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from routes.user import app_bp
 from utils.finance import build_financial_periods
+from utils.financial_metrics import calculate_period_metrics
 from utils.rule_engine import evaluate_rules
 from analysis.scoring import calculate_health_score
-import json
+from extensions import db, cache
+from models.analysis import Analysis
+from models.goal import Goal
+from utils.cache_keys import user_analysis_key
+from routes.goals import prepare_goals_data
+from recommendations import generate_recommendations
 
 @app_bp.route('/analysis')
 @jwt_required()
+@cache.cached(timeout=86400, key_prefix=lambda: user_analysis_key(get_jwt_identity()))
 def analysis():
     user_id = int(get_jwt_identity())
     
-    # Get last 6 months of data
+    # 1. Fetch Financial Data
     periods = build_financial_periods(user_id, months=6)
     
+    # 2. Pipeline Calculations
+    metrics = calculate_period_metrics(periods)
     insights = evaluate_rules(periods)
+    health_score = calculate_health_score(periods, metrics.get("has_data", False), insights)
     
-    current_period = periods[-1] if periods else None
-    
-    health_data = calculate_health_score(current_period, insights)
-    
-    # Prepare data for Chart.js
-    chart_labels = [p.period_id for p in periods]
-    chart_income = [p.total_income for p in periods]
-    chart_expenses = [p.total_expenses for p in periods]
-    chart_savings = [p.savings for p in periods]
-    
-    # Current month category distribution for Doughnut chart
-    category_labels = []
-    category_data = []
-    if current_period:
-        for cat, amt in current_period.categories.items():
-            category_labels.append(cat)
-            category_data.append(amt)
+    # 3. Database Persistence
+    current_period_id = periods[-1].period_id if periods else "NO_DATA"
+    if current_period_id != "NO_DATA":
+        analysis_record = Analysis.query.filter_by(user_id=user_id, period=current_period_id).first()
+        if not analysis_record:
+            analysis_record = Analysis(user_id=user_id, period=current_period_id)
+            db.session.add(analysis_record)
             
-    # Calculate prev month changes
-    income_change = 0
-    expense_change = 0
-    savings_change = 0
-    if len(periods) >= 2:
-        prev = periods[-2]
-        curr = periods[-1]
-        if prev.total_income > 0:
-            income_change = ((curr.total_income - prev.total_income) / prev.total_income) * 100
-        if prev.total_expenses > 0:
-            expense_change = ((curr.total_expenses - prev.total_expenses) / prev.total_expenses) * 100
-        if prev.savings > 0: # Note: savings could be negative
-            savings_change = ((curr.savings - prev.savings) / abs(prev.savings)) * 100
-
-    has_data = len(periods) > 0 and any(p.total_income > 0 or p.total_expenses > 0 for p in periods)
-
+        analysis_record.metrics = metrics
+        analysis_record.insights = insights
+        analysis_record.health_score = health_score
+        db.session.commit()
+        
+    # 4. Generate Recommendations (Phase 9)
+    # Fetch user goals to pass into recommendation engine
+    user_goals = db.session.query(Goal).filter_by(user_id=user_id).all()
+    active_goals, completed_goals = prepare_goals_data(user_goals)
+    
+    # Convert active goals to simple dicts for the pure function engine
+    prepared_goals = []
+    for g in active_goals:
+        prepared_goals.append({
+            "goal_name": g.get("goal_name") if isinstance(g, dict) else getattr(g, "goal_name", ""),
+            "status": g.get("status") if isinstance(g, dict) else getattr(g, "status", ""),
+            "req_monthly": g.get("req_monthly") if isinstance(g, dict) else getattr(g, "req_monthly", 0)
+        })
+        
+    if metrics.get('has_data'):
+        recommendations = generate_recommendations(insights, prepared_goals, metrics, health_score)
+    else:
+        recommendations = []
+    
+    # 5. Render Template
     return render_template(
         'app/analysis.html',
-        has_data=has_data,
-        current_period=current_period,
-        health_data=health_data,
+        metrics=metrics,
         insights=insights,
-        income_change=round(income_change, 1),
-        expense_change=round(expense_change, 1),
-        savings_change=round(savings_change, 1),
-        chart_data=json.dumps({
-            'labels': chart_labels,
-            'income': chart_income,
-            'expenses': chart_expenses,
-            'savings': chart_savings,
-            'cat_labels': category_labels,
-            'cat_data': category_data
-        })
+        health_score=health_score,
+        recommendations=recommendations
     )

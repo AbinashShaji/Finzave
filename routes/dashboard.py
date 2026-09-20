@@ -16,9 +16,15 @@ def dashboard():
     
     # Use the same data adapter
     periods = build_financial_periods(user_id, months=6)
+    
+    # We need has_data for scoring calculation
+    has_data = any((p.total_income > 0 or p.total_expenses > 0) for p in periods)
+    
     insights = evaluate_rules(periods)
     current_period = periods[-1] if periods else None
-    health_data = calculate_health_score(current_period, insights)
+    
+    # Fix P0 Bug: Update signature to match analysis.py
+    health_data = calculate_health_score(periods, has_data, insights)
     
     # Recent transactions
     recent_expenses = db.session.query(Expense).filter_by(user_id=user_id).order_by(Expense.date.desc()).limit(5).all()
@@ -31,8 +37,6 @@ def dashboard():
             category_labels.append(cat)
             category_data.append(amt)
             
-    has_data = current_period is not None and (current_period.total_income > 0 or current_period.total_expenses > 0)
-
     return render_template(
         'app/dashboard.html',
         has_data=has_data,

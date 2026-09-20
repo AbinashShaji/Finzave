@@ -1,4 +1,4 @@
-from flask import render_template, request, jsonify, Response
+from flask import render_template, request, jsonify, Response, stream_with_context
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from routes.user import app_bp
 from extensions import db, cache
@@ -311,19 +311,23 @@ def export_expenses_csv():
         query = query.filter(Expense.category == category)
 
     query = query.order_by(Expense.date.desc(), Expense.id.desc())
-    expenses = query.all()
 
-    si = StringIO()
-    cw = csv.writer(si)
-    cw.writerow(['Date', 'Category', 'Description', 'Amount'])
-    for e in expenses:
-        cw.writerow([e.date.isoformat(), e.category, e.description, f"{e.amount:.2f}"])
-
-    output = si.getvalue()
-    si.close()
+    def generate():
+        si = StringIO()
+        cw = csv.writer(si)
+        cw.writerow(['Date', 'Category', 'Description', 'Amount'])
+        yield si.getvalue()
+        si.seek(0)
+        si.truncate(0)
+        
+        for e in query.yield_per(100):
+            cw.writerow([e.date.isoformat(), e.category, e.description, f"{e.amount:.2f}"])
+            yield si.getvalue()
+            si.seek(0)
+            si.truncate(0)
 
     return Response(
-        output,
+        stream_with_context(generate()),
         mimetype="text/csv",
         headers={"Content-Disposition": "attachment;filename=expenses_export.csv"}
     )
@@ -339,7 +343,10 @@ def upload_csv():
     if file.filename == '' or not file.filename.lower().endswith('.csv'):
         return jsonify({"error": "No selected file or invalid extension. Must be a .csv file."}), 400
         
-    file_bytes = file.read()
+    file_bytes = file.read(2 * 1024 * 1024) # Read up to 2MB
+    if len(file.read(1)) > 0:
+        return jsonify({"error": "File exceeds maximum allowed size of 2MB."}), 400
+        
     result = process_expense_csv(file_bytes)
     
     if not result['success']:
@@ -362,7 +369,10 @@ def confirm_csv():
     if file.filename == '' or not file.filename.lower().endswith('.csv'):
         return jsonify({"error": "No selected file or invalid extension. Must be a .csv file."}), 400
         
-    file_bytes = file.read()
+    file_bytes = file.read(2 * 1024 * 1024) # Read up to 2MB
+    if len(file.read(1)) > 0:
+        return jsonify({"error": "File exceeds maximum allowed size of 2MB."}), 400
+        
     result = process_expense_csv(file_bytes)
     
     if not result['success']:

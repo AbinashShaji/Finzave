@@ -14,12 +14,15 @@ import io
 def reports():
     user_id = int(get_jwt_identity())
     periods = build_financial_periods(user_id, months=6)
+    
+    # We need has_data for scoring calculation
+    has_data = any((p.total_income > 0 or p.total_expenses > 0) for p in periods)
+    
     insights = evaluate_rules(periods)
     current_period = periods[-1] if periods else None
-    health_data = calculate_health_score(current_period, insights)
     
-    # We will pass the full periods list to let Jinja select if needed, or just show current period
-    has_data = current_period is not None and (current_period.total_income > 0 or current_period.total_expenses > 0)
+    # Fix P0 Bug: Update signature to match analysis.py
+    health_data = calculate_health_score(periods, has_data, insights)
     
     return render_template(
         'app/reports.html',
