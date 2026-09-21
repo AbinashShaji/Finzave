@@ -125,7 +125,7 @@ def get_stats():
         })
 
     # Recent Feedback
-    recent_feedbacks = Feedback.query.order_by(Feedback.created_at.desc()).limit(5).all()
+    recent_feedbacks = Feedback.query.filter(Feedback.status != 'deleted').order_by(Feedback.created_at.desc()).limit(5).all()
     recent_feedback_list = []
     for f in recent_feedbacks:
         recent_feedback_list.append({
@@ -136,7 +136,7 @@ def get_stats():
         })
 
     # Recent Reviews
-    recent_reviews = Review.query.order_by(Review.created_at.desc()).limit(5).all()
+    recent_reviews = Review.query.filter(Review.status != 'deleted').order_by(Review.created_at.desc()).limit(5).all()
     recent_review_list = []
     for r in recent_reviews:
         recent_review_list.append({
@@ -285,7 +285,7 @@ def delete_review(review_id):
     if not review:
         return jsonify(message="Review not found"), 404
         
-    db.session.delete(review)
+    review.status = 'deleted'
     db.session.commit()
     return jsonify(message="Review deleted successfully"), 200
 
@@ -333,7 +333,7 @@ def delete_feedback(feedback_id):
     if not feedback:
         return jsonify(message="Feedback not found"), 404
         
-    db.session.delete(feedback)
+    feedback.status = 'deleted'
     db.session.commit()
     return jsonify(message="Feedback deleted successfully"), 200
 

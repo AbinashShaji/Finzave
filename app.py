@@ -63,6 +63,14 @@ def create_app(config_class=Config):
         except Exception:
             pass
 
+    @app.after_request
+    def add_cache_control(response):
+        if 'text/html' in response.headers.get('Content-Type', ''):
+            response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+        return response
+
     # Register blueprints
     from routes.auth import auth_bp
     from routes.public import public_bp
