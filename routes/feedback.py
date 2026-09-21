@@ -23,7 +23,7 @@ def submit_feedback():
     category = data.get('category', '').strip()
     message = data.get('message', '').strip()
     
-    if not category or category not in ['App Review', 'Bug Report', 'Suggestions', 'Other']:
+    if not category or category not in ['Feature Request', 'Bug Report', 'General Feedback', 'Other']:
         return jsonify({"msg": "Invalid feedback category."}), 400
         
     if not message or len(message) < 5 or len(message) > 1000:

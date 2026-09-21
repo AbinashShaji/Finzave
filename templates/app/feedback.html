@@ -26,7 +26,7 @@
                 <p class="text-sm text-fz-gray-500 mt-1">Rate your overall experience with FinZave.</p>
             </div>
 
-            <form id="review-form" class="space-y-5 flex-1 flex flex-col" onsubmit="submitReview(event)">
+            <form id="review-form" class="space-y-5" onsubmit="submitReview(event)">
                 <!-- Star Rating -->
                 <div>
                     <label class="block text-sm font-bold text-fz-black mb-2">Rating</label>
@@ -51,15 +51,15 @@
                 </div>
 
                 <!-- Review Text -->
-                <div class="flex-1 flex flex-col">
+                <div>
                     <label class="block text-sm font-bold text-fz-black mb-2">Review</label>
-                    <textarea id="review-message" rows="5" required placeholder="Tell us what you like about FinZave..." class="w-full px-4 py-3 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fz-black text-sm resize-none flex-1"></textarea>
+                    <textarea id="review-message" rows="5" required placeholder="Tell us what you like about FinZave..." class="w-full px-4 py-3 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fz-black text-sm resize-none"></textarea>
                 </div>
                 
                 <div id="review-error" class="text-sm font-semibold text-fz-red hidden"></div>
                 <div id="review-success" class="text-sm font-semibold text-green-600 hidden">Review submitted successfully!</div>
                 
-                <div class="pt-2 mt-auto">
+                <div class="pt-2">
                     <button type="submit" id="submit-review-btn" class="w-full bg-fz-black text-white py-3 rounded-lg font-semibold hover:bg-fz-red transition-colors shadow-sm">
                         Submit Review
                     </button>
@@ -106,7 +106,7 @@
                 <p class="text-sm text-fz-gray-500 mt-1">Report problems or suggest improvements.</p>
             </div>
 
-            <form id="feedback-form" class="space-y-5 flex-1 flex flex-col" onsubmit="submitFeedback(event)">
+            <form id="feedback-form" class="space-y-5" onsubmit="submitFeedback(event)">
                 
                 <div>
                     <label for="feedback-category" class="block text-sm font-bold text-fz-black mb-2">Category</label>
@@ -130,15 +130,15 @@
                     </div>
                 </div>
 
-                <div class="flex-1 flex flex-col">
+                <div>
                     <label class="block text-sm font-bold text-fz-black mb-2">Message</label>
-                    <textarea id="feedback-message" rows="5" required placeholder="Describe your issue or suggestion..." class="w-full px-4 py-3 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fz-black text-sm resize-none flex-1"></textarea>
+                    <textarea id="feedback-message" rows="5" required placeholder="Describe your issue or suggestion..." class="w-full px-4 py-3 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fz-black text-sm resize-none"></textarea>
                 </div>
                 
                 <div id="feedback-error" class="text-sm font-semibold text-fz-red hidden"></div>
                 <div id="feedback-success" class="text-sm font-semibold text-green-600 hidden">Feedback submitted successfully!</div>
                 
-                <div class="pt-2 mt-auto">
+                <div class="pt-2">
                     <button type="submit" id="submit-feedback-btn" class="w-full bg-fz-black text-white py-3 rounded-lg font-semibold hover:bg-fz-red transition-colors shadow-sm">
                         Submit Feedback
                     </button>
@@ -149,7 +149,7 @@
             <div class="mt-8 border-t border-fz-gray-200 pt-6">
                 <h4 class="text-sm font-bold text-fz-black mb-4">Your Feedback History</h4>
                 
-                <div class="flex flex-col gap-3 overflow-y-auto pr-1" style="max-height: 250px;" id="feedbacks-container">
+                <div class="space-y-4" id="feedbacks-container">
                     {% if feedbacks %}
                         {% for fb in feedbacks %}
                         <div class="bg-fz-gray-50 p-4 rounded-xl border border-fz-gray-200">
@@ -217,6 +217,23 @@
                 }
             });
         }
+
+        // Draft saving to prevent data loss on timeout
+        const reviewMsg = document.getElementById('review-message');
+        if (localStorage.getItem('draftReview')) {
+            reviewMsg.value = localStorage.getItem('draftReview');
+        }
+        reviewMsg.addEventListener('input', () => {
+            localStorage.setItem('draftReview', reviewMsg.value);
+        });
+
+        const feedbackMsg = document.getElementById('feedback-message');
+        if (localStorage.getItem('draftFeedback')) {
+            feedbackMsg.value = localStorage.getItem('draftFeedback');
+        }
+        feedbackMsg.addEventListener('input', () => {
+            localStorage.setItem('draftFeedback', feedbackMsg.value);
+        });
     });
 
     function hoverStars(rating) {
@@ -283,11 +300,25 @@
                 body: JSON.stringify({ rating: parseInt(rating), content: message })
             });
             
+            if (res.status === 429) {
+                errEl.textContent = 'You are submitting reviews too fast. Please try again later.';
+                errEl.classList.remove('hidden');
+                return;
+            }
+            
+            if (res.status === 401) {
+                errEl.textContent = 'Your session has expired. Your draft is saved. Please log in again to submit.';
+                errEl.classList.remove('hidden');
+                setTimeout(() => window.location.href = '/login', 2000);
+                return;
+            }
+            
             const data = await res.json();
             
             if (res.ok) {
                 succEl.classList.remove('hidden');
                 document.getElementById('review-message').value = '';
+                localStorage.removeItem('draftReview');
                 setRating(0);
                 
                 // Prepend dynamically
@@ -354,11 +385,25 @@
                 headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
                 body: JSON.stringify({ category, message })
             });
+            
+            if (res.status === 429) {
+                errEl.textContent = 'You are submitting feedback too fast. Please try again later.';
+                errEl.classList.remove('hidden');
+                return;
+            }
+            if (res.status === 401) {
+                errEl.textContent = 'Your session has expired. Your draft is saved. Please log in again to submit.';
+                errEl.classList.remove('hidden');
+                setTimeout(() => window.location.href = '/login', 2000);
+                return;
+            }
+            
             const data = await res.json();
             
             if (res.ok) {
                 succEl.classList.remove('hidden');
                 document.getElementById('feedback-message').value = '';
+                localStorage.removeItem('draftFeedback');
                 
                 // Prepend dynamically
                 const noMsg = document.getElementById('no-feedbacks-msg');
