@@ -2,14 +2,14 @@ import pandas as pd
 from datetime import datetime
 import io
 import logging
-from models.expense import EXPENSE_CATEGORIES
+from models.expense import EXPENSE_CATEGORIES, normalize_category, Expense
 
 logger = logging.getLogger(__name__)
 
 REQUIRED_COLUMNS = ['date', 'amount', 'category']
 OPTIONAL_COLUMNS = ['description']
 
-def process_expense_csv(file_stream: bytes) -> dict:
+def process_expense_csv(file_stream: bytes, user_id: int = None) -> dict:
     """
     Parses an uploaded CSV file containing expenses.
     Validates structure, values, and returns valid/invalid row counts.
@@ -33,6 +33,17 @@ def process_expense_csv(file_stream: bytes) -> dict:
     valid_records = []
     invalid_records = []
     
+
+    existing_hashes = set()
+    if user_id:
+        try:
+            existing_expenses = Expense.query.filter_by(user_id=user_id).all()
+            for ex in existing_expenses:
+                h = f"{ex.date.isoformat()}_{ex.amount}_{ex.category}_{ex.description}"
+                existing_hashes.add(h)
+        except Exception as e:
+            logger.error(f"Error fetching existing expenses: {str(e)}")
+    
     for index, row in df.iterrows():
         record = {
             "row_number": index + 2, # Account for 0-index and header
@@ -43,6 +54,9 @@ def process_expense_csv(file_stream: bytes) -> dict:
         # Validate Date
         try:
             date_val = pd.to_datetime(row['date']).date()
+            if date_val > datetime.now().date():
+                record['is_valid'] = False
+                record['errors'].append("Future transaction date is not allowed")
             record['date'] = date_val.isoformat()
         except Exception:
             record['is_valid'] = False
@@ -64,10 +78,9 @@ def process_expense_csv(file_stream: bytes) -> dict:
             record['is_valid'] = False
             record['errors'].append("Category cannot be empty")
         else:
-            # Case insensitive match against EXPENSE_CATEGORIES
-            matched = next((c for c in EXPENSE_CATEGORIES if c.lower() == category.lower()), None)
-            if matched:
-                record['category'] = matched
+            normalized_cat = normalize_category(category)
+            if normalized_cat:
+                record['category'] = normalized_cat
             else:
                 record['is_valid'] = False
                 record['errors'].append(f"Invalid category: {category}")
@@ -80,8 +93,17 @@ def process_expense_csv(file_stream: bytes) -> dict:
                 desc = val[:255]
         record['description'] = desc
         
+
+        if record['is_valid']:
+            # Check for duplicates
+            row_hash = f"{record['date']}_{record['amount']}_{record['category']}_{record.get('description', '')}"
+            if user_id and row_hash in existing_hashes:
+                record['is_valid'] = False
+                record['errors'].append("Duplicate transaction")
+                
         if record['is_valid']:
             valid_records.append(record)
+            existing_hashes.add(row_hash) # Prevent intra-CSV duplicates
         else:
             invalid_records.append(record)
             

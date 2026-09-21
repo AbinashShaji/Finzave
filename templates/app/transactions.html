@@ -75,7 +75,7 @@
     <div class="bg-white rounded-2xl border border-fz-gray-200 shadow-sm overflow-hidden">
         <div class="p-6 border-b border-fz-gray-200 flex justify-between items-center">
             <h3 class="text-lg font-bold text-fz-black">Recent Expenses</h3>
-            <a href="/app/expenses" id="view-all-expenses-btn" class="hidden text-sm font-semibold text-fz-red hover:underline">View All Expenses →</a>
+            <a href="/app/expenses" id="view-all-expenses-btn" class="text-sm font-semibold text-fz-red hover:underline">View All Expenses →</a>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm text-fz-gray-600">
@@ -111,7 +111,7 @@
         <form id="add-fixed-form" class="space-y-4">
             <div>
                 <label class="block text-sm font-medium text-fz-gray-600 mb-1">Effective Date</label>
-                <input type="date" id="add-fix-date" required class="w-full px-4 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fz-red/20 focus:border-fz-red">
+                <input type="date" max="{{ today_date }}" id="add-fix-date" required class="w-full px-4 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fz-red/20 focus:border-fz-red">
             </div>
             <div>
                 <label class="block text-sm font-medium text-fz-gray-600 mb-1">Amount (₹)</label>
@@ -169,7 +169,7 @@
             <input type="hidden" id="edit-fix-id">
             <div>
                 <label class="block text-sm font-medium text-fz-gray-600 mb-1">Effective Date</label>
-                <input type="date" id="edit-fix-date" required class="w-full px-4 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fz-red/20 focus:border-fz-red">
+                <input type="date" max="{{ today_date }}" id="edit-fix-date" required class="w-full px-4 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fz-red/20 focus:border-fz-red">
             </div>
             <div>
                 <label class="block text-sm font-medium text-fz-gray-600 mb-1">Amount (₹)</label>
@@ -198,7 +198,7 @@
         <form id="variable-form" class="space-y-4">
             <div>
                 <label class="block text-sm font-medium text-fz-gray-600 mb-1">Date</label>
-                <input type="date" id="var-date" required class="w-full px-4 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fz-red/20 focus:border-fz-red">
+                <input type="date" max="{{ today_date }}" id="var-date" required class="w-full px-4 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fz-red/20 focus:border-fz-red">
             </div>
             <div>
                 <label class="block text-sm font-medium text-fz-gray-600 mb-1">Amount (₹)</label>
@@ -228,7 +228,7 @@
             <input type="hidden" id="edit-var-id">
             <div>
                 <label class="block text-sm font-medium text-fz-gray-600 mb-1">Date</label>
-                <input type="date" id="edit-var-date" required class="w-full px-4 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fz-red/20 focus:border-fz-red">
+                <input type="date" max="{{ today_date }}" id="edit-var-date" required class="w-full px-4 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fz-red/20 focus:border-fz-red">
             </div>
             <div>
                 <label class="block text-sm font-medium text-fz-gray-600 mb-1">Amount (₹)</label>
@@ -276,7 +276,7 @@
         <form id="expense-form" class="space-y-4">
             <div>
                 <label class="block text-sm font-medium text-fz-gray-600 mb-1">Date</label>
-                <input type="date" id="exp-date" required class="w-full px-4 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fz-red/20 focus:border-fz-red">
+                <input type="date" max="{{ today_date }}" id="exp-date" required class="w-full px-4 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fz-red/20 focus:border-fz-red">
             </div>
             <div>
                 <label class="block text-sm font-medium text-fz-gray-600 mb-1">Amount (₹)</label>
@@ -303,7 +303,7 @@
 <!-- CSV Import Modal -->
 <div id="csv-modal" class="hidden" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 99999; background-color: rgba(0,0,0,0.6); align-items: center; justify-content: center; backdrop-filter: blur(4px);">
     <div class="absolute inset-0" onclick="closeModal('csv')"></div>
-    <div class="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl p-6 mx-4 max-h-[90vh] flex flex-col transform transition-all">
+    <div class="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl p-6 mx-4 max-h-[90vh] flex flex-col transform transition-all overflow-y-auto">
         <div class="flex items-center justify-between mb-6 flex-shrink-0">
             <h3 class="text-xl font-bold text-fz-black">Import Expenses CSV</h3>
             <button onclick="closeModal('csv')" class="text-fz-gray-400 hover:text-fz-black">
@@ -327,27 +327,30 @@
         </div>
         
         <!-- Preview Step -->
-        <div id="csv-preview-step" class="hidden flex-col flex-1 overflow-hidden">
-            <div class="flex justify-between items-center mb-2 flex-shrink-0">
+        <div id="csv-preview-step" class="hidden">
+            <div class="flex justify-between items-center mb-4">
                 <p class="text-sm font-medium text-fz-black" id="csv-preview-stats">Found 0 records.</p>
                 <button onclick="resetCsvModal()" class="text-xs text-fz-red hover:underline">Cancel & Upload Another</button>
             </div>
-            <div class="overflow-y-auto flex-1 border border-fz-gray-200 rounded-lg">
-                <table class="w-full text-left text-sm text-fz-gray-600 relative">
-                    <thead class="bg-fz-gray-50 text-xs uppercase text-fz-gray-500 font-medium sticky top-0 z-10">
+            <div class="overflow-y-auto border border-fz-gray-200 rounded-lg max-h-[50vh] bg-white shadow-inner">
+                <table class="w-full text-left text-sm text-fz-gray-600 relative min-w-[600px]">
+                    <thead class="bg-gray-50 text-xs uppercase text-fz-gray-500 font-medium sticky top-0 z-10 shadow-sm">
                         <tr>
-                            <th class="px-4 py-3">Row</th>
-                            <th class="px-4 py-3">Date</th>
-                            <th class="px-4 py-3">Category</th>
-                            <th class="px-4 py-3 text-right">Amount</th>
+                            <th class="px-4 py-3 whitespace-nowrap">Row</th>
+                            <th class="px-4 py-3 whitespace-nowrap">Date</th>
+                            <th class="px-4 py-3 whitespace-nowrap">Category</th>
+                            <th class="px-4 py-3 text-right whitespace-nowrap">Amount</th>
                             <th class="px-4 py-3">Status</th>
+                            <th class="px-4 py-3 whitespace-nowrap w-12 text-center">
+                                <input type="checkbox" id="csv-select-all" class="w-4 h-4 rounded border-gray-300 text-fz-red accent-red-600 focus:ring-fz-red cursor-pointer">
+                            </th>
                         </tr>
                     </thead>
-                    <tbody id="csv-preview-body" class="divide-y divide-fz-gray-100">
+                    <tbody id="csv-preview-body" class="divide-y divide-fz-gray-100 bg-white">
                     </tbody>
                 </table>
             </div>
-            <div class="mt-4 flex gap-3 flex-shrink-0">
+            <div class="mt-6 flex gap-3">
                 <button onclick="closeModal('csv')" class="flex-1 bg-white border border-fz-gray-200 text-fz-black py-2.5 rounded-lg font-medium hover:bg-fz-gray-50 transition-colors">Cancel</button>
                 <button id="csv-confirm-btn" class="flex-1 bg-fz-black text-white py-2.5 rounded-lg font-medium hover:bg-fz-red transition-colors disabled:opacity-50 disabled:cursor-not-allowed">Confirm Import</button>
             </div>
@@ -371,6 +374,24 @@
 
 {% block scripts %}
 <script>
+
+    function buildRow(cells, rowClass) {
+        const tr = document.createElement('tr');
+        if (rowClass) tr.className = rowClass;
+        
+        cells.forEach(cell => {
+            const td = document.createElement('td');
+            if (cell.className) td.className = cell.className;
+            if (cell.html) {
+                td.innerHTML = cell.html;
+            } else if (cell.text) {
+                td.textContent = cell.text;
+            }
+            tr.appendChild(td);
+        });
+        return tr;
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
         loadExpenses();
         loadIncome();
@@ -592,7 +613,6 @@
                 if (res.ok && data.success) {
                     document.getElementById('csv-upload-step').classList.add('hidden');
                     document.getElementById('csv-preview-step').classList.remove('hidden');
-                    document.getElementById('csv-preview-step').classList.add('flex');
                     
                     document.getElementById('csv-preview-stats').innerHTML = `Found <span class="font-bold text-fz-black">${data.valid_count} valid</span> and <span class="font-bold text-fz-red">${data.invalid_count} invalid</span> records.`;
                     
@@ -601,38 +621,83 @@
                     
                     // Render valid rows
                     data.valid_records.forEach(r => {
-                        tbody.innerHTML += `
-                            <tr class="bg-white">
-                                <td class="px-4 py-2">${r.row_number}</td>
-                                <td class="px-4 py-2">${r.date}</td>
-                                <td class="px-4 py-2">${r.category}</td>
-                                <td class="px-4 py-2 text-right">₹${r.amount}</td>
-                                <td class="px-4 py-2"><span class="text-green-600 text-xs font-semibold">Valid</span></td>
-                            </tr>
-                        `;
+                        const tr = buildRow([
+                            { text: r.row_number, className: "px-4 py-2" },
+                            { text: r.date, className: "px-4 py-2" },
+                            { text: r.category, className: "px-4 py-2" },
+                            { text: '₹' + r.amount, className: "px-4 py-2 text-right" },
+                            { html: '<span class="text-green-600 text-xs font-semibold">Valid</span>', className: "px-4 py-2" },
+                            { html: `<input type="checkbox" class="csv-row-select w-4 h-4 rounded border-gray-300 text-fz-red accent-red-600 focus:ring-fz-red cursor-pointer" value="${r.row_number}" checked>`, className: "px-4 py-2 text-center" }
+                        ], "bg-white hover:bg-gray-50 transition-colors");
+                        tbody.appendChild(tr);
                     });
                     
                     // Render invalid rows
                     data.invalid_records.forEach(r => {
-                        tbody.innerHTML += `
-                            <tr class="bg-red-50">
-                                <td class="px-4 py-2">${r.row_number}</td>
-                                <td class="px-4 py-2">${r.date || '-'}</td>
-                                <td class="px-4 py-2">${r.category || '-'}</td>
-                                <td class="px-4 py-2 text-right">${r.amount ? '₹'+r.amount : '-'}</td>
-                                <td class="px-4 py-2"><span class="text-fz-red text-xs font-semibold">${r.errors.join(', ')}</span></td>
-                            </tr>
-                        `;
+                        const tr = buildRow([
+                            { text: r.row_number, className: "px-4 py-2 text-gray-400" },
+                            { text: r.date || '-', className: "px-4 py-2 text-gray-400" },
+                            { text: r.category || '-', className: "px-4 py-2 text-gray-400" },
+                            { text: r.amount ? '₹'+r.amount : '-', className: "px-4 py-2 text-right text-gray-400" },
+                            { html: `<span class="text-fz-red text-xs font-semibold">${r.errors.map(e => e.replace(/</g, '&lt;').replace(/>/g, '&gt;')).join(', ')}</span>`, className: "px-4 py-2" },
+                            { html: `<input type="checkbox" disabled class="w-4 h-4 rounded border-gray-200 text-gray-300 cursor-not-allowed">`, className: "px-4 py-2 text-center" }
+                        ], "bg-red-50");
+                        tbody.appendChild(tr);
                     });
                     
                     const confirmBtn = document.getElementById('csv-confirm-btn');
+                    
+                    function updateSelectedCount() {
+                        const selectedCount = document.querySelectorAll('.csv-row-select:checked').length;
+                        if (selectedCount === 0) {
+                            confirmBtn.disabled = true;
+                            confirmBtn.innerHTML = 'Confirm Import (0)';
+                        } else {
+                            confirmBtn.disabled = false;
+                            confirmBtn.innerHTML = `Confirm Import (${selectedCount})`;
+                        }
+                        
+                        const selectAll = document.getElementById('csv-select-all');
+                        const totalSelectable = document.querySelectorAll('.csv-row-select').length;
+                        if (totalSelectable === 0) {
+                            selectAll.checked = false;
+                            selectAll.indeterminate = false;
+                        } else if (selectedCount === totalSelectable) {
+                            selectAll.checked = true;
+                            selectAll.indeterminate = false;
+                        } else if (selectedCount === 0) {
+                            selectAll.checked = false;
+                            selectAll.indeterminate = false;
+                        } else {
+                            selectAll.checked = false;
+                            selectAll.indeterminate = true;
+                        }
+                    }
+                    
+                    // Initial update
                     if (data.valid_count === 0) {
                         confirmBtn.disabled = true;
                         confirmBtn.innerHTML = 'No Valid Records';
+                        document.getElementById('csv-select-all').disabled = true;
                     } else {
-                        confirmBtn.disabled = false;
-                        confirmBtn.innerHTML = `Confirm Import (${data.valid_count})`;
+                        document.getElementById('csv-select-all').disabled = false;
+                        document.getElementById('csv-select-all').checked = true;
+                        updateSelectedCount();
                     }
+                    
+                    // Event listeners
+                    document.getElementById('csv-select-all').addEventListener('change', (e) => {
+                        document.querySelectorAll('.csv-row-select').forEach(cb => {
+                            cb.checked = e.target.checked;
+                        });
+                        updateSelectedCount();
+                    });
+                    
+                    tbody.addEventListener('change', (e) => {
+                        if (e.target.classList.contains('csv-row-select')) {
+                            updateSelectedCount();
+                        }
+                    });
                 } else {
                     errDiv.textContent = data.error || "Failed to parse CSV";
                     errDiv.classList.remove('hidden');
@@ -649,6 +714,12 @@
         
         document.getElementById('csv-confirm-btn').addEventListener('click', async () => {
             if (!uploadedFile) return;
+            
+            // Gather selected rows
+            const selectedCheckboxes = document.querySelectorAll('.csv-row-select:checked');
+            if (selectedCheckboxes.length === 0) return;
+            const selectedRows = Array.from(selectedCheckboxes).map(cb => parseInt(cb.value, 10));
+            
             const btn = document.getElementById('csv-confirm-btn');
             btn.disabled = true;
             btn.innerHTML = 'Importing...';
@@ -658,6 +729,7 @@
             // To ensure strict security, we send the file again for server-side revalidation
             const formData = new FormData();
             formData.append('file', uploadedFile);
+            formData.append('selected_rows', JSON.stringify(selectedRows));
             
             try {
                 const res = await fetch('/app/api/transactions/confirm-csv', {
@@ -734,20 +806,19 @@
                     fixedBody.innerHTML = '<tr><td colspan="4" class="px-4 py-6 text-center text-sm text-fz-gray-500">No fixed incomes recorded yet.</td></tr>';
                 } else {
                     data.fixed_incomes.forEach((inc, index) => {
-                        fixedBody.innerHTML += `
-                            <tr class="hover:bg-fz-gray-50 transition-colors">
-                                <td class="px-4 py-4">${new Date(inc.date).toLocaleDateString()}</td>
-                                <td class="px-4 py-4">${inc.description || '-'}</td>
-                                <td class="px-4 py-4 text-right font-medium text-fz-black">₹${inc.amount.toLocaleString()}</td>
-                                <td class="px-4 py-4 text-center">
+                        const tr = buildRow([
+                            { text: new Date(inc.date).toLocaleDateString(), className: "px-4 py-4" },
+                            { text: inc.description || '-', className: "px-4 py-4" },
+                            { text: '₹' + inc.amount.toLocaleString(), className: "px-4 py-4 text-right font-medium text-fz-black" },
+                            { html: `
                                     <div class="flex items-center justify-center gap-3">
                                         <button onclick="editFixedIncome(${index})" class="text-sm font-semibold text-fz-black hover:underline">Edit</button>
                                         <div class="w-px h-3.5 bg-fz-gray-300"></div>
                                         <button onclick="promptDeleteIncome(${inc.id}, 'fixed')" class="text-sm font-semibold text-fz-red hover:underline">Delete</button>
                                     </div>
-                                </td>
-                            </tr>
-                        `;
+                                `, className: "px-4 py-4 text-center" }
+                        ], "hover:bg-fz-gray-50 transition-colors");
+                        fixedBody.appendChild(tr);
                     });
                 }
 
@@ -760,20 +831,19 @@
                 }
                 
                 data.variable_incomes.forEach((inc, index) => {
-                    tbody.innerHTML += `
-                        <tr class="hover:bg-fz-gray-50 transition-colors">
-                            <td class="px-6 py-4">${new Date(inc.date).toLocaleDateString()}</td>
-                            <td class="px-6 py-4">${inc.description || '-'}</td>
-                            <td class="px-6 py-4 text-right font-medium text-green-600">₹${inc.amount.toLocaleString()}</td>
-                            <td class="px-6 py-4 text-center">
+                    const tr = buildRow([
+                        { text: new Date(inc.date).toLocaleDateString(), className: "px-6 py-4" },
+                        { text: inc.description || '-', className: "px-6 py-4" },
+                        { text: '₹' + inc.amount.toLocaleString(), className: "px-6 py-4 text-right font-medium text-green-600" },
+                        { html: `
                                 <div class="flex items-center justify-center gap-3">
                                     <button onclick="editVariableIncome(${index})" class="text-sm font-semibold text-fz-black hover:underline">Edit</button>
                                     <div class="w-px h-3.5 bg-fz-gray-300"></div>
                                     <button onclick="promptDeleteIncome(${inc.id}, 'variable')" class="text-sm font-semibold text-fz-red hover:underline">Delete</button>
                                 </div>
-                            </td>
-                        </tr>
-                    `;
+                            `, className: "px-6 py-4 text-center" }
+                    ], "hover:bg-fz-gray-50 transition-colors");
+                    tbody.appendChild(tr);
                 });
             }
         } catch (err) {
@@ -785,7 +855,7 @@
         const inc = allFixedIncomes[index];
         document.getElementById('edit-fix-id').value = inc.id;
         
-        // Convert ISO date to YYYY-MM-DD for input[type="date"]
+        // Convert ISO date to YYYY-MM-DD for input[type="date" max="{{ today_date }}"]
         const dt = new Date(inc.date);
         const yyyy = dt.getFullYear();
         const mm = String(dt.getMonth() + 1).padStart(2, '0');
@@ -921,43 +991,57 @@
         }
     });
 
-    async function loadExpenses() {
+    let currentPage = 1;
+    
+    async function loadExpenses(page = 1) {
         try {
-            const res = await fetch('/app/api/transactions/expense?limit=5');
+            currentPage = page;
+            const res = await fetch(`/app/api/transactions/expense?page=${page}&per_page=5`);
             const tbody = document.getElementById('expense-table-body');
-            const viewAllBtn = document.getElementById('view-all-expenses-btn');
+            const paginationControls = document.getElementById('pagination-controls');
             
             if (res.ok) {
                 const responseData = await res.json();
-                const data = responseData.data;
-                const totalCount = responseData.total_count;
+                const data = responseData.transactions;
+                const totalPages = responseData.total_pages;
+                const totalItems = responseData.total_items;
                 
-                if (totalCount > 5) {
-                    viewAllBtn.classList.remove('hidden');
-                } else {
-                    viewAllBtn.classList.add('hidden');
-                }
-
                 tbody.innerHTML = '';
                 if (data.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center">No expenses recorded yet.</td></tr>';
+                    if(paginationControls) paginationControls.classList.add('hidden');
                     return;
                 }
                 
                 data.forEach(ex => {
-                    tbody.innerHTML += `
-                        <tr class="hover:bg-fz-gray-50 transition-colors">
-                            <td class="px-6 py-4">${new Date(ex.date).toLocaleDateString()}</td>
-                            <td class="px-6 py-4">${ex.category}</td>
-                            <td class="px-6 py-4">${ex.description || '-'}</td>
-                            <td class="px-6 py-4 text-right font-medium text-fz-black">₹${ex.amount.toLocaleString()}</td>
-                        </tr>
-                    `;
+                    const tr = buildRow([
+                        { text: new Date(ex.date).toLocaleDateString(), className: "px-6 py-4" },
+                        { text: ex.category, className: "px-6 py-4" },
+                        { text: ex.description || '-', className: "px-6 py-4" },
+                        { text: '₹' + ex.amount.toLocaleString(), className: "px-6 py-4 text-right font-medium text-fz-black" }
+                    ], "hover:bg-fz-gray-50 transition-colors");
+                    tbody.appendChild(tr);
                 });
+                
+                // Update Pagination UI
+                if(paginationControls) {
+                    paginationControls.classList.remove('hidden');
+                    document.getElementById('page-info').textContent = `Page ${currentPage} of ${totalPages} (${totalItems} items)`;
+                    document.getElementById('prev-page-btn').disabled = currentPage <= 1;
+                    document.getElementById('next-page-btn').disabled = currentPage >= totalPages;
+                }
             }
         } catch (err) {
             console.error(err);
         }
+    }
+    
+    function prevPage() {
+        if(currentPage > 1) loadExpenses(currentPage - 1);
+    }
+    
+    function nextPage() {
+        loadExpenses(currentPage + 1);
     }
 
     function openModal(id) {
