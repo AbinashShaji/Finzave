@@ -15,8 +15,11 @@ def admin_required():
             try:
                 verify_jwt_in_request()
             except Exception as e:
+                import traceback
+                print(f"JWT Verification Failed in admin_required: {e}")
+                traceback.print_exc()
                 if request.path.startswith('/api/'):
-                    return jsonify(message="Missing or invalid token"), 401
+                    return jsonify(message=f"Token error: {str(e)}"), 401
                 return redirect(url_for('public.login'))
             
             user_id = int(get_jwt_identity())

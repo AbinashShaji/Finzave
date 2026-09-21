@@ -13,17 +13,15 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <style>
-        /* Structural layout to enforce strict sidebar and content boundaries on desktop */
+        /* Structural layout for fixed sidebar and independent scrolling */
         @media (min-width: 768px) {
-            .admin-desktop-grid {
-                display: grid;
-                grid-template-columns: 16rem minmax(0, 1fr);
-                min-height: 100vh;
+            #main-content {
+                margin-left: 16rem; /* width of w-64 */
             }
         }
     </style>
 </head>
-<body class="bg-fz-gray-50 text-fz-black font-sans selection:bg-fz-red selection:text-white relative admin-desktop-grid">
+<body class="bg-fz-gray-50 text-fz-black font-sans selection:bg-fz-red selection:text-white relative">
 
     <!-- Mobile Header -->
     <div class="md:hidden flex items-center justify-between bg-fz-black text-white px-6 py-4 sticky top-0 z-30">
@@ -40,7 +38,7 @@
     <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden md:hidden"></div>
 
     <!-- Sidebar Navigation -->
-    <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-fz-black text-white transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col h-screen md:h-auto sticky top-0 overflow-y-auto">
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-fz-black text-white transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col h-screen overflow-y-auto">
         <div class="p-6">
             <a href="{{ url_for('admin.dashboard') }}" class="flex items-center gap-2 group mb-10">
                 <div class="w-8 h-8 rounded-lg bg-white text-fz-black flex items-center justify-center font-bold text-xl tracking-tighter group-hover:bg-fz-red group-hover:text-white transition-colors duration-300">FZ</div>
@@ -74,7 +72,7 @@
     </aside>
 
     <!-- Main Content Area -->
-    <main class="flex flex-col min-h-screen max-w-full min-w-0">
+    <main id="main-content" class="flex flex-col min-h-screen max-w-full min-w-0">
         <header class="bg-white border-b border-fz-gray-200 h-[72px] hidden md:flex flex-shrink-0 items-center justify-between px-8 sticky top-0 z-20">
             <h1 class="text-xl font-bold tracking-tight">{% block header_title %}Dashboard{% endblock %}</h1>
             <div class="flex items-center gap-4">

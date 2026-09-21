@@ -19,6 +19,14 @@
                     placeholder="Choose a username">
             </div>
 
+            <!-- Full Name Input -->
+            <div class="flex flex-col gap-2">
+                <label for="full-name" class="text-sm font-medium text-fz-black">Full Name (Optional)</label>
+                <input type="text" id="full-name" name="full_name" maxlength="120"
+                    class="w-full px-4 py-3 bg-white border border-fz-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-fz-black focus:border-transparent transition-all"
+                    placeholder="Enter your full name">
+            </div>
+
             <!-- Email Input -->
             <div class="flex flex-col gap-2">
                 <label for="email" class="text-sm font-medium text-fz-black">Email address</label>
@@ -96,6 +104,7 @@
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     const usernameInput = document.getElementById('username');
+    const fullNameInput = document.getElementById('full-name');
     const emailInput = document.getElementById('email');
     const pwInput = document.getElementById('password');
     const confirmPwInput = document.getElementById('confirm-password');
@@ -187,6 +196,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (submitBtn.disabled) return;
         
         const username = usernameInput.value;
+        const full_name = fullNameInput.value;
         const email = emailInput.value;
         const password = pwInput.value;
         const confirm_password = confirmPwInput.value;
@@ -209,7 +219,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ username, email, password, confirm_password, terms_accepted })
+                body: JSON.stringify({ username, full_name, email, password, confirm_password, terms_accepted })
             });
             
             const data = await response.json();

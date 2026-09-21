@@ -1,0 +1,281 @@
+{% extends "app/base_app.html" %}
+
+{% block title %}FinZave - Profile{% endblock %}
+{% block header_title %}Account Profile{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-8">
+
+    <!-- Profile Information -->
+    <div class="bg-white p-6 md:p-8 rounded-2xl border border-fz-gray-200 shadow-sm">
+        <div class="flex items-center gap-3 mb-6 border-b border-fz-gray-100 pb-4">
+            <i data-lucide="user" class="w-6 h-6 text-fz-black"></i>
+            <h2 class="text-xl font-bold text-fz-black">Profile Information</h2>
+        </div>
+        
+        <div class="flex flex-col md:flex-row gap-8 items-start">
+            <div class="flex flex-col items-center gap-4">
+                <div id="profile-avatar" class="w-24 h-24 rounded-full bg-fz-black text-white flex items-center justify-center text-3xl font-bold">
+                    U
+                </div>
+            </div>
+            
+            <form id="profile-form" class="flex-1 space-y-5 w-full">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="block text-sm font-medium text-fz-gray-600 mb-1">Username</label>
+                        <input type="text" id="username" class="w-full px-4 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fz-black text-fz-gray-500 bg-fz-gray-50 cursor-not-allowed" value="Loading..." disabled>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-fz-gray-600 mb-1">Email Address</label>
+                        <input type="email" id="email" class="w-full px-4 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fz-black" placeholder="user@example.com" required>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-fz-gray-600 mb-1">Full Name</label>
+                    <input type="text" id="full-name" class="w-full px-4 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fz-black" placeholder="Your Full Name">
+                </div>
+                
+                <div id="profile-msg" class="hidden text-sm font-medium mt-1"></div>
+                
+                <div class="flex justify-end pt-2">
+                    <button type="submit" id="profile-btn" class="bg-fz-black text-white px-5 py-2 rounded-lg font-medium hover:bg-fz-red transition-colors flex items-center">
+                        <span>Save Profile</span>
+                        <svg class="spinner hidden animate-spin ml-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Password & Security -->
+    <div class="bg-white p-6 md:p-8 rounded-2xl border border-fz-gray-200 shadow-sm">
+        <div class="flex items-center gap-3 mb-6 border-b border-fz-gray-100 pb-4">
+            <i data-lucide="shield" class="w-6 h-6 text-fz-black"></i>
+            <h2 class="text-xl font-bold text-fz-black">Password & Security</h2>
+        </div>
+        
+        <form id="password-form" class="space-y-5">
+            <div>
+                <label class="block text-sm font-medium text-fz-gray-600 mb-1">Current Password</label>
+                <input type="password" id="current-password" required class="w-full px-4 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fz-black" placeholder="••••••••">
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                    <label class="block text-sm font-medium text-fz-gray-600 mb-1">New Password</label>
+                    <input type="password" id="new-password" required class="w-full px-4 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fz-black" placeholder="••••••••">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-fz-gray-600 mb-1">Confirm New Password</label>
+                    <input type="password" id="confirm-password" required class="w-full px-4 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fz-black" placeholder="••••••••">
+                </div>
+            </div>
+            
+            <div id="password-msg" class="hidden text-sm font-medium mt-1"></div>
+            
+            <div class="flex justify-end pt-2">
+                <button type="submit" id="password-btn" class="bg-fz-black text-white px-5 py-2 rounded-lg font-medium hover:bg-fz-red transition-colors flex items-center">
+                    <span>Update Password</span>
+                    <svg class="spinner hidden animate-spin ml-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Preferences & Notifications -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        
+        <!-- App Preferences -->
+        <div class="bg-white p-6 rounded-2xl border border-fz-gray-200 shadow-sm">
+            <h2 class="text-lg font-bold text-fz-black mb-4 border-b border-fz-gray-100 pb-2">Preferences</h2>
+            <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-semibold text-fz-black">Currency</p>
+                        <p class="text-xs text-fz-gray-500">Default currency for reports.</p>
+                    </div>
+                    <select id="currency-select" class="bg-white border border-fz-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-fz-black">
+                        <option value="INR">INR (₹)</option>
+                        <option value="USD">USD ($)</option>
+                        <option value="EUR">EUR (€)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification Settings -->
+        <div class="bg-white p-6 rounded-2xl border border-fz-gray-200 shadow-sm">
+            <h2 class="text-lg font-bold text-fz-black mb-4 border-b border-fz-gray-100 pb-2">Notifications</h2>
+            <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-semibold text-fz-black">Email Alerts</p>
+                        <p class="text-xs text-fz-gray-500">Monthly reports and goals.</p>
+                    </div>
+                    <button type="button" id="email-notif-toggle" class="w-11 h-6 bg-fz-gray-200 rounded-full flex items-center p-1 cursor-pointer transition-colors duration-200" aria-checked="false">
+                        <div class="w-4 h-4 bg-white rounded-full shadow-md"></div>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    
+    <div id="pref-msg" class="hidden text-sm font-medium mt-1 text-center bg-white p-4 rounded-xl border border-fz-gray-200"></div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function getCookie(name) {
+        let value = "; " + document.cookie;
+        let parts = value.split("; " + name + "=");
+        if (parts.length === 2) return parts.pop().split(";").shift();
+        return "";
+    }
+
+    function showMsg(elId, msg, isError) {
+        const el = document.getElementById(elId);
+        el.textContent = msg;
+        el.classList.remove('hidden', 'text-fz-red', 'text-green-600');
+        el.classList.add(isError ? 'text-fz-red' : 'text-green-600');
+        setTimeout(() => el.classList.add('hidden'), 5000);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        lucide.createIcons();
+        const csrfToken = getCookie('csrf_access_token');
+        
+        // Load data
+        fetch('/app/api/profile', { headers: { 'X-CSRF-TOKEN': csrfToken } })
+            .then(res => res.json())
+            .then(data => {
+                if (data.username) {
+                    document.getElementById('username').value = data.username;
+                    document.getElementById('profile-avatar').textContent = data.username.charAt(0).toUpperCase();
+                    document.getElementById('email').value = data.email;
+                    document.getElementById('full-name').value = data.full_name || '';
+                    
+                    document.getElementById('currency-select').value = data.settings.currency;
+                    
+                    const toggle = document.getElementById('email-notif-toggle');
+                    if (data.settings.email_notifications) {
+                        toggle.setAttribute('aria-checked', 'true');
+                        toggle.classList.remove('bg-fz-gray-200');
+                        toggle.classList.add('bg-fz-red', 'justify-end');
+                    } else {
+                        toggle.setAttribute('aria-checked', 'false');
+                        toggle.classList.remove('bg-fz-red', 'justify-end');
+                        toggle.classList.add('bg-fz-gray-200');
+                    }
+                }
+            }).catch(console.error);
+
+        // Save Profile
+        document.getElementById('profile-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('profile-btn');
+            const spinner = btn.querySelector('.spinner');
+            btn.disabled = true;
+            spinner.classList.remove('hidden');
+            
+            try {
+                const res = await fetch('/app/api/profile', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+                    body: JSON.stringify({
+                        email: document.getElementById('email').value,
+                        full_name: document.getElementById('full-name').value
+                    })
+                });
+                const data = await res.json();
+                showMsg('profile-msg', data.message, !res.ok);
+            } catch (err) {
+                showMsg('profile-msg', 'An error occurred.', true);
+            } finally {
+                btn.disabled = false;
+                spinner.classList.add('hidden');
+            }
+        });
+
+        // Update Password
+        document.getElementById('password-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('password-btn');
+            const spinner = btn.querySelector('.spinner');
+            btn.disabled = true;
+            spinner.classList.remove('hidden');
+            
+            try {
+                const res = await fetch('/app/api/profile/password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+                    body: JSON.stringify({
+                        current_password: document.getElementById('current-password').value,
+                        new_password: document.getElementById('new-password').value,
+                        confirm_password: document.getElementById('confirm-password').value
+                    })
+                });
+                const data = await res.json();
+                showMsg('password-msg', data.message, !res.ok);
+                if (res.ok) document.getElementById('password-form').reset();
+            } catch (err) {
+                showMsg('password-msg', 'An error occurred.', true);
+            } finally {
+                btn.disabled = false;
+                spinner.classList.add('hidden');
+            }
+        });
+
+        // Update Preferences
+        const updatePreferences = async (currency, email_notif) => {
+            try {
+                const res = await fetch('/app/api/profile/preferences', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+                    body: JSON.stringify({
+                        currency: currency,
+                        email_notifications: email_notif
+                    })
+                });
+                const data = await res.json();
+                showMsg('pref-msg', data.message, !res.ok);
+                // Also update pref-msg container to be visible during transition
+                const prefMsg = document.getElementById('pref-msg');
+                prefMsg.classList.remove('hidden');
+            } catch (err) {
+                showMsg('pref-msg', 'An error occurred.', true);
+            }
+        };
+
+        // Currency change
+        document.getElementById('currency-select').addEventListener('change', (e) => {
+            const toggle = document.getElementById('email-notif-toggle');
+            const email_notif = toggle.getAttribute('aria-checked') === 'true';
+            updatePreferences(e.target.value, email_notif);
+        });
+
+        // Toggle click
+        document.getElementById('email-notif-toggle').addEventListener('click', (e) => {
+            const toggle = e.currentTarget;
+            const isChecked = toggle.getAttribute('aria-checked') === 'true';
+            
+            if (isChecked) {
+                // Turn OFF
+                toggle.setAttribute('aria-checked', 'false');
+                toggle.classList.remove('bg-fz-red', 'justify-end');
+                toggle.classList.add('bg-fz-gray-200');
+            } else {
+                // Turn ON
+                toggle.setAttribute('aria-checked', 'true');
+                toggle.classList.remove('bg-fz-gray-200');
+                toggle.classList.add('bg-fz-red', 'justify-end');
+            }
+            
+            updatePreferences(document.getElementById('currency-select').value, !isChecked);
+        });
+
+    });
+</script>
+{% endblock %}

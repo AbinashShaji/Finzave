@@ -21,6 +21,7 @@ def register():
 
     username = data.get('username')
     email = data.get('email')
+    full_name = data.get('full_name')
     password = data.get('password')
     confirm_password = data.get('confirm_password')
     terms_accepted = data.get('terms_accepted')
@@ -51,7 +52,7 @@ def register():
         return jsonify({"message": "Email already exists"}), 409
 
     # Add user
-    new_user = User(username=username, email=email)
+    new_user = User(username=username, email=email, full_name=full_name)
     new_user.set_password(password)
     db.session.add(new_user)
     db.session.commit()
@@ -88,6 +89,7 @@ def login():
         "user": {
             "id": user.id,
             "username": user.username,
+            "full_name": user.full_name,
             "email": user.email,
             "role": user.role
         }
@@ -114,6 +116,7 @@ def me():
     return jsonify({
         "id": user.id,
         "username": user.username,
+        "full_name": user.full_name,
         "email": user.email,
         "role": user.role,
         "created_at": user.created_at.isoformat()
