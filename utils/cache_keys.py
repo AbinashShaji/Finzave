@@ -9,6 +9,12 @@ def user_transaction_key(user_id):
 def user_analysis_key(user_id):
     return f"user_analysis_{user_id}"
 
+def user_analysis_monthly_key(user_id):
+    return f"user_analysis_monthly_{user_id}"
+
+def user_analysis_yearly_key(user_id):
+    return f"user_analysis_yearly_{user_id}"
+
 def invalidate_user_financial_cache(user_id):
     """
     Clears all financial-related cache keys for a specific user.
@@ -17,3 +23,5 @@ def invalidate_user_financial_cache(user_id):
     cache.delete(user_dashboard_key(user_id))
     cache.delete(user_transaction_key(user_id))
     cache.delete(user_analysis_key(user_id))
+    cache.delete(user_analysis_monthly_key(user_id))
+    cache.delete(user_analysis_yearly_key(user_id))

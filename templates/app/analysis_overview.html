@@ -1,0 +1,135 @@
+{% extends "app/base_app.html" %}
+
+{% block title %}FinZave - Analysis Overview{% endblock %}
+{% block header_title %}Financial Analysis{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-12 py-8">
+    
+    {% if not metrics.has_data %}
+    <div class="bg-white p-12 rounded-2xl border border-fz-gray-200 shadow-sm text-center">
+        <div class="w-16 h-16 bg-fz-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-fz-gray-400">
+            <i data-lucide="bar-chart-2" class="w-8 h-8"></i>
+        </div>
+        <h3 class="text-lg font-bold text-fz-black mb-2">Not enough data yet.</h3>
+        <p class="text-fz-gray-500 max-w-md mx-auto mb-6">
+            We need at least two months of income and expense data to generate meaningful behavioural insights. Keep adding your transactions!
+        </p>
+        <a href="{{ url_for('app.transactions') }}" class="bg-fz-black text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-fz-red transition-colors inline-flex items-center gap-2">
+            <i data-lucide="plus" class="w-4 h-4"></i> Add Transactions
+        </a>
+    </div>
+    {% else %}
+
+    <!-- SECTION 1: ANALYSIS OVERVIEW -->
+    <section class="space-y-8">
+        <div class="text-center space-y-2">
+            <span class="text-sm font-bold tracking-widest text-fz-gray-400 uppercase">Summary</span>
+            <h2 class="text-3xl font-bold text-fz-black tracking-tight">This Month</h2>
+            <p class="text-sm text-fz-gray-500">{{ overview.current_month }}</p>
+        </div>
+        
+        <div class="bg-white rounded-3xl border border-fz-gray-200 shadow-sm overflow-hidden">
+            <!-- Narrative block -->
+            <div class="p-8 md:p-10 bg-fz-gray-50 border-b border-fz-gray-100 text-center">
+                <h3 class="text-2xl font-bold text-fz-black mb-3">{{ overview.narrative_title }}</h3>
+                <p class="text-base text-fz-gray-600 max-w-2xl mx-auto leading-relaxed">{{ overview.narrative_body }}</p>
+            </div>
+            
+            <!-- Key Metrics -->
+            <div class="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 divide-fz-gray-100">
+                <div class="p-6 text-center hover:bg-fz-gray-50 transition-colors">
+                    <div class="text-xs font-semibold uppercase tracking-wider text-fz-gray-400 mb-2">Income</div>
+                    <div class="text-xl font-bold text-fz-black">₹{{ "{:,.2f}".format(overview.income) }}</div>
+                </div>
+                <div class="p-6 text-center hover:bg-fz-gray-50 transition-colors">
+                    <div class="text-xs font-semibold uppercase tracking-wider text-fz-gray-400 mb-2">Expenses</div>
+                    <div class="text-xl font-bold text-fz-black">₹{{ "{:,.2f}".format(overview.expenses) }}</div>
+                </div>
+                <div class="p-6 text-center hover:bg-fz-gray-50 transition-colors">
+                    <div class="text-xs font-semibold uppercase tracking-wider text-fz-gray-400 mb-2">Savings</div>
+                    <div class="text-xl font-bold text-fz-black">₹{{ "{:,.2f}".format(overview.savings) }}</div>
+                </div>
+                <div class="p-6 text-center hover:bg-fz-gray-50 transition-colors">
+                    <div class="text-xs font-semibold uppercase tracking-wider text-fz-gray-400 mb-2">Rate</div>
+                    <div class="text-xl font-bold text-fz-black">{{ "{:.1f}".format(overview.savings_rate * 100) }}%</div>
+                </div>
+            </div>
+        </div>
+        
+        {% if overview.categories and overview.categories|length > 0 %}
+        <!-- Supporting Chart (Doughnut) -->
+        <div class="max-w-md mx-auto mt-8">
+            <h4 class="text-sm font-bold text-center text-fz-gray-500 mb-6 uppercase tracking-widest">Where your money went</h4>
+            <div class="relative w-full h-[250px]">
+                <canvas id="categoryChart"></canvas>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12">
+            <a href="{{ url_for('app.analysis_monthly') }}" class="group bg-white border border-fz-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-bold text-fz-black group-hover:text-fz-red transition-colors">View Monthly Analysis</h3>
+                    <p class="text-sm text-fz-gray-500 mt-1">Detailed month-to-month patterns and trends.</p>
+                </div>
+                <i data-lucide="arrow-right" class="w-5 h-5 text-fz-gray-400 group-hover:text-fz-red transition-colors"></i>
+            </a>
+            
+            <a href="{{ url_for('app.analysis_yearly') }}" class="group bg-white border border-fz-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-bold text-fz-black group-hover:text-fz-red transition-colors">View Yearly Analysis</h3>
+                    <p class="text-sm text-fz-gray-500 mt-1">Long-term half-by-half performance comparison.</p>
+                </div>
+                <i data-lucide="arrow-right" class="w-5 h-5 text-fz-gray-400 group-hover:text-fz-red transition-colors"></i>
+            </a>
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        lucide.createIcons();
+        
+        {% if metrics.has_data %}
+        
+        // --- Overview Category Doughnut Chart ---
+        const overviewData = JSON.parse('{{ overview | tojson | safe }}');
+        if (overviewData.categories && Object.keys(overviewData.categories).length > 0) {
+            const catEntries = Object.entries(overviewData.categories).sort((a,b)=>b[1]-a[1]).slice(0, 6); // Top 6
+            const catCtx = document.getElementById('categoryChart').getContext('2d');
+            new Chart(catCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: catEntries.map(e => e[0]),
+                    datasets: [{
+                        data: catEntries.map(e => e[1]),
+                        backgroundColor: ['#1e293b', '#334155', '#475569', '#64748b', '#94a3b8', '#cbd5e1'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { position: 'right', labels: { boxWidth: 12, font: { family: "'Inter', sans-serif" } } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ' ₹' + context.raw.toLocaleString('en-IN');
+                                }
+                            }
+                        }
+                    },
+                    cutout: '75%'
+                }
+            });
+        }
+        {% endif %}
+    });
+</script>
+{% endblock %}

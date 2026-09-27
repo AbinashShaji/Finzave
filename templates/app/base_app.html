@@ -56,7 +56,7 @@
                 <a href="{{ url_for('app.goals') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-fz-gray-50 {% if request.endpoint == 'app.goals' %}bg-fz-gray-50 text-fz-black font-semibold border-l-4 border-fz-red{% else %}text-fz-gray-600{% endif %}">
                     <i data-lucide="target" class="w-5 h-5"></i> Goals
                 </a>
-                <a href="{{ url_for('app.analysis') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-fz-gray-50 {% if request.endpoint == 'app.analysis' %}bg-fz-gray-50 text-fz-black font-semibold border-l-4 border-fz-red{% else %}text-fz-gray-600{% endif %}">
+                <a href="{{ url_for('app.analysis') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-fz-gray-50 {% if request.endpoint in ['app.analysis', 'app.analysis_monthly', 'app.analysis_yearly'] %}bg-fz-gray-50 text-fz-black font-semibold border-l-4 border-fz-red{% else %}text-fz-gray-600{% endif %}">
                     <i data-lucide="pie-chart" class="w-5 h-5"></i> Analysis
                 </a>
                 <a href="{{ url_for('app.planning') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-fz-gray-50 {% if request.endpoint == 'app.planning' %}bg-fz-gray-50 text-fz-black font-semibold border-l-4 border-fz-red{% else %}text-fz-gray-600{% endif %}">

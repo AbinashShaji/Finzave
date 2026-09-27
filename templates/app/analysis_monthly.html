@@ -1,0 +1,262 @@
+{% extends "app/base_app.html" %}
+
+{% block title %}FinZave - Monthly Analysis{% endblock %}
+{% block header_title %}Financial Analysis{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto space-y-6">
+
+    {# --- Sub-navigation tabs --- #}
+    <div class="flex items-center gap-1 bg-white rounded-xl border border-fz-gray-200 p-1 shadow-sm w-fit">
+        <a href="{{ url_for('app.analysis') }}"
+           class="px-5 py-2.5 rounded-lg text-sm font-medium text-fz-gray-600 hover:bg-fz-gray-50 transition-colors">
+            Overview
+        </a>
+        <a href="{{ url_for('app.analysis_monthly') }}"
+           class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors bg-fz-black text-white">
+            Monthly
+        </a>
+        <a href="{{ url_for('app.analysis_yearly') }}"
+           class="px-5 py-2.5 rounded-lg text-sm font-medium text-fz-gray-600 hover:bg-fz-gray-50 transition-colors">
+            Yearly
+        </a>
+    </div>
+
+    {% if not monthly.has_data %}
+    <div class="bg-white p-12 rounded-2xl border border-fz-gray-200 shadow-sm text-center">
+        <div class="w-16 h-16 bg-fz-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-fz-gray-400">
+            <i data-lucide="bar-chart-2" class="w-8 h-8"></i>
+        </div>
+        <h3 class="text-lg font-bold text-fz-black mb-2">Not enough data yet</h3>
+        <p class="text-fz-gray-500 max-w-md mx-auto mb-6">
+            We need at least two months of income and expense data to perform month-to-month analysis. Keep adding your transactions!
+        </p>
+        <a href="{{ url_for('app.transactions') }}" class="bg-fz-black text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-fz-red transition-colors inline-flex items-center gap-2">
+            <i data-lucide="plus" class="w-4 h-4"></i> Add Transactions
+        </a>
+    </div>
+    {% else %}
+
+    {# --- 1. Averages --- #}
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-white p-5 rounded-2xl border border-fz-gray-200 shadow-sm">
+            <div class="text-xs font-medium text-fz-gray-500 uppercase tracking-wider mb-1">Avg Income</div>
+            <div class="text-2xl font-bold text-fz-black">₹{{ "{:,.0f}".format(monthly.avg_income) }}</div>
+            <div class="text-xs text-fz-gray-400 mt-1">across {{ monthly.months_data|length }} months</div>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-fz-gray-200 shadow-sm">
+            <div class="text-xs font-medium text-fz-gray-500 uppercase tracking-wider mb-1">Avg Expenses</div>
+            <div class="text-2xl font-bold text-fz-black">₹{{ "{:,.0f}".format(monthly.avg_expenses) }}</div>
+            <div class="text-xs text-fz-gray-400 mt-1">across {{ monthly.months_data|length }} months</div>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-fz-gray-200 shadow-sm">
+            <div class="text-xs font-medium text-fz-gray-500 uppercase tracking-wider mb-1">Avg Savings</div>
+            <div class="text-2xl font-bold {% if monthly.avg_savings < 0 %}text-fz-red{% else %}text-fz-black{% endif %}">₹{{ "{:,.0f}".format(monthly.avg_savings) }}</div>
+            <div class="text-xs text-fz-gray-400 mt-1">across {{ monthly.months_data|length }} months</div>
+        </div>
+    </div>
+
+    {# --- 2. Monthly Data Table --- #}
+    <div class="bg-white rounded-2xl border border-fz-gray-200 shadow-sm overflow-hidden">
+        <div class="p-5 border-b border-fz-gray-100 flex items-center justify-between">
+            <div>
+                <h3 class="text-base font-bold text-fz-black">Month-by-Month Breakdown</h3>
+                <p class="text-xs text-fz-gray-500 mt-0.5">{{ monthly.months_data[0].period }} to {{ monthly.months_data[-1].period }}</p>
+            </div>
+            <div class="flex items-center gap-4 text-xs">
+                <span class="flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+                    Best: <strong class="text-fz-black">{{ monthly.best_month.period }}</strong> (₹{{ "{:,.0f}".format(monthly.best_month.savings) }})
+                </span>
+                <span class="flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                    Worst: <strong class="text-fz-black">{{ monthly.worst_month.period }}</strong> (₹{{ "{:,.0f}".format(monthly.worst_month.savings) }})
+                </span>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="border-b border-fz-gray-100 text-fz-gray-500">
+                        <th class="text-left font-medium px-5 py-3">Month</th>
+                        <th class="text-right font-medium px-3 py-3">Income</th>
+                        <th class="text-right font-medium px-3 py-3">Expenses</th>
+                        <th class="text-right font-medium px-3 py-3">Savings</th>
+                        <th class="text-right font-medium px-5 py-3">Rate</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-fz-gray-50">
+                    {% for m in monthly.months_data|reverse %}
+                    <tr class="hover:bg-fz-gray-50 transition-colors {% if m.period == monthly.best_month.period %}bg-green-50/40{% elif m.period == monthly.worst_month.period %}bg-red-50/40{% endif %}">
+                        <td class="px-5 py-3 font-medium text-fz-black">{{ m.period }}</td>
+                        <td class="text-right px-3 py-3 text-fz-black">₹{{ "{:,.0f}".format(m.income) }}</td>
+                        <td class="text-right px-3 py-3 text-fz-black">₹{{ "{:,.0f}".format(m.expenses) }}</td>
+                        <td class="text-right px-3 py-3 font-medium {% if m.savings < 0 %}text-fz-red{% else %}text-fz-black{% endif %}">₹{{ "{:,.0f}".format(m.savings) }}</td>
+                        <td class="text-right px-5 py-3 text-fz-gray-600">{{ "{:.1f}".format(m.savings_rate) }}%</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {# --- 3. Trend Charts --- #}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {# Income / Expense / Savings trend #}
+        <div class="bg-white p-6 rounded-2xl border border-fz-gray-200 shadow-sm flex flex-col">
+            <h3 class="text-sm font-bold text-fz-black mb-4">Income & Expense Trend</h3>
+            <div class="flex-1 w-full min-h-[280px] relative">
+                <canvas id="incExpTrendChart"></canvas>
+            </div>
+        </div>
+        {# Savings trend #}
+        <div class="bg-white p-6 rounded-2xl border border-fz-gray-200 shadow-sm flex flex-col">
+            <h3 class="text-sm font-bold text-fz-black mb-4">Savings Trend</h3>
+            <div class="flex-1 w-full min-h-[280px] relative">
+                <canvas id="savingsTrendChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    {# --- 4. Category Comparison --- #}
+    {% if monthly.category_comparison %}
+    <div class="bg-white rounded-2xl border border-fz-gray-200 shadow-sm overflow-hidden">
+        <div class="p-5 border-b border-fz-gray-100">
+            <h3 class="text-base font-bold text-fz-black">Category Comparison</h3>
+            <p class="text-xs text-fz-gray-500 mt-0.5">Top categories: first month vs latest month</p>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="border-b border-fz-gray-100 text-fz-gray-500">
+                        <th class="text-left font-medium px-5 py-3">Category</th>
+                        <th class="text-right font-medium px-3 py-3">{{ monthly.months_data[0].period }}</th>
+                        <th class="text-right font-medium px-3 py-3">{{ monthly.months_data[-1].period }}</th>
+                        <th class="text-right font-medium px-3 py-3">Change</th>
+                        <th class="text-right font-medium px-5 py-3">Total</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-fz-gray-50">
+                    {% for cat in monthly.category_comparison %}
+                    <tr class="hover:bg-fz-gray-50 transition-colors">
+                        <td class="px-5 py-3 font-medium text-fz-black">{{ cat.category }}</td>
+                        <td class="text-right px-3 py-3 text-fz-gray-600">₹{{ "{:,.0f}".format(cat.first_month) }}</td>
+                        <td class="text-right px-3 py-3 text-fz-black">₹{{ "{:,.0f}".format(cat.last_month) }}</td>
+                        <td class="text-right px-3 py-3">
+                            {% if cat.diff > 0 %}
+                            <span class="text-red-600 font-medium">+₹{{ "{:,.0f}".format(cat.diff) }}</span>
+                            {% elif cat.diff < 0 %}
+                            <span class="text-green-600 font-medium">-₹{{ "{:,.0f}".format(cat.diff|abs) }}</span>
+                            {% else %}
+                            <span class="text-fz-gray-400">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-right px-5 py-3 text-fz-gray-600 font-medium">₹{{ "{:,.0f}".format(cat.total) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    {# --- 5. Behavioural Patterns & Insights --- #}
+    {% if monthly.insights %}
+    <div class="bg-white rounded-2xl border border-fz-gray-200 shadow-sm overflow-hidden">
+        <div class="p-5 border-b border-fz-gray-100 flex items-center gap-2">
+            <i data-lucide="sparkles" class="w-4 h-4 text-blue-600"></i>
+            <h3 class="text-base font-bold text-fz-black">Detected Patterns</h3>
+        </div>
+        <div class="divide-y divide-fz-gray-50">
+            {% for insight_text in monthly.insights %}
+            <div class="px-5 py-3.5 flex items-start gap-3 hover:bg-fz-gray-50 transition-colors">
+                <span class="w-1.5 h-1.5 rounded-full bg-blue-400 mt-2 flex-shrink-0"></span>
+                <p class="text-sm text-fz-gray-700 leading-relaxed">{{ insight_text }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        lucide.createIcons();
+
+        {% if monthly.has_data %}
+        const chartData = JSON.parse('{{ chart_data | safe }}');
+
+        const chartFontFamily = "'Outfit', sans-serif";
+        const gridColor = '#f1f5f9';
+        const gridBorderDash = [4, 4];
+
+        // --- Income & Expense Trend (grouped bar) ---
+        if (chartData.labels && chartData.labels.length > 0) {
+            const ieCtx = document.getElementById('incExpTrendChart').getContext('2d');
+            new Chart(ieCtx, {
+                type: 'bar',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [
+                        { label: 'Income', data: chartData.income, backgroundColor: '#16a34a', borderRadius: 4, barPercentage: 0.7 },
+                        { label: 'Expenses', data: chartData.expenses, backgroundColor: '#e11d48', borderRadius: 4, barPercentage: 0.7 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 11, family: chartFontFamily } } },
+                        tooltip: { callbacks: { label: ctx => ' ₹' + ctx.raw.toLocaleString('en-IN') } }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: gridColor, borderDash: gridBorderDash }, ticks: { callback: v => '₹' + v.toLocaleString('en-IN'), font: { size: 10 } } },
+                        x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+                    }
+                }
+            });
+        }
+
+        // --- Savings Trend Line ---
+        if (chartData.labels && chartData.labels.length > 0) {
+            const stCtx = document.getElementById('savingsTrendChart').getContext('2d');
+            new Chart(stCtx, {
+                type: 'line',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [{
+                        label: 'Savings',
+                        data: chartData.savings,
+                        borderColor: '#1e293b',
+                        backgroundColor: 'rgba(30, 41, 59, 0.08)',
+                        borderWidth: 2.5,
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: '#1e293b',
+                        pointBorderWidth: 2,
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { callbacks: { label: ctx => ' ₹' + ctx.raw.toLocaleString('en-IN') } }
+                    },
+                    scales: {
+                        y: { grid: { color: gridColor, borderDash: gridBorderDash }, ticks: { callback: v => '₹' + v.toLocaleString('en-IN'), font: { size: 10 } } },
+                        x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+                    }
+                }
+            });
+        }
+        {% endif %}
+    });
+</script>
+{% endblock %}
