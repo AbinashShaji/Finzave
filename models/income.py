@@ -5,7 +5,10 @@ from extensions import db
 
 class Income(db.Model):
     __tablename__ = 'incomes'
-    __table_args__ = (Index('ix_income_user_date', 'user_id', 'date'),)
+    __table_args__ = (
+        Index('ix_income_user_date', 'user_id', 'date'),
+        Index('ix_income_user_type_date', 'user_id', 'income_type', 'date'),
+    )
 
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id', ondelete='CASCADE'), index=True)

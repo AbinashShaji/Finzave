@@ -63,7 +63,10 @@ def normalize_category(category_name: str) -> str:
 
 class Expense(db.Model):
     __tablename__ = 'expenses'
-    __table_args__ = (Index('ix_expense_user_date', 'user_id', 'date'),)
+    __table_args__ = (
+        Index('ix_expense_user_date', 'user_id', 'date'),
+        Index('ix_expense_user_category_date', 'user_id', 'category', 'date'),
+    )
 
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id', ondelete='CASCADE'), index=True)

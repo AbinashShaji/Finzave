@@ -115,7 +115,8 @@ def get_stats():
     module_usage = [{"module": k, "count": v} for k, v in sorted(modules.items(), key=lambda item: item[1], reverse=True)]
 
     # Recent activity list (last 10 non-sensitive)
-    latest_activities = UserActivity.query.order_by(UserActivity.created_at.desc()).limit(10).all()
+    from sqlalchemy.orm import joinedload
+    latest_activities = UserActivity.query.options(joinedload(UserActivity.user)).order_by(UserActivity.created_at.desc()).limit(10).all()
     recent_activity_list = []
     for a in latest_activities:
         recent_activity_list.append({
@@ -125,7 +126,7 @@ def get_stats():
         })
 
     # Recent Feedback
-    recent_feedbacks = Feedback.query.filter(Feedback.status != 'deleted').order_by(Feedback.created_at.desc()).limit(5).all()
+    recent_feedbacks = Feedback.query.options(joinedload(Feedback.user)).filter(Feedback.status != 'deleted').order_by(Feedback.created_at.desc()).limit(5).all()
     recent_feedback_list = []
     for f in recent_feedbacks:
         recent_feedback_list.append({
@@ -136,7 +137,7 @@ def get_stats():
         })
 
     # Recent Reviews
-    recent_reviews = Review.query.filter(Review.status != 'deleted').order_by(Review.created_at.desc()).limit(5).all()
+    recent_reviews = Review.query.options(joinedload(Review.user)).filter(Review.status != 'deleted').order_by(Review.created_at.desc()).limit(5).all()
     recent_review_list = []
     for r in recent_reviews:
         recent_review_list.append({

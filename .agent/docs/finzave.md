@@ -2367,3 +2367,25 @@ If a future feature request conflicts with this scope, explicitly identify the c
 The goal is not to make FinZave the biggest possible finance application.
 
 The goal is to make FinZave a coherent, technically sound, polished, efficient and well-justified MCA mini project.
+
+## Optimization Update
+
+### Security Improvements
+- .env, *.env, and .env.* have been added to .gitignore.
+- Removed unused debug scripts containing hardcoded passwords (e.g. 	est_admin_script.py, update_admin_creds.py).
+- Auth test suite was updated to comply with rigorous password strength constraints.
+
+### Code Cleanup
+- Removed unused dashboard_data endpoint from outes/dashboard.py to enforce utils/finance.py as the single source of truth.
+- Purged the scratch/ directory which contained temporary files and integration testing leftovers.
+
+### Performance Improvements
+- Eliminated N+1 database queries in outes/admin.py for UserActivity, Feedback, and Review by applying joinedload() from SQLAlchemy.
+
+### Database Optimizations
+- Created and executed a database migration to add composite indexes: ix_expense_user_category_date and ix_income_user_type_date to accelerate heavily-used transaction filtering.
+
+### Testing Improvements
+- Created 	ests/test_finance.py covering core financial engine abstractions (FinancialPeriod aggregations, metrics).
+- Updated existing test suites to prevent regression with security hardening.
+

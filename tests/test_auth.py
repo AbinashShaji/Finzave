@@ -6,7 +6,9 @@ def test_register_success(client):
     response = client.post('/api/auth/register', json={
         "username": "testuser_1",
         "email": "testuser_1@example.com",
-        "password": "password123"
+        "password": "Password123!",
+        "confirm_password": "Password123!",
+        "terms_accepted": True
     })
     assert response.status_code == 201
     assert b"User registered successfully" in response.data
@@ -14,22 +16,26 @@ def test_register_success(client):
     # Verify password stored as hash
     user = User.query.filter_by(username="testuser_1").first()
     assert user is not None
-    assert user.password_hash != "password123"
-    assert user.check_password("password123") is True
+    assert user.password_hash != "Password123!"
+    assert user.check_password("Password123!") is True
     assert user.role == "user"
 
 def test_duplicate_registration(client):
     client.post('/api/auth/register', json={
         "username": "testuser_dup",
         "email": "testuser_dup@example.com",
-        "password": "password123"
+        "password": "Password123!",
+        "confirm_password": "Password123!",
+        "terms_accepted": True
     })
     
     # Try duplicate username
     response = client.post('/api/auth/register', json={
         "username": "testuser_dup",
         "email": "another@example.com",
-        "password": "password123"
+        "password": "Password123!",
+        "confirm_password": "Password123!",
+        "terms_accepted": True
     })
     assert response.status_code == 409
     assert b"Username already exists" in response.data
@@ -38,7 +44,9 @@ def test_duplicate_registration(client):
     response = client.post('/api/auth/register', json={
         "username": "testuser_dup2",
         "email": "testuser_dup@example.com",
-        "password": "password123"
+        "password": "Password123!",
+        "confirm_password": "Password123!",
+        "terms_accepted": True
     })
     assert response.status_code == 409
     assert b"Email already exists" in response.data
@@ -56,23 +64,27 @@ def test_login_success(client):
     client.post('/api/auth/register', json={
         "username": "testuser_log",
         "email": "testuser_log@example.com",
-        "password": "password123"
+        "password": "Password123!",
+        "confirm_password": "Password123!",
+        "terms_accepted": True
     })
 
     response = client.post('/api/auth/login', json={
         "username": "testuser_log",
-        "password": "password123"
+        "password": "Password123!"
     })
     assert response.status_code == 200
     data = response.get_json()
-    assert "access_token" in data
+    assert "user" in data
     assert data["user"]["username"] == "testuser_log"
 
 def test_wrong_password(client):
     client.post('/api/auth/register', json={
         "username": "testuser_wrong",
         "email": "testuser_wrong@example.com",
-        "password": "password123"
+        "password": "Password123!",
+        "confirm_password": "Password123!",
+        "terms_accepted": True
     })
 
     response = client.post('/api/auth/login', json={
@@ -90,18 +102,18 @@ def test_valid_jwt_me(client):
     client.post('/api/auth/register', json={
         "username": "testuser_me",
         "email": "testuser_me@example.com",
-        "password": "password123"
+        "password": "Password123!",
+        "confirm_password": "Password123!",
+        "terms_accepted": True
     })
 
-    login_resp = client.post('/api/auth/login', json={
+    # The client automatically handles cookies returned by login
+    client.post('/api/auth/login', json={
         "username": "testuser_me",
-        "password": "password123"
+        "password": "Password123!"
     })
-    token = login_resp.get_json()["access_token"]
 
-    response = client.get('/api/auth/me', headers={
-        "Authorization": f"Bearer {token}"
-    })
+    response = client.get('/api/auth/me')
     assert response.status_code == 200
     data = response.get_json()
     assert data["username"] == "testuser_me"
