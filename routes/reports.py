@@ -1,10 +1,11 @@
-from flask import render_template, request, Response
+from flask import render_template, request, Response, send_file
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from routes.user import app_bp
 from extensions import db
 from utils.finance import build_financial_periods
 from utils.rule_engine import evaluate_rules
 from analysis.scoring import calculate_health_score
+from utils.pdf_generator import generate_financial_report_pdf
 from models.expense import Expense
 import csv
 import io
@@ -72,4 +73,43 @@ def export_csv():
         output.getvalue(),
         mimetype="text/csv",
         headers={"Content-disposition": "attachment; filename=transactions_export.csv"}
+    )
+
+@app_bp.route('/api/reports/export/pdf', methods=['GET'])
+@jwt_required()
+def export_pdf():
+    user_id = int(get_jwt_identity())
+    periods = build_financial_periods(user_id, months=6)
+    
+    selected_period = request.args.get('period')
+    current_period = None
+    
+    if selected_period:
+        for p in periods:
+            if p.period_id == selected_period:
+                current_period = p
+                break
+        if not current_period:
+            return "Invalid period selected", 400
+            
+    if not current_period:
+        current_period = periods[-1] if periods else None
+        
+    if not current_period:
+        return "No financial data available to generate report", 400
+        
+    current_has_data = (current_period.total_income > 0 or current_period.total_expenses > 0)
+    
+    idx = periods.index(current_period)
+    historical_periods = periods[:idx+1]
+        
+    insights = evaluate_rules(historical_periods)
+    health_data = calculate_health_score(historical_periods, current_has_data, insights)
+    
+    pdf_bytes = generate_financial_report_pdf(current_period, health_data)
+    
+    return Response(
+        pdf_bytes,
+        mimetype="application/pdf",
+        headers={"Content-disposition": f"attachment; filename=finzave_report_{current_period.period_id}.pdf"}
     )

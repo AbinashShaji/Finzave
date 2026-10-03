@@ -2437,3 +2437,12 @@ The goal is to make FinZave a coherent, technically sound, polished, efficient a
 - **Data flow correction:** Updated frontend to listen for dropdown changes and navigate to ?period=YYYY-MM with a loading state. Updated backend to extract period from request arguments, validate it against uild_financial_periods, accurately calculate current_has_data for that specific month, and evaluate the rule engine using only historical data up to the chosen period.
 - **Cache handling:** The reports endpoint calculates dynamically per request and isn't globally cached, ensuring different periods won't mistakenly return cached data from other periods.
 
+
+## Reports PDF Export Implementation
+
+- **PDF generation flow:** Created a new endpoint /api/reports/export/pdf that dynamically generates a PDF using eportlab. The generation is handled by a new utility utils/pdf_generator.py.
+- **Endpoint:** GET /app/api/reports/export/pdf?period=YYYY-MM
+- **Data source:** Uses utils/finance.py -> uild_financial_periods() just like the main reports page, ensuring calculations are never duplicated. The health data is pulled using the rule engine dynamically for the selected context.
+- **Security handling:** Handled strictly using JWT authentication, ensuring users can only export their own financial data. The data fetching itself natively uses the logged-in user's identity to prevent unauthorized scope access.
+- **Testing results:** Created 	ests/test_reports_pdf.py and implemented comprehensive testing against multiple periods, authenticated contexts, unauthenticated protection, and valid PDF signatures. All 5 test cases successfully pass.
+
