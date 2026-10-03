@@ -55,8 +55,14 @@
                     <i data-lucide="piggy-bank" class="w-5 h-5"></i>
                 </div>
             </div>
-            <div class="text-3xl font-bold {% if current_period.savings < 0 %}text-fz-red{% else %}text-fz-black{% endif %}">₹{{ "{:,.2f}".format(current_period.savings) }}</div>
-            <p class="text-sm text-fz-gray-500 mt-2">This month</p>
+            <div class="text-3xl font-bold {% if current_period.status != 'incomplete' and current_period.savings < 0 %}text-fz-red{% else %}text-fz-black{% endif %}">
+                {% if current_period.status == 'incomplete' %}
+                <span class="text-fz-gray-500 text-2xl font-medium">Pending</span>
+                {% else %}
+                ₹{{ "{:,.2f}".format(current_period.savings) }}
+                {% endif %}
+            </div>
+            <p class="text-sm text-fz-gray-500 mt-2">{% if current_period.status == 'incomplete' %}Tracking incomplete{% else %}This month{% endif %}</p>
         </div>
 
         <!-- Savings Rate -->
@@ -67,8 +73,16 @@
                     <i data-lucide="percent" class="w-5 h-5"></i>
                 </div>
             </div>
-            <div class="text-3xl font-bold text-fz-black">{% if current_period.savings_rate is not none %}{{ "{:.1f}".format(current_period.savings_rate * 100) }}%{% else %}N/A{% endif %}</div>
-            <p class="text-sm text-fz-gray-500 mt-2">This month</p>
+            <div class="text-3xl font-bold text-fz-black">
+                {% if current_period.status == 'incomplete' %}
+                <span class="text-fz-gray-500 text-2xl font-medium">Pending</span>
+                {% elif current_period.savings_rate is not none %}
+                {{ "{:.1f}".format(current_period.savings_rate * 100) }}%
+                {% else %}
+                N/A
+                {% endif %}
+            </div>
+            <p class="text-sm text-fz-gray-500 mt-2">{% if current_period.status == 'incomplete' %}Tracking incomplete{% else %}This month{% endif %}</p>
         </div>
     </div>
 
@@ -87,7 +101,13 @@
                         </h2>
                         <div class="text-right">
                             <div class="text-sm text-fz-gray-400 uppercase tracking-wider">Health Score</div>
+                            {% if current_period.status == 'incomplete' %}
+                            <div class="text-2xl font-bold text-fz-gray-400">Pending</div>
+                            {% elif health_data.score is not none %}
                             <div class="text-2xl font-bold {% if health_data.score >= 80 %}text-green-400{% elif health_data.score >= 60 %}text-blue-400{% elif health_data.score >= 40 %}text-orange-400{% else %}text-red-400{% endif %}">{{ health_data.score }}</div>
+                            {% else %}
+                            <div class="text-2xl font-bold text-fz-gray-400">N/A</div>
+                            {% endif %}
                         </div>
                     </div>
                     
@@ -122,9 +142,16 @@
                     <h2 class="text-lg font-bold text-fz-black">Category Breakdown</h2>
                     <a href="{{ url_for('app.analysis') }}" class="text-sm font-medium text-fz-red hover:underline">View Analysis</a>
                 </div>
-                <div class="w-full h-[300px] relative">
-                    <canvas id="categoryChart"></canvas>
+                {% if current_period.status == 'incomplete' or current_period.total_expenses == 0 %}
+                <div class="w-full h-[300px] flex flex-col items-center justify-center text-center px-4" aria-label="Empty chart state">
+                    <i data-lucide="pie-chart" class="w-10 h-10 text-fz-gray-300 mb-3"></i>
+                    <p class="text-sm text-fz-gray-500">Expense distribution will appear once you add transactions.</p>
                 </div>
+                {% else %}
+                <div class="w-full h-[300px] relative">
+                    <canvas id="categoryChart" aria-label="Category Breakdown Chart"></canvas>
+                </div>
+                {% endif %}
             </div>
         </div>
 
@@ -173,7 +200,7 @@
         {% if has_data %}
         const chartData = JSON.parse('{{ chart_data | safe }}');
         
-        if (chartData.cat_labels && chartData.cat_labels.length > 0) {
+        if (chartData.cat_labels && chartData.cat_labels.length > 0 && '{{ current_period.status }}' !== 'incomplete') {
             const catCtx = document.getElementById('categoryChart').getContext('2d');
             new Chart(catCtx, {
                 type: 'doughnut',

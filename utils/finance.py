@@ -142,11 +142,13 @@ def build_financial_periods(user_id, months=6):
         variable_total = variable_dict.get((year, month), 0.0)
         expenses_list = expense_dict.get((year, month), [])
         
+        is_current = (year == today.year and month == today.month)
         period = FinancialPeriod(
             period_id=period_id,
             fixed_income=fixed_total,
             variable_income=variable_total,
-            expenses=expenses_list
+            expenses=expenses_list,
+            is_current_month=is_current
         )
         periods.append(period)
         

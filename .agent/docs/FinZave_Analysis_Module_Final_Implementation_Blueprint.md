@@ -588,3 +588,33 @@ explaining:
 -   How the user can improve.
 
 The system must have one financial truth and multiple intelligent views.
+
+------------------------------------------------------------------------
+
+# Financial Period Completeness Update
+
+## Concept
+A `FinancialPeriod` now has a `status` property which can be `complete`, `incomplete`, or `no_data`.
+
+## Rules for Incomplete Months
+1. Current month + income exists + no expenses: Status is "incomplete".
+2. Previous completed months or current month with both income and expenses: Status is "complete".
+3. New user with no financial activity: Status is "no_data".
+
+## Analysis Behaviour Changes
+When a month is incomplete:
+- The Analysis Overview explicitly states that financial tracking is incomplete.
+- Category breakdowns do not calculate misleading 100% reduction diffs.
+- Savings impact insights avoid generating false positive insights based on zero expenses.
+- Trends comparisons against previous months are halted to prevent rewarding incomplete tracking.
+
+## Chart Empty State Rules
+Charts in `analysis`, `analysis_monthly`, `analysis_yearly`, and `dashboard` must NEVER display empty graphs with axes and meaningless zero values for incomplete data.
+- If data is incomplete, the chart area is replaced with a FinZave-styled empty state.
+- Empty states use Lucide icons (e.g., `pie-chart`, `bar-chart`, `line-chart`) with descriptive messages like "Add expense records to unlock spending insights."
+
+## Architectural Decisions
+- `is_current_month` flag is injected into `FinancialPeriod` by `utils/finance.py`.
+- `is_incomplete` flag is passed directly into template rendering logic by `analysis/services.py` and `utils/financial_metrics.py`.
+- The rule evaluation in `utils/rule_engine.py` skips the current period if it is `incomplete` to prevent false positive rule-based insights.
+- The `calculate_health_score` function in `analysis/scoring.py` inherently accounts for incomplete months by receiving filtered insights and avoids false rewards.

@@ -23,6 +23,7 @@ def calculate_period_metrics(periods: List[FinancialPeriod]) -> Dict[str, Any]:
     
     metrics = {
         "has_data": True,
+        "is_incomplete": current.status == "incomplete",
         "current_period": {
             "period_id": current.period_id,
             "total_income": current.total_income,
@@ -32,9 +33,9 @@ def calculate_period_metrics(periods: List[FinancialPeriod]) -> Dict[str, Any]:
             "categories": current.categories
         },
         "trends": {
-            "income_change": 0.0,
-            "expense_change": 0.0,
-            "savings_change": 0.0
+            "income_change": None,
+            "expense_change": None,
+            "savings_change": None
         },
         "chart_data": {
             "labels": [],
@@ -46,7 +47,7 @@ def calculate_period_metrics(periods: List[FinancialPeriod]) -> Dict[str, Any]:
     }
     
     # Calculate period-over-period trends if we have at least 2 periods
-    if len(periods) >= 2:
+    if len(periods) >= 2 and current.status != "incomplete":
         prev = periods[-2]
         
         income_change = percentage_change(current.total_income, prev.total_income)

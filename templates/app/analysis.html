@@ -83,7 +83,7 @@
                         <div class="w-7 h-7 rounded-lg bg-green-50 text-green-600 flex items-center justify-center"><i data-lucide="arrow-down-left" class="w-3.5 h-3.5"></i></div>
                     </div>
                     <div class="text-xl font-bold text-fz-black">₹{{ "{:,.0f}".format(overview.income) }}</div>
-                    {% if overview.has_comparison %}
+                    {% if overview.has_comparison and overview.trends.income_change is not none %}
                     <div class="text-xs font-medium {% if overview.trends.income_change >= 0 %}text-green-600{% else %}text-red-600{% endif %} mt-1">
                         {{ "{:+.1f}".format(overview.trends.income_change) }}% vs last month
                     </div>
@@ -96,7 +96,7 @@
                         <div class="w-7 h-7 rounded-lg bg-red-50 text-fz-red flex items-center justify-center"><i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i></div>
                     </div>
                     <div class="text-xl font-bold text-fz-black">₹{{ "{:,.0f}".format(overview.expenses) }}</div>
-                    {% if overview.has_comparison %}
+                    {% if overview.has_comparison and overview.trends.expense_change is not none %}
                     <div class="text-xs font-medium {% if overview.trends.expense_change <= 0 %}text-green-600{% else %}text-red-600{% endif %} mt-1">
                         {{ "{:+.1f}".format(overview.trends.expense_change) }}% vs last month
                     </div>
@@ -110,9 +110,13 @@
                     </div>
                     <div class="text-xl font-bold {% if overview.savings < 0 %}text-fz-red{% else %}text-fz-black{% endif %}">₹{{ "{:,.0f}".format(overview.savings) }}</div>
                     {% if overview.has_comparison %}
-                    <div class="text-xs font-medium {% if overview.trends.savings_change >= 0 %}text-green-600{% else %}text-red-600{% endif %} mt-1">
-                        {{ "{:+.1f}".format(overview.trends.savings_change) }}% vs last month
-                    </div>
+                        {% if overview.is_incomplete %}
+                        <div class="text-xs font-medium text-fz-gray-400 mt-1 italic">Pending completion</div>
+                        {% elif overview.trends.savings_change is not none %}
+                        <div class="text-xs font-medium {% if overview.trends.savings_change >= 0 %}text-green-600{% else %}text-red-600{% endif %} mt-1">
+                            {{ "{:+.1f}".format(overview.trends.savings_change) }}% vs last month
+                        </div>
+                        {% endif %}
                     {% endif %}
                 </div>
                 {# Savings Rate #}
@@ -162,13 +166,21 @@
                                 <span class="ml-1.5 text-[10px] font-bold uppercase bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">New</span>
                                 {% endif %}
                             </td>
-                            <td class="text-right px-3 py-3 text-fz-black font-medium">₹{{ "{:,.0f}".format(entry.current) }}</td>
+                            <td class="text-right px-3 py-3 text-fz-black font-medium">
+                                {% if overview.is_incomplete %}
+                                <span class="text-fz-gray-400 text-xs italic">No data recorded</span>
+                                {% else %}
+                                ₹{{ "{:,.0f}".format(entry.current) }}
+                                {% endif %}
+                            </td>
                             {% if overview.has_comparison %}
                             <td class="text-right px-3 py-3 text-fz-gray-500">₹{{ "{:,.0f}".format(entry.previous) }}</td>
                             <td class="text-right px-3 py-3">
-                                {% if entry.diff > 0 %}
+                                {% if overview.is_incomplete %}
+                                <span class="text-fz-gray-400 text-xs italic">Pending</span>
+                                {% elif entry.diff is not none and entry.diff > 0 %}
                                 <span class="text-red-600 font-medium">+₹{{ "{:,.0f}".format(entry.diff) }}</span>
-                                {% elif entry.diff < 0 %}
+                                {% elif entry.diff is not none and entry.diff < 0 %}
                                 <span class="text-green-600 font-medium">-₹{{ "{:,.0f}".format(entry.diff|abs) }}</span>
                                 {% else %}
                                 <span class="text-fz-gray-400">—</span>
@@ -176,7 +188,9 @@
                             </td>
                             {% endif %}
                             <td class="text-right px-5 py-3 text-fz-gray-600">
-                                {% if overview.income > 0 %}{{ "{:.0f}".format(entry.pct_of_income) }}%{% else %}—{% endif %}
+                                {% if overview.is_incomplete %}
+                                <span class="text-fz-gray-400">—</span>
+                                {% elif overview.income > 0 %}{{ "{:.0f}".format(entry.pct_of_income) }}%{% else %}—{% endif %}
                             </td>
                         </tr>
                         {% endif %}
@@ -194,16 +208,30 @@
             {# Category Doughnut #}
             <div class="bg-white p-5 rounded-2xl border border-fz-gray-200 shadow-sm flex-1 flex flex-col">
                 <h3 class="text-sm font-bold text-fz-black mb-3">Expense Distribution</h3>
-                <div class="flex-1 w-full min-h-[220px] relative">
-                    <canvas id="categoryChart"></canvas>
+                {% if overview.is_incomplete or overview.expenses == 0 %}
+                <div class="flex-1 w-full min-h-[220px] flex flex-col items-center justify-center text-center px-4" aria-label="Empty chart state">
+                    <i data-lucide="pie-chart" class="w-8 h-8 text-fz-gray-300 mb-2"></i>
+                    <p class="text-sm text-fz-gray-500">Expense distribution will appear once you add transactions.</p>
                 </div>
+                {% else %}
+                <div class="flex-1 w-full min-h-[220px] relative">
+                    <canvas id="categoryChart" aria-label="Expense Distribution Chart"></canvas>
+                </div>
+                {% endif %}
             </div>
             {# Income vs Expense bar #}
             <div class="bg-white p-5 rounded-2xl border border-fz-gray-200 shadow-sm flex-1 flex flex-col">
                 <h3 class="text-sm font-bold text-fz-black mb-3">Income vs Expenses</h3>
-                <div class="flex-1 w-full min-h-[200px] relative">
-                    <canvas id="trendChart"></canvas>
+                {% if overview.is_incomplete %}
+                <div class="flex-1 w-full min-h-[200px] flex flex-col items-center justify-center text-center px-4" aria-label="Empty chart state">
+                    <i data-lucide="bar-chart" class="w-8 h-8 text-fz-gray-300 mb-2"></i>
+                    <p class="text-sm text-fz-gray-500">Add expense records to unlock spending insights.</p>
                 </div>
+                {% else %}
+                <div class="flex-1 w-full min-h-[200px] relative">
+                    <canvas id="trendChart" aria-label="Income vs Expense Trend Chart"></canvas>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -323,7 +351,7 @@
         const overview = JSON.parse('{{ overview | tojson | safe }}');
 
         // --- Category Doughnut ---
-        if (overview.categories && Object.keys(overview.categories).length > 0) {
+        if (!overview.is_incomplete && overview.categories && Object.keys(overview.categories).length > 0) {
             const catEntries = Object.entries(overview.categories).sort((a,b)=>b[1]-a[1]).slice(0, 7);
             const catCtx = document.getElementById('categoryChart').getContext('2d');
             new Chart(catCtx, {
@@ -353,7 +381,7 @@
         }
 
         // --- Income vs Expense Bar ---
-        if (chartData.labels && chartData.labels.length > 0) {
+        if (!overview.is_incomplete && chartData.labels && chartData.labels.length > 0) {
             const trendCtx = document.getElementById('trendChart').getContext('2d');
             new Chart(trendCtx, {
                 type: 'bar',

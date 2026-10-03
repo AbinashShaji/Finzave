@@ -31,10 +31,10 @@ def build_overview(periods: List[FinancialPeriod]) -> Dict[str, Any]:
     for cat in sorted(all_cats):
         curr_amt = current.categories.get(cat, 0.0)
         prev_amt = prev.categories.get(cat, 0.0) if prev else 0.0
-        diff = curr_amt - prev_amt
-        pct_change = percentage_change(curr_amt, prev_amt) if prev else None
-        pct_of_income = (curr_amt / current.total_income * 100) if current.total_income > 0 else 0.0
-        is_new = prev is not None and prev_amt == 0.0 and curr_amt > 0.0
+        diff = curr_amt - prev_amt if current.status != "incomplete" else None
+        pct_change = percentage_change(curr_amt, prev_amt) if prev and current.status != "incomplete" else None
+        pct_of_income = (curr_amt / current.total_income * 100) if current.total_income > 0 and current.status != "incomplete" else 0.0
+        is_new = prev is not None and prev_amt == 0.0 and curr_amt > 0.0 and current.status != "incomplete"
 
         category_breakdown.append({
             "category": cat,
@@ -50,7 +50,9 @@ def build_overview(periods: List[FinancialPeriod]) -> Dict[str, Any]:
 
     # --- Savings Impact Analysis: detailed per-category insights ---
     savings_insights = []
-    if prev:
+    if current.status == "incomplete":
+        savings_insights.append("Your expense data for this month is incomplete. Savings impact will be calculated after transactions are added.")
+    elif prev:
         savings_diff = current.savings - prev.savings
         income_diff = current.total_income - prev.total_income
 
@@ -112,7 +114,10 @@ def build_overview(periods: List[FinancialPeriod]) -> Dict[str, Any]:
     narrative_title = "Welcome to your financial overview."
     narrative_body = "We don't have enough data yet to compare your spending against previous months. Keep adding transactions!"
 
-    if prev:
+    if current.status == "incomplete":
+        narrative_title = "Your financial tracking is incomplete."
+        narrative_body = "You have recorded income but no expenses yet. Add your expenses to generate an accurate spending analysis."
+    elif prev:
         savings_diff = current.savings - prev.savings
         if savings_diff > 0:
             narrative_title = f"Your savings increased by ₹{savings_diff:,.0f} this month."
@@ -142,11 +147,11 @@ def build_overview(periods: List[FinancialPeriod]) -> Dict[str, Any]:
 
     # --- Trends (for vs-previous-month badges) ---
     trends = {
-        "income_change": 0.0,
-        "expense_change": 0.0,
-        "savings_change": 0.0,
+        "income_change": None,
+        "expense_change": None,
+        "savings_change": None,
     }
-    if prev:
+    if prev and current.status != "incomplete":
         ic = percentage_change(current.total_income, prev.total_income)
         ec = percentage_change(current.total_expenses, prev.total_expenses)
         sc = percentage_change(current.savings, prev.savings)
@@ -156,6 +161,7 @@ def build_overview(periods: List[FinancialPeriod]) -> Dict[str, Any]:
 
     return {
         "has_data": True,
+        "is_incomplete": current.status == "incomplete",
         "current_month": current.period_id,
         "income": current.total_income,
         "expenses": current.total_expenses,
@@ -263,9 +269,9 @@ def build_monthly_analysis(periods: List[FinancialPeriod]) -> Dict[str, Any]:
     # --- Month-over-month changes for the latest two ---
     curr = periods[-1]
     prev = periods[-2]
-    income_change = percentage_change(curr.total_income, prev.total_income)
-    expense_change = percentage_change(curr.total_expenses, prev.total_expenses)
-    savings_change = percentage_change(curr.savings, prev.savings)
+    income_change = percentage_change(curr.total_income, prev.total_income) if curr.status != "incomplete" else None
+    expense_change = percentage_change(curr.total_expenses, prev.total_expenses) if curr.status != "incomplete" else None
+    savings_change = percentage_change(curr.savings, prev.savings) if curr.status != "incomplete" else None
 
     # --- Category comparison across all months ---
     all_cats: set = set()
@@ -320,6 +326,7 @@ def build_monthly_analysis(periods: List[FinancialPeriod]) -> Dict[str, Any]:
 
     return {
         "has_data": True,
+        "is_incomplete": curr.status == "incomplete",
         "current_period": curr.period_id,
         "previous_period": prev.period_id,
         "months_data": months_data,
@@ -377,9 +384,11 @@ def build_yearly_analysis(periods: List[FinancialPeriod]) -> Dict[str, Any]:
     h1_data = aggregate_half(first_half)
     h2_data = aggregate_half(second_half)
 
-    income_change = percentage_change(h2_data["income"], h1_data["income"])
-    expense_change = percentage_change(h2_data["expenses"], h1_data["expenses"])
-    savings_change = percentage_change(h2_data["savings"], h1_data["savings"])
+    is_incomplete = periods[-1].status == "incomplete"
+
+    income_change = percentage_change(h2_data["income"], h1_data["income"]) if not is_incomplete else None
+    expense_change = percentage_change(h2_data["expenses"], h1_data["expenses"]) if not is_incomplete else None
+    savings_change = percentage_change(h2_data["savings"], h1_data["savings"]) if not is_incomplete else None
 
     # --- Narrative ---
     def _change_str(val: Optional[float], metric_name: str, invert_color: bool = False) -> str:
@@ -454,6 +463,7 @@ def build_yearly_analysis(periods: List[FinancialPeriod]) -> Dict[str, Any]:
 
     return {
         "has_data": True,
+        "is_incomplete": is_incomplete,
         "h1_label": f"{first_half[0].period_id} to {first_half[-1].period_id}",
         "h2_label": f"{second_half[0].period_id} to {second_half[-1].period_id}",
         "h1_data": h1_data,

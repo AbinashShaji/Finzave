@@ -106,16 +106,30 @@
         {# Income / Expense / Savings trend #}
         <div class="bg-white p-6 rounded-2xl border border-fz-gray-200 shadow-sm flex flex-col">
             <h3 class="text-sm font-bold text-fz-black mb-4">Income & Expense Trend</h3>
-            <div class="flex-1 w-full min-h-[280px] relative">
-                <canvas id="incExpTrendChart"></canvas>
+            {% if monthly.is_incomplete %}
+            <div class="flex-1 w-full min-h-[280px] flex flex-col items-center justify-center text-center px-4" aria-label="Empty chart state">
+                <i data-lucide="bar-chart" class="w-8 h-8 text-fz-gray-300 mb-2"></i>
+                <p class="text-sm text-fz-gray-500">Income & expense trends will fully appear once current month transactions are complete.</p>
             </div>
+            {% else %}
+            <div class="flex-1 w-full min-h-[280px] relative">
+                <canvas id="incExpTrendChart" aria-label="Income & Expense Trend Chart"></canvas>
+            </div>
+            {% endif %}
         </div>
         {# Savings trend #}
         <div class="bg-white p-6 rounded-2xl border border-fz-gray-200 shadow-sm flex flex-col">
             <h3 class="text-sm font-bold text-fz-black mb-4">Savings Trend</h3>
-            <div class="flex-1 w-full min-h-[280px] relative">
-                <canvas id="savingsTrendChart"></canvas>
+            {% if monthly.is_incomplete %}
+            <div class="flex-1 w-full min-h-[280px] flex flex-col items-center justify-center text-center px-4" aria-label="Empty chart state">
+                <i data-lucide="trending-up" class="w-8 h-8 text-fz-gray-300 mb-2"></i>
+                <p class="text-sm text-fz-gray-500">Savings trend will appear once current month transactions are complete.</p>
             </div>
+            {% else %}
+            <div class="flex-1 w-full min-h-[280px] relative">
+                <canvas id="savingsTrendChart" aria-label="Savings Trend Chart"></canvas>
+            </div>
+            {% endif %}
         </div>
     </div>
 
@@ -197,7 +211,7 @@
         const gridBorderDash = [4, 4];
 
         // --- Income & Expense Trend (grouped bar) ---
-        if (chartData.labels && chartData.labels.length > 0) {
+        if (!monthly.is_incomplete && chartData.labels && chartData.labels.length > 0) {
             const ieCtx = document.getElementById('incExpTrendChart').getContext('2d');
             new Chart(ieCtx, {
                 type: 'bar',
@@ -223,7 +237,7 @@
         }
 
         // --- Savings Trend Line ---
-        if (chartData.labels && chartData.labels.length > 0) {
+        if (!monthly.is_incomplete && chartData.labels && chartData.labels.length > 0) {
             const stCtx = document.getElementById('savingsTrendChart').getContext('2d');
             new Chart(stCtx, {
                 type: 'line',

@@ -20,8 +20,9 @@ DISCRETIONARY_CATEGORIES = {
 }
 
 class FinancialPeriod:
-    def __init__(self, period_id: str, fixed_income: float, variable_income: float, expenses: List[Dict[str, Any]]):
+    def __init__(self, period_id: str, fixed_income: float, variable_income: float, expenses: List[Dict[str, Any]], is_current_month: bool = False):
         self.period_id = period_id
+        self.is_current_month = is_current_month
         self.fixed_income = fixed_income
         self.variable_income = variable_income
         self.total_income = fixed_income + variable_income
@@ -44,6 +45,13 @@ class FinancialPeriod:
             cat = e.get('category', 'Others')
             amt = e.get('amount', 0.0)
             self.categories[cat] = self.categories.get(cat, 0.0) + amt
+            
+        if self.total_income == 0 and self.total_expenses == 0:
+            self.status = "no_data"
+        elif self.is_current_month and self.total_income > 0 and self.total_expenses == 0:
+            self.status = "incomplete"
+        else:
+            self.status = "complete"
 
 def percentage_change(current: float, previous: float) -> Optional[float]:
     if previous == 0:
@@ -66,6 +74,10 @@ def evaluate_rules(periods: List[FinancialPeriod]) -> List[Dict[str, Any]]:
         
     # Sort chronologically assumed (oldest to newest)
     current_period = periods[-1]
+    
+    # Do not generate insights for an incomplete current period
+    if current_period.status == "incomplete":
+        return insights
     
     # Needs at least one period for single-period rules
     _evaluate_rb03_low_savings_rate(current_period, insights)
