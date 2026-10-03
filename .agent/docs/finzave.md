@@ -2389,3 +2389,51 @@ The goal is to make FinZave a coherent, technically sound, polished, efficient a
 - Created 	ests/test_finance.py covering core financial engine abstractions (FinancialPeriod aggregations, metrics).
 - Updated existing test suites to prevent regression with security hardening.
 
+
+
+## Planning Module Decision Support Update
+
+### Architecture Changes
+- **Financial Capacity Endpoint**: Added /api/planning/capacity to fetch dynamic savings capacity calculated directly from utils.finance.build_financial_periods(..., months=1) without duplicating financial rules.
+- **Affordability Engine**: Replaced generic warnings in planning/insights.py with deterministic percentage-based logic that warns if a planned commitment uses >80% or >100% of available monthly savings.
+
+### Backend Implementation
+- **SIP Projections**: Upgraded planning/sip.py to return a yearly_breakdown containing a matrix of investment amount, returns, and total future value.
+- **EMI Projections**: Added loan-type awareness to outes/planning.py (down payment deduction for vehicles) and upgraded planning/emi.py to return a full yearly_amortization array detailing principal and interest reduction over time.
+
+### Frontend Refactoring
+- **Decoupled JS**: Migrated all inline JavaScript logic from planning.html to a dedicated static/js/planning.js file.
+- **Performance**: Implemented a 300ms debounce wrapper around all calculator input events, eliminating the N+1 database querying flaw associated with the legacy rapid-fire keystroke trigger.
+- **UI Adjustments**: Styled with FinZave Tailwind standards, added Chart.js SIP/EMI graphs, breakdown tables, capacity suggestion widgets, and a legally compliant investment disclaimer.
+
+### Testing Additions
+- Created 	ests/test_planning.py to cover core engine math (zero interest edge cases), integration pathways (JWT verification, CSRF matching), and JSON schema integrity.
+
+
+
+## Planning UX Improvement Update
+
+- Removed preset assumptions from inputs to prevent premature calculation
+- Added user-driven calculations only triggering when all valid parameters are entered
+- Added repayment visibility (Principal, Interest, Total Cost) for EMI projections
+- Improved SIP disclaimer handling to a prominent dedicated section
+- Added friendly empty states indicating action required before results appear
+- Refactored JS to gracefully manage empty states, clearing the view when data is incomplete
+
+
+
+## Planning UI Accessibility Update
+
+- Improved Financial Impact alert contrast.
+- Added contextual icons.
+- Improved disclaimer readability.
+- Followed FinZave accessibility standards.
+
+
+## Reports Period Filter Fix
+
+- **Root cause:** The Reports module dropdown wasn't linked to any data fetching mechanism, and the backend route unconditionally returned the most recent period regardless of user selection.
+- **Files changed:** routes/reports.py, templates/app/reports.html, tests/test_reports.py.
+- **Data flow correction:** Updated frontend to listen for dropdown changes and navigate to ?period=YYYY-MM with a loading state. Updated backend to extract period from request arguments, validate it against uild_financial_periods, accurately calculate current_has_data for that specific month, and evaluate the rule engine using only historical data up to the chosen period.
+- **Cache handling:** The reports endpoint calculates dynamically per request and isn't globally cached, ensuring different periods won't mistakenly return cached data from other periods.
+

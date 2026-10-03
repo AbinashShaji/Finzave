@@ -15,18 +15,40 @@ def reports():
     user_id = int(get_jwt_identity())
     periods = build_financial_periods(user_id, months=6)
     
-    # We need has_data for scoring calculation
+    # We need global has_data to know if user has ANY data ever
     has_data = any((p.total_income > 0 or p.total_expenses > 0) for p in periods)
     
-    insights = evaluate_rules(periods)
-    current_period = periods[-1] if periods else None
+    selected_period = request.args.get('period')
+    current_period = None
     
-    # Fix P0 Bug: Update signature to match analysis.py
-    health_data = calculate_health_score(periods, has_data, insights)
+    if selected_period:
+        for p in periods:
+            if p.period_id == selected_period:
+                current_period = p
+                break
+        if not current_period:
+            return "Invalid period selected", 400
+                
+    if not current_period:
+        current_period = periods[-1] if periods else None
+        
+    current_has_data = False
+    if current_period:
+        current_has_data = (current_period.total_income > 0 or current_period.total_expenses > 0)
+        
+    # Get historical periods up to the current period for accurate rule engine evaluation
+    historical_periods = []
+    if current_period:
+        idx = periods.index(current_period)
+        historical_periods = periods[:idx+1]
+        
+    insights = evaluate_rules(historical_periods)
+    health_data = calculate_health_score(historical_periods, current_has_data, insights)
     
     return render_template(
         'app/reports.html',
         has_data=has_data,
+        current_has_data=current_has_data,
         current_period=current_period,
         health_data=health_data,
         periods=periods

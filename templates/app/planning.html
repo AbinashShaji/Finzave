@@ -10,240 +10,282 @@
         <h2 class="text-xl font-bold text-fz-black">Calculators & Projections</h2>
         <span class="text-xs font-semibold uppercase tracking-wider text-fz-red bg-red-50 px-3 py-1 rounded-full border border-red-100">Planning Mode</span>
     </div>
+    
+    <!-- Capacity Section -->
+    <div class="bg-white rounded-2xl border border-fz-gray-200 shadow-sm p-5 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div>
+            <h3 class="text-sm font-bold text-fz-black flex items-center gap-2">
+                <i data-lucide="wallet" class="w-4 h-4 text-fz-gray-500"></i> Financial Capacity
+            </h3>
+            <p class="text-xs text-fz-gray-500 mt-1">Based on your current month's savings</p>
+        </div>
+        <div class="flex items-center gap-6">
+            <div class="text-right">
+                <span class="block text-xs font-bold text-fz-gray-500 uppercase tracking-wider">Current Savings</span>
+                <span class="text-lg font-bold text-fz-black" id="cap-savings">₹0</span>
+            </div>
+            <div class="text-right pl-6 border-l border-fz-gray-200">
+                <span class="block text-xs font-bold text-fz-gray-500 uppercase tracking-wider">Suggested SIP</span>
+                <span class="text-lg font-bold text-green-600" id="cap-suggested">₹0 - ₹0</span>
+            </div>
+        </div>
+    </div>
 
     <!-- 1. Calculator Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start pb-12">
         
-        <!-- SIP Calculator Workspace -->
-        <div class="bg-white rounded-2xl border border-fz-gray-200 shadow-sm flex flex-col overflow-hidden">
-            <div class="p-5 border-b border-fz-gray-100 flex items-center gap-3 bg-fz-gray-50">
-                <i data-lucide="trending-up" class="w-5 h-5 text-fz-black"></i>
-                <h3 class="text-base font-bold text-fz-black">SIP Growth Calculator</h3>
+        <!-- SIP Column -->
+        <div class="flex flex-col gap-6">
+            <!-- SIP Calculator Workspace -->
+            <div class="bg-white rounded-2xl border border-fz-gray-200 shadow-sm flex flex-col overflow-hidden">
+            <div class="p-5 border-b border-fz-gray-100 flex items-center justify-between bg-fz-gray-50">
+                <div class="flex items-center gap-3">
+                    <i data-lucide="trending-up" class="w-5 h-5 text-fz-black"></i>
+                    <h3 class="text-base font-bold text-fz-black">SIP Growth Calculator</h3>
+                </div>
+                <div class="group relative cursor-pointer">
+                    <i data-lucide="help-circle" class="w-4 h-4 text-fz-gray-400 hover:text-fz-black transition-colors"></i>
+                    <div class="absolute right-0 top-6 w-64 bg-fz-black text-white text-xs p-3 rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50 shadow-lg">
+                        Systematic Investment Plan (SIP) allows you to invest a fixed amount regularly.
+                    </div>
+                </div>
             </div>
             
             <div class="p-6 flex-1 flex flex-col gap-6">
                 <form id="sip-form" class="space-y-4">
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div>
-                            <label class="block text-xs font-bold text-fz-gray-500 uppercase tracking-wider mb-1.5">Monthly (₹)</label>
-                            <input type="number" id="sip-monthly" class="w-full px-3 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-fz-black text-sm" value="10000" min="1">
+                            <label class="block text-xs font-bold text-fz-gray-500 uppercase tracking-wider mb-1.5">Monthly Investment</label>
+                            <input type="number" id="sip-monthly" placeholder="Enter amount" class="w-full px-3 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-fz-black text-sm" min="1">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-fz-gray-500 uppercase tracking-wider mb-1.5">Rate (%)</label>
-                            <input type="number" id="sip-rate" step="0.1" class="w-full px-3 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-fz-black text-sm" value="12" min="0">
+                            <label class="block text-xs font-bold text-fz-gray-500 uppercase tracking-wider mb-1.5">Expected Return</label>
+                            <input type="number" id="sip-rate" step="0.1" placeholder="Enter rate" class="w-full px-3 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-fz-black text-sm" min="0">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-fz-gray-500 uppercase tracking-wider mb-1.5">Years</label>
-                            <input type="number" id="sip-years" class="w-full px-3 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-fz-black text-sm" value="10" min="1">
+                            <label class="block text-xs font-bold text-fz-gray-500 uppercase tracking-wider mb-1.5">Duration</label>
+                            <input type="number" id="sip-years" placeholder="Enter years" class="w-full px-3 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-fz-black text-sm" min="1">
                         </div>
                     </div>
                 </form>
 
-                <!-- Result Area -->
-                <div class="bg-fz-black text-white rounded-xl p-5 mt-auto">
-                    <div id="sip-insight-container" class="hidden"></div>
+                <!-- SIP Empty State -->
+                <div id="sip-empty-state" class="flex-1 flex items-center justify-center border-2 border-dashed border-fz-gray-200 rounded-xl p-8 text-center text-fz-gray-500 text-sm h-48">
+                    Enter your investment amount to view projection.
+                </div>
+                
+                <!-- SIP Results State -->
+                <div id="sip-results-state" class="hidden flex-1 flex flex-col gap-6">
+                    <!-- Chart Area -->
+                    <div class="h-48 w-full relative">
+                        <canvas id="sipChart"></canvas>
+                    </div>
                     
-                    <p class="text-xs text-fz-gray-400 font-medium uppercase tracking-wider mb-1">Estimated Future Value</p>
-                    <p class="text-3xl font-bold mb-4" id="sip-future-value">₹0</p>
-                    
-                    <div class="grid grid-cols-2 gap-4 text-sm border-t border-fz-gray-800 pt-4">
-                        <div>
-                            <span class="block text-fz-gray-400">Total Invested</span>
-                            <span class="font-medium" id="sip-invested">₹0</span>
+                    <!-- Result Area -->
+                    <div class="bg-fz-black text-white rounded-xl p-5">
+                        <p class="text-xs text-fz-gray-400 font-medium uppercase tracking-wider mb-1">SIP Summary</p>
+                        <p class="text-xs text-fz-gray-400 font-medium uppercase tracking-wider mt-3">Future Value</p>
+                        <p class="text-3xl font-bold mb-4" id="sip-future-value">₹0</p>
+                        
+                        <div class="grid grid-cols-2 gap-4 text-sm border-t border-fz-gray-800 pt-4">
+                            <div>
+                                <span class="block text-fz-gray-400">Total Invested</span>
+                                <span class="font-medium" id="sip-invested">₹0</span>
+                            </div>
+                            <div>
+                                <span class="block text-fz-gray-400">Estimated Returns</span>
+                                <span class="font-medium text-green-400" id="sip-returns">₹0</span>
+                            </div>
                         </div>
-                        <div>
-                            <span class="block text-fz-gray-400">Est. Returns</span>
-                            <span class="font-medium text-green-400" id="sip-returns">₹0</span>
+                    </div>
+
+                    <!-- Affordability -->
+                    <div>
+                        <p class="text-xs text-fz-gray-500 font-bold uppercase tracking-wider mb-2">Financial Impact</p>
+                        <div id="sip-insight-container"></div>
+                    </div>
+
+                    <!-- Disclaimer -->
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-xs text-red-700">
+                        <div class="flex items-start gap-2 mb-1">
+                            <i data-lucide="alert-triangle" class="w-4 h-4 flex-shrink-0 text-red-700 mt-0.5" aria-hidden="true"></i>
+                            <p class="font-bold text-red-800">Investment Disclaimer</p>
+                        </div>
+                        <div class="pl-6 space-y-1 text-red-700">
+                            <p>This projection is based on the assumed return rate.</p>
+                            <p>Actual market returns may be higher or lower depending on market conditions.</p>
+                            <p>Investments are subject to market risks and losses may occur.</p>
+                            <p>This calculator provides an estimate only and does not guarantee future returns.</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        
+        <!-- SIP Yearly Breakdown -->
+        <div id="sip-table-container" class="hidden bg-white rounded-2xl border border-fz-gray-200 shadow-sm overflow-hidden">
+            <div class="p-4 border-b border-fz-gray-100 bg-fz-gray-50">
+                <h3 class="text-sm font-bold text-fz-black">SIP Year-by-Year Growth</h3>
+            </div>
+            <div class="overflow-x-auto max-h-64 overflow-y-auto">
+                <table class="w-full text-left text-sm text-fz-gray-600">
+                    <thead class="text-xs uppercase bg-gray-50 text-fz-gray-500 sticky top-0 z-10 shadow-sm">
+                        <tr>
+                            <th class="px-4 py-3">Year</th>
+                            <th class="px-4 py-3">Invested</th>
+                            <th class="px-4 py-3">Returns</th>
+                            <th class="px-4 py-3">Value</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sip-breakdown-body" class="divide-y divide-fz-gray-100">
+                        <!-- JS renders rows -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
+    <!-- EMI Column -->
+    <div class="flex flex-col gap-6">
         <!-- EMI Calculator Workspace -->
         <div class="bg-white rounded-2xl border border-fz-gray-200 shadow-sm flex flex-col overflow-hidden">
-            <div class="p-5 border-b border-fz-gray-100 flex items-center gap-3 bg-fz-gray-50">
-                <i data-lucide="home" class="w-5 h-5 text-fz-black"></i>
-                <h3 class="text-base font-bold text-fz-black">EMI Liability Calculator</h3>
+            <div class="p-5 border-b border-fz-gray-100 flex items-center justify-between bg-fz-gray-50">
+                <div class="flex items-center gap-3">
+                    <i data-lucide="home" class="w-5 h-5 text-fz-black"></i>
+                    <h3 class="text-base font-bold text-fz-black">EMI Loan Planner</h3>
+                </div>
+                <div class="group relative cursor-pointer">
+                    <i data-lucide="help-circle" class="w-4 h-4 text-fz-gray-400 hover:text-fz-black transition-colors"></i>
+                    <div class="absolute right-0 top-6 w-64 bg-fz-black text-white text-xs p-3 rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50 shadow-lg">
+                        Equated Monthly Installment (EMI) represents the fixed payment you make to clear a loan.
+                    </div>
+                </div>
             </div>
             
             <div class="p-6 flex-1 flex flex-col gap-6">
                 <form id="emi-form" class="space-y-4">
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="mb-4">
+                        <label class="block text-xs font-bold text-fz-gray-500 uppercase tracking-wider mb-1.5">Loan Type</label>
+                        <select id="emi-loan-type" class="w-full px-3 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-fz-black text-sm">
+                            <option value="Home">Home Loan</option>
+                            <option value="Personal">Personal Loan</option>
+                            <option value="Education">Education Loan</option>
+                            <option value="Car">Car Loan</option>
+                            <option value="Bike">Bike Loan</option>
+                        </select>
+                    </div>
+                    
+                    <div id="emi-vehicle-inputs" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs font-bold text-fz-gray-500 uppercase tracking-wider mb-1.5">Principal (₹)</label>
-                            <input type="number" id="emi-principal" class="w-full px-3 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-fz-black text-sm" value="5000000" min="1">
+                            <label class="block text-xs font-bold text-fz-gray-500 uppercase tracking-wider mb-1.5">Vehicle Price (₹)</label>
+                            <input type="number" id="emi-vehicle-price" placeholder="Enter vehicle price" class="w-full px-3 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-fz-black text-sm" min="1">
                         </div>
                         <div>
+                            <label class="block text-xs font-bold text-fz-gray-500 uppercase tracking-wider mb-1.5">Down Payment (₹)</label>
+                            <input type="number" id="emi-down-payment" placeholder="Enter down payment" class="w-full px-3 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-fz-black text-sm" min="0">
+                        </div>
+                    </div>
+                    
+                    <div id="emi-standard-inputs" class="grid grid-cols-1 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-fz-gray-500 uppercase tracking-wider mb-1.5">Loan Amount (₹)</label>
+                            <input type="number" id="emi-principal" placeholder="Enter loan amount" class="w-full px-3 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-fz-black text-sm" min="1">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
                             <label class="block text-xs font-bold text-fz-gray-500 uppercase tracking-wider mb-1.5">Rate (%)</label>
-                            <input type="number" id="emi-rate" step="0.1" class="w-full px-3 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-fz-black text-sm" value="8.5" min="0">
+                            <input type="number" id="emi-rate" step="0.1" placeholder="Enter interest rate" class="w-full px-3 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-fz-black text-sm" min="0">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-fz-gray-500 uppercase tracking-wider mb-1.5">Years</label>
-                            <input type="number" id="emi-years" class="w-full px-3 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-fz-black text-sm" value="20" min="1">
+                            <input type="number" id="emi-years" placeholder="Enter duration" class="w-full px-3 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-fz-black text-sm" min="1">
                         </div>
                     </div>
                 </form>
 
-                <!-- Result Area -->
-                <div class="bg-fz-gray-50 border border-fz-gray-200 rounded-xl p-5 mt-auto text-fz-black">
-                    <div id="emi-insight-container" class="hidden"></div>
+                <!-- EMI Empty State -->
+                <div id="emi-empty-state" class="flex-1 flex items-center justify-center border-2 border-dashed border-fz-gray-200 rounded-xl p-8 text-center text-fz-gray-500 text-sm h-48">
+                    Enter loan details to calculate EMI.
+                </div>
+
+                <!-- EMI Results State -->
+                <div id="emi-results-state" class="hidden flex-1 flex flex-col gap-6">
+                    <!-- Chart Area -->
+                    <div class="h-48 w-full relative">
+                        <canvas id="emiChart"></canvas>
+                    </div>
                     
-                    <p class="text-xs text-fz-gray-500 font-bold uppercase tracking-wider mb-1">Monthly EMI Payment</p>
-                    <p class="text-3xl font-bold mb-4 text-fz-red" id="emi-monthly">₹0</p>
-                    
-                    <div class="grid grid-cols-2 gap-4 text-sm border-t border-fz-gray-200 pt-4">
-                        <div>
-                            <span class="block text-fz-gray-500 font-medium">Principal Amount</span>
-                            <span class="font-bold text-fz-black" id="emi-total-principal">₹0</span>
+                    <!-- Result Area -->
+                    <div class="bg-fz-gray-50 border border-fz-gray-200 rounded-xl p-5 text-fz-black">
+                        <p class="text-xs text-fz-gray-500 font-bold uppercase tracking-wider mb-1">Loan Details:</p>
+                        <div class="grid grid-cols-2 gap-4 text-sm mb-4">
+                            <div>
+                                <span class="block text-fz-gray-500">Loan Type</span>
+                                <span class="font-medium" id="emi-display-type">Home Loan</span>
+                            </div>
+                            <div>
+                                <span class="block text-fz-gray-500">Borrowed Amount</span>
+                                <span class="font-medium" id="emi-total-principal">₹0</span>
+                            </div>
                         </div>
-                        <div>
-                            <span class="block text-fz-gray-500 font-medium">Total Interest</span>
-                            <span class="font-bold text-fz-black" id="emi-interest">₹0</span>
+
+                        <p class="text-xs text-fz-gray-500 font-bold uppercase tracking-wider mb-1">Monthly Commitment:</p>
+                        <p class="text-3xl font-bold mb-4 text-fz-red" id="emi-monthly">₹0</p>
+                        
+                        <p class="text-xs text-fz-gray-500 font-bold uppercase tracking-wider mb-1">Total Cost:</p>
+                        <div class="grid grid-cols-3 gap-2 text-sm border-t border-fz-gray-200 pt-4">
+                            <div>
+                                <span class="block text-fz-gray-500 font-medium">Principal</span>
+                                <span class="font-bold text-fz-black" id="emi-principal-cost">₹0</span>
+                            </div>
+                            <div>
+                                <span class="block text-fz-gray-500 font-medium">Interest</span>
+                                <span class="font-bold text-fz-black" id="emi-interest">₹0</span>
+                            </div>
+                            <div>
+                                <span class="block text-fz-gray-500 font-medium">Total Repayment</span>
+                                <span class="font-bold text-fz-black" id="emi-total-paid">₹0</span>
+                            </div>
                         </div>
+                    </div>
+
+                    <!-- Affordability -->
+                    <div>
+                        <p class="text-xs text-fz-gray-500 font-bold uppercase tracking-wider mb-2">Financial Impact</p>
+                        <div id="emi-insight-container"></div>
                     </div>
                 </div>
             </div>
         </div>
-
-    </div>
-
-    <!-- 2 & 3. Planning Insights & Future Area -->
-    <div class="bg-white rounded-2xl border border-fz-gray-200 shadow-sm p-6 lg:p-8 flex flex-col md:flex-row items-center gap-8 relative overflow-hidden">
-        <div class="w-16 h-16 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0 z-10 border border-blue-100">
-            <i data-lucide="brain-circuit" class="w-8 h-8"></i>
-        </div>
-        <div class="flex-1 z-10 text-center md:text-left">
-            <h3 class="text-lg font-bold text-fz-black mb-2">Intelligent Planning Engine</h3>
-            <p class="text-sm text-fz-gray-600 max-w-2xl leading-relaxed">
-                The FinZave deterministic rule engine powers these calculators. Use them to safely plan your investments or predict your EMI liabilities based on strict deterministic mathematics.
-            </p>
-            <div class="mt-4 flex flex-wrap gap-2 justify-center md:justify-start">
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-green-100 text-green-700 text-xs font-semibold"><i data-lucide="check" class="w-3 h-3"></i> Backend Integration Complete</span>
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-blue-100 text-blue-700 text-xs font-semibold"><i data-lucide="cpu" class="w-3 h-3"></i> Core Algorithm Active</span>
+        
+        <!-- EMI Amortization -->
+        <div id="emi-table-container" class="hidden bg-white rounded-2xl border border-fz-gray-200 shadow-sm overflow-hidden">
+            <div class="p-4 border-b border-fz-gray-100 bg-fz-gray-50">
+                <h3 class="text-sm font-bold text-fz-black">EMI Principal Reduction Timeline</h3>
+            </div>
+            <div class="overflow-x-auto max-h-64 overflow-y-auto">
+                <table class="w-full text-left text-sm text-fz-gray-600">
+                    <thead class="text-xs uppercase bg-gray-50 text-fz-gray-500 sticky top-0 z-10 shadow-sm">
+                        <tr>
+                            <th class="px-4 py-3">Year</th>
+                            <th class="px-4 py-3">Principal Paid</th>
+                            <th class="px-4 py-3">Interest Paid</th>
+                            <th class="px-4 py-3">Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody id="emi-breakdown-body" class="divide-y divide-fz-gray-100">
+                        <!-- JS renders rows -->
+                    </tbody>
+                </table>
             </div>
         </div>
-        
-        <!-- Decorative Background -->
-        <div class="absolute right-0 top-0 bottom-0 w-64 bg-gradient-to-l from-blue-50 to-transparent pointer-events-none hidden md:block"></div>
     </div>
-
 </div>
 {% endblock %}
 
 {% block scripts %}
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        lucide.createIcons();
-        calculateSIP();
-        calculateEMI();
-
-        // Add event listeners
-        const sipInputs = ['sip-monthly', 'sip-rate', 'sip-years'];
-        sipInputs.forEach(id => {
-            document.getElementById(id).addEventListener('input', calculateSIP);
-        });
-
-        const emiInputs = ['emi-principal', 'emi-rate', 'emi-years'];
-        emiInputs.forEach(id => {
-            document.getElementById(id).addEventListener('input', calculateEMI);
-        });
-    });
-    
-    function displayInsight(type, insight) {
-        const container = document.getElementById(`${type}-insight-container`);
-        if (!insight) {
-            container.className = 'hidden';
-            container.innerHTML = '';
-            return;
-        }
-
-        let iconName = insight.status === 'WARNING' ? 'alert-triangle' : 'check-circle';
-        let colors = '';
-        
-        if (type === 'sip') {
-            colors = insight.status === 'WARNING' ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-green-500/10 border-green-500/20 text-green-400';
-        } else {
-            colors = insight.status === 'WARNING' ? 'bg-red-50 border-red-200 text-red-700' : 'bg-green-50 border-green-200 text-green-700';
-        }
-
-        container.className = `mb-4 p-3 rounded-lg text-sm font-medium border ${colors}`;
-        container.innerHTML = `
-            <div class="flex items-start gap-2">
-                <i data-lucide="${iconName}" class="w-4 h-4 mt-0.5 flex-shrink-0"></i>
-                <span>${insight.message}</span>
-            </div>
-        `;
-        lucide.createIcons({ root: container });
-    }
-
-    async function calculateSIP() {
-        const monthly = document.getElementById('sip-monthly').value;
-        const rate = document.getElementById('sip-rate').value;
-        const years = document.getElementById('sip-years').value;
-        
-        if (!monthly || !rate || !years) {
-            displayInsight('sip', null);
-            return;
-        }
-
-        try {
-            const csrfToken = getCookie('csrf_access_token');
-            const res = await fetch('/app/api/planning/calculate_sip', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
-                body: JSON.stringify({ monthly_investment: monthly, annual_rate: rate, years: years })
-            });
-            if (res.ok) {
-                const data = await res.json();
-                document.getElementById('sip-future-value').textContent = `₹${Math.round(data.future_value).toLocaleString()}`;
-                document.getElementById('sip-invested').textContent = `₹${Math.round(data.total_invested).toLocaleString()}`;
-                document.getElementById('sip-returns').textContent = `₹${Math.round(data.est_returns).toLocaleString()}`;
-                displayInsight('sip', data.insight);
-            } else {
-                displayInsight('sip', { status: 'WARNING', message: 'Failed to retrieve insights from the server.' });
-            }
-        } catch (err) {
-            console.error(err);
-            displayInsight('sip', { status: 'WARNING', message: 'Network error occurred while fetching insights.' });
-        }
-    }
-
-    async function calculateEMI() {
-        const principal = document.getElementById('emi-principal').value;
-        const rate = document.getElementById('emi-rate').value;
-        const years = document.getElementById('emi-years').value;
-        
-        if (!principal || !rate || !years) {
-            displayInsight('emi', null);
-            return;
-        }
-
-        try {
-            const csrfToken = getCookie('csrf_access_token');
-            const res = await fetch('/app/api/planning/calculate_emi', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
-                body: JSON.stringify({ principal: principal, annual_rate: rate, years: years })
-            });
-            if (res.ok) {
-                const data = await res.json();
-                document.getElementById('emi-monthly').textContent = `₹${Math.round(data.monthly_emi).toLocaleString()}`;
-                document.getElementById('emi-total-principal').textContent = `₹${Math.round(principal).toLocaleString()}`;
-                document.getElementById('emi-interest').textContent = `₹${Math.round(data.total_interest).toLocaleString()}`;
-                displayInsight('emi', data.insight);
-            } else {
-                displayInsight('emi', { status: 'WARNING', message: 'Failed to retrieve insights from the server.' });
-            }
-        } catch (err) {
-            console.error(err);
-            displayInsight('emi', { status: 'WARNING', message: 'Network error occurred while fetching insights.' });
-        }
-    }
-
-    function getCookie(name) {
-        let matches = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"));
-        return matches ? decodeURIComponent(matches[1]) : undefined;
-    }
-</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/planning.js') }}"></script>
 {% endblock %}

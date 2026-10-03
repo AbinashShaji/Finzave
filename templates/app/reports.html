@@ -26,15 +26,27 @@
             <p class="text-sm text-fz-gray-500 mt-1">Generate and export your financial statements.</p>
         </div>
         <div class="flex items-center gap-3">
-            <select class="bg-white border border-fz-gray-200 text-fz-black text-sm rounded-lg px-4 py-2 font-medium focus:outline-none focus:ring-1 focus:ring-fz-black shadow-sm cursor-pointer">
+            <select id="period-select" class="bg-white border border-fz-gray-200 text-fz-black text-sm rounded-lg px-4 py-2 font-medium focus:outline-none focus:ring-1 focus:ring-fz-black shadow-sm cursor-pointer">
                 {% for p in periods|reverse %}
-                    <option value="{{ p.period_id }}">{{ p.period_id }}</option>
+                    <option value="{{ p.period_id }}" {% if current_period and p.period_id == current_period.period_id %}selected{% endif %}>{{ p.period_id }}</option>
                 {% endfor %}
             </select>
         </div>
     </div>
 
     <!-- Main Report Card -->
+    {% if not current_has_data %}
+    <div class="flex flex-col items-center justify-center p-12 bg-white rounded-2xl border border-dashed border-fz-gray-300 text-center">
+        <div class="w-16 h-16 bg-fz-gray-50 rounded-full flex items-center justify-center mb-4">
+            <i data-lucide="file-minus" class="w-8 h-8 text-fz-gray-400"></i>
+        </div>
+        <h3 class="text-lg font-bold text-fz-black mb-2">No Activity</h3>
+        <p class="text-sm text-fz-gray-500 max-w-sm mb-6">No financial activity recorded for this period.</p>
+        <a href="{{ url_for('app.transactions') }}" class="bg-fz-black text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-fz-red transition-colors">
+            Add Transactions
+        </a>
+    </div>
+    {% else %}
     <div class="bg-white rounded-2xl border border-fz-gray-200 shadow-sm overflow-hidden flex flex-col">
         <!-- Summary Header -->
         <div class="bg-fz-black p-6 md:p-8 text-white grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
@@ -113,6 +125,7 @@
         </div>
     </div>
     {% endif %}
+    {% endif %}
 
 </div>
 {% endblock %}
@@ -121,6 +134,18 @@
 <script>
     document.addEventListener("DOMContentLoaded", () => {
         lucide.createIcons();
+        
+        const periodSelect = document.getElementById('period-select');
+        if (periodSelect) {
+            periodSelect.addEventListener('change', (e) => {
+                const overlay = document.createElement('div');
+                overlay.className = 'fixed inset-0 bg-white/80 flex items-center justify-center z-50';
+                overlay.innerHTML = '<div class="flex flex-col items-center gap-4"><div class="w-8 h-8 border-4 border-fz-red border-t-transparent rounded-full animate-spin"></div><span class="text-lg font-bold text-fz-black">Generating report...</span></div>';
+                document.body.appendChild(overlay);
+                
+                window.location.href = `/app/reports?period=${e.target.value}`;
+            });
+        }
     });
 </script>
 {% endblock %}

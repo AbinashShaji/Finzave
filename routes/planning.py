@@ -17,6 +17,27 @@ def get_current_savings(user_id):
         return periods[0].savings
     return None
 
+@app_bp.route('/api/planning/capacity', methods=['GET'])
+@jwt_required()
+def api_planning_capacity():
+    user_id = int(get_jwt_identity())
+    periods = build_financial_periods(user_id, months=1)
+    if not periods:
+        return jsonify({"savings": 0, "income": 0, "suggested_sip_min": 0, "suggested_sip_max": 0}), 200
+    
+    savings = periods[0].savings
+    income = periods[0].total_income
+    
+    suggested_min = savings * 0.30 if savings > 0 else 0
+    suggested_max = savings * 0.50 if savings > 0 else 0
+    
+    return jsonify({
+        "savings": savings,
+        "income": income,
+        "suggested_sip_min": suggested_min,
+        "suggested_sip_max": suggested_max
+    }), 200
+
 @app_bp.route('/api/planning/calculate_sip', methods=['POST'])
 @jwt_required()
 def api_calculate_sip():
@@ -55,9 +76,16 @@ def api_calculate_emi():
         if 'principal' not in data or 'annual_rate' not in data or 'years' not in data:
             return jsonify({"error": "Missing required fields"}), 400
             
-        principal = float(data.get('principal', 0))
-        annual_rate = float(data.get('annual_rate', 0))
+        loan_type = data.get('loan_type', 'Personal')
         years = int(data.get('years', 0))
+        annual_rate = float(data.get('annual_rate', 0))
+        
+        if loan_type in ['Car', 'Bike']:
+            vehicle_price = float(data.get('vehicle_price', 0))
+            down_payment = float(data.get('down_payment', 0))
+            principal = max(0, vehicle_price - down_payment)
+        else:
+            principal = float(data.get('principal', 0))
         
         if principal < 0 or annual_rate < 0 or years < 0:
             return jsonify({"error": "Values cannot be negative"}), 400
