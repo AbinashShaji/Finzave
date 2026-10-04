@@ -1,0 +1,335 @@
+{% extends "app/base_app.html" %}
+
+{% block title %}FinZave — {{ intel.goal_name | capitalize }}{% endblock %}
+{% block header_title %}Goal Intelligence{% endblock %}
+
+{% block content %}
+<div style="max-width: 1100px; margin: 0 auto; padding: 0 24px 80px;">
+
+    <!-- ═══════════════════════════════════════════════════════
+         HEADER — compact, no marketing
+    ════════════════════════════════════════════════════════ -->
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 20px 0; border-bottom: 1px solid #e4e4e7; margin-bottom: 40px;">
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <a href="{{ url_for('app.goals') }}" style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #71717a; text-decoration: none;">
+                <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i> Back to Goals
+            </a>
+            <div style="width: 1px; height: 16px; background: #d4d4d8;"></div>
+            <span style="font-size: 15px; font-weight: 700; color: #0a0a0a; text-transform: capitalize;">{{ intel.goal_name }}</span>
+        </div>
+        <span style="font-size: 12px; font-weight: 500; color: #71717a;">Created {{ intel.created_date.strftime('%b %d, %Y') }}</span>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         SECTION 1 — HERO (Two columns)
+    ════════════════════════════════════════════════════════ -->
+    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 40px; margin-bottom: 64px;">
+
+        <!-- LEFT: Goal Summary -->
+        <div style="flex: 1 1 280px; min-width: 260px;">
+            <p style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #e11d48; margin-bottom: 24px;">Goal Summary</p>
+            <h2 style="font-size: 40px; font-weight: 700; color: #0a0a0a; letter-spacing: -0.03em; line-height: 1.1; margin: 0 0 32px; text-transform: capitalize;">{{ intel.goal_name }}</h2>
+
+            <div style="display: flex; flex-direction: column; gap: 24px;">
+                <div>
+                    <p style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #e11d48; margin: 0 0 4px;">Category</p>
+                    <p style="font-size: 16px; font-weight: 700; color: #0a0a0a; margin: 0;">Personal Goal</p>
+                </div>
+                <div>
+                    <p style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #e11d48; margin: 0 0 4px;">Deadline</p>
+                    <p style="font-size: 16px; font-weight: 700; color: #0a0a0a; margin: 0;">{{ intel.target_date.strftime('%B %Y') }}</p>
+                </div>
+                <div>
+                    <p style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #e11d48; margin: 0 0 4px;">Health Status</p>
+                    <p style="font-size: 16px; font-weight: 700; color: #0a0a0a; margin: 0; display: flex; align-items: center; gap: 8px;">
+                        {% if intel.health.status == 'GREEN' %}
+                            <span style="color: #16a34a;">✓</span>
+                        {% elif intel.health.status == 'YELLOW' %}
+                            <span style="color: #ca8a04;">⚠</span>
+                        {% else %}
+                            <span style="color: #e11d48;">⚠</span>
+                        {% endif %}
+                        {{ intel.health.title }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: Goal Progress Circle
+             ┌─────────────────────────────────────────────┐
+             │ This is a DIRECT COPY of the public         │
+             │ Services page Goal Tracking component       │
+             │ (lines 104-146 of services.html) with       │
+             │ dynamic data instead of hardcoded values.    │
+             └─────────────────────────────────────────────┘
+        -->
+        <div style="flex: 1 1 380px; display: flex; justify-content: center;">
+            <!-- Outer white circle — EXACT same classes as services.html line 104 -->
+            <div class="bg-white rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.04)] aspect-square flex flex-col items-center justify-center border border-fz-gray-100 relative p-8 group" style="width: 380px; height: 380px;">
+
+                <!-- Circular Progress SVG — EXACT same as services.html line 107-113 -->
+                <div class="absolute inset-4 sm:inset-8">
+                    <svg class="w-full h-full -rotate-90 transform" viewBox="0 0 100 100">
+                        <!-- Background Track -->
+                        <circle class="text-fz-gray-100" stroke-width="2" stroke="currentColor" fill="transparent" r="48" cx="50" cy="50" />
+                        <!-- Progress Arc — dashoffset = 301.59 * (1 - completion%) -->
+                        <circle class="text-fz-red transition-all duration-1000 ease-out group-hover:stroke-fz-black" stroke-width="2" stroke-linecap="round" stroke="currentColor" fill="transparent" r="48" cx="50" cy="50" stroke-dasharray="301.59" stroke-dashoffset="{{ 301.59 * (1 - (intel.progress.completion_pct / 100)) }}" />
+                    </svg>
+                </div>
+
+                <!-- Inner Content — EXACT same structure as services.html line 117-132 -->
+                <div class="relative z-10 flex flex-col items-center text-center">
+                    <span class="px-3 py-1 bg-fz-gray-100 rounded-full text-[10px] font-semibold tracking-widest text-fz-gray-800 uppercase mb-4">{{ intel.goal_name }}</span>
+                    <div class="text-3xl sm:text-5xl font-bold tracking-tighter text-fz-black mb-1 transition-colors group-hover:text-fz-red">{{ "{:.0f}".format(intel.progress.completion_pct) }}%</div>
+                    <div class="text-xs text-fz-gray-800 font-medium mb-6">Target Date: {{ intel.target_date.strftime('%b %Y') }}</div>
+
+                    <div class="flex items-center gap-6 border-t border-fz-gray-100 pt-4 w-full justify-center px-4">
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] text-fz-gray-800 font-medium uppercase tracking-wider mb-0.5">Saved</span>
+                            <span class="text-sm font-bold text-fz-black">₹{{ "{:,.0f}".format(intel.progress.saved) }}</span>
+                        </div>
+                        <div class="w-px h-8 bg-fz-gray-100"></div>
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] text-fz-gray-800 font-medium uppercase tracking-wider mb-0.5">Target</span>
+                            <span class="text-sm font-bold text-fz-black">₹{{ "{:,.0f}".format(intel.progress.target) }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Floating Tooltip: Req. Monthly — EXACT same as services.html line 136-139 -->
+                <div class="absolute -bottom-4 right-0 sm:right-8 bg-fz-black text-white px-4 py-3 rounded-2xl shadow-xl flex flex-col border border-fz-gray-800 group-hover:-translate-y-2 transition-transform duration-300">
+                    <span class="text-[10px] text-fz-gray-400 font-medium uppercase tracking-wider mb-0.5">Req. Monthly</span>
+                    <span class="text-sm font-semibold tracking-tight text-white">₹{{ "{:,.0f}".format(intel.affordability.req_monthly) }}</span>
+                </div>
+
+                <!-- Floating Tooltip: Remaining — EXACT same as services.html line 142-145 -->
+                <div class="absolute -top-2 left-0 sm:left-4 bg-white px-4 py-2 rounded-xl shadow-lg flex flex-col border border-fz-gray-100 group-hover:-translate-y-1 transition-transform duration-300">
+                    <span class="text-[10px] text-fz-gray-400 font-medium uppercase tracking-wider mb-0.5">Remaining</span>
+                    <span class="text-sm font-semibold tracking-tight text-fz-black">₹{{ "{:,.0f}".format(intel.progress.remaining) }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         SECTION 2 — FINANCIAL ANALYSIS (Two cards side by side)
+    ════════════════════════════════════════════════════════ -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px; margin-bottom: 40px;">
+
+        <!-- CARD 1: Financial Capacity -->
+        <div style="background: #fafafa; border-radius: 20px; padding: 32px; border: 1px solid #f4f4f5;">
+            <p style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #e11d48; margin: 0 0 24px;">Financial Capacity</p>
+
+            <div style="display: flex; flex-direction: column; gap: 0;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; padding: 12px 0; border-bottom: 1px solid #e4e4e7;">
+                    <span style="font-size: 13px; font-weight: 500; color: #71717a;">Monthly Income</span>
+                    <span style="font-size: 16px; font-weight: 700; color: #0a0a0a;">₹{{ "{:,.0f}".format(intel.total_income) }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; padding: 12px 0; border-bottom: 1px solid #e4e4e7;">
+                    <span style="font-size: 13px; font-weight: 500; color: #71717a;">Monthly Expenses</span>
+                    <span style="font-size: 16px; font-weight: 700; color: #0a0a0a;">₹{{ "{:,.0f}".format(intel.total_expenses) }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; padding: 12px 0; border-bottom: 1px solid #e4e4e7;">
+                    <span style="font-size: 13px; font-weight: 600; color: #0a0a0a;">Current Savings Capacity</span>
+                    <span style="font-size: 18px; font-weight: 700; color: #0a0a0a;">₹{{ "{:,.0f}".format(intel.affordability.current_savings_capacity) }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; padding: 12px 0;">
+                    <span style="font-size: 13px; font-weight: 600; color: #0a0a0a;">Required Monthly Saving</span>
+                    <span style="font-size: 18px; font-weight: 700; color: #e11d48;">₹{{ "{:,.0f}".format(intel.affordability.req_monthly) }}</span>
+                </div>
+            </div>
+
+            <!-- Impact callout -->
+            <div style="margin-top: 20px; background: white; border: 1px solid #e4e4e7; border-radius: 12px; padding: 16px;">
+                <p style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #e11d48; margin: 0 0 6px;">Goal Impact</p>
+                <p style="font-size: 13px; font-weight: 500; color: #0a0a0a; margin: 0;">This goal uses <b>{{ "{:.0f}".format(intel.affordability.raw_impact_pct) }}%</b> of your current monthly savings capacity.</p>
+            </div>
+        </div>
+
+        <!-- CARD 2: Goal Breakdown -->
+        <div style="background: white; border-radius: 20px; padding: 32px; border: 1px solid #e4e4e7;">
+            <p style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #e11d48; margin: 0 0 24px;">Goal Breakdown</p>
+
+            <div style="display: flex; flex-direction: column; gap: 0;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; padding: 14px 0; border-bottom: 1px solid #f4f4f5;">
+                    <span style="font-size: 13px; font-weight: 500; color: #71717a;">Target Amount</span>
+                    <span style="font-size: 18px; font-weight: 700; color: #0a0a0a;">₹{{ "{:,.0f}".format(intel.progress.target) }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; padding: 14px 0; border-bottom: 1px solid #f4f4f5;">
+                    <span style="font-size: 13px; font-weight: 500; color: #71717a;">Saved Amount</span>
+                    <span style="font-size: 18px; font-weight: 700; color: #0a0a0a;">₹{{ "{:,.0f}".format(intel.progress.saved) }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; padding: 14px 0; border-bottom: 1px solid #f4f4f5;">
+                    <span style="font-size: 13px; font-weight: 500; color: #71717a;">Remaining Amount</span>
+                    <span style="font-size: 18px; font-weight: 700; color: #0a0a0a;">₹{{ "{:,.0f}".format(intel.progress.remaining) }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; padding: 14px 0;">
+                    <span style="font-size: 13px; font-weight: 700; color: #0a0a0a; text-transform: uppercase; letter-spacing: 0.05em;">Completion</span>
+                    <span style="font-size: 28px; font-weight: 700; color: #e11d48;">{{ "{:.0f}".format(intel.progress.completion_pct) }}%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         SECTION 3 — FINANCIAL HEALTH (Single recommendation banner)
+    ════════════════════════════════════════════════════════ -->
+    {% if intel.health.status == 'GREEN' %}
+    <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 16px; padding: 24px 28px; margin-bottom: 40px; display: flex; align-items: center; gap: 16px;">
+        <div style="width: 40px; height: 40px; border-radius: 50%; background: #dcfce7; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <span style="font-size: 18px; color: #16a34a;">✓</span>
+        </div>
+        <div>
+            <p style="font-size: 14px; font-weight: 700; color: #0a0a0a; margin: 0 0 2px;">{{ intel.health.title }}</p>
+            <p style="font-size: 13px; font-weight: 500; color: #0a0a0a; margin: 0;">{{ intel.health.message }}</p>
+        </div>
+    </div>
+    {% elif intel.health.status == 'YELLOW' %}
+    <div style="background: #fefce8; border: 1px solid #fde68a; border-radius: 16px; padding: 24px 28px; margin-bottom: 40px; display: flex; align-items: center; gap: 16px;">
+        <div style="width: 40px; height: 40px; border-radius: 50%; background: #fef9c3; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <span style="font-size: 18px; color: #ca8a04;">⚠</span>
+        </div>
+        <div>
+            <p style="font-size: 14px; font-weight: 700; color: #0a0a0a; margin: 0 0 2px;">{{ intel.health.title }}</p>
+            <p style="font-size: 13px; font-weight: 500; color: #0a0a0a; margin: 0;">{{ intel.health.message }}</p>
+        </div>
+    </div>
+    {% else %}
+    <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 16px; padding: 24px 28px; margin-bottom: 40px; display: flex; align-items: center; gap: 16px;">
+        <div style="width: 40px; height: 40px; border-radius: 50%; background: #ffe4e6; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <span style="font-size: 18px; color: #e11d48;">⚠</span>
+        </div>
+        <div>
+            <p style="font-size: 14px; font-weight: 700; color: #0a0a0a; margin: 0 0 2px;">{{ intel.health.title }}</p>
+            <p style="font-size: 13px; font-weight: 500; color: #0a0a0a; margin: 0;">{{ intel.health.message }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ═══════════════════════════════════════════════════════
+         SECTION 4 — REALISTIC PROJECTION
+    ════════════════════════════════════════════════════════ -->
+    <div style="background: white; border: 1px solid #e4e4e7; border-radius: 20px; padding: 32px;">
+        <p style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #e11d48; margin: 0 0 4px;">Realistic Projection</p>
+        <p style="font-size: 14px; font-weight: 600; color: #0a0a0a; margin: 0 0 28px;">When will I reach my target?</p>
+
+        <div style="width: 100%; height: 320px; position: relative;">
+            <canvas id="projectionChart"></canvas>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    lucide.createIcons();
+
+    // Build projection data from real calculations
+    var projData = {{ intel.projection | tojson | safe }};
+    var currentSaved = {{ intel.progress.saved }};
+    var targetAmount = {{ intel.progress.target }};
+
+    // Prepend "Current" point if the projection doesn't start with it
+    var labels = ['Current'];
+    var amounts = [currentSaved];
+
+    for (var i = 0; i < projData.length; i++) {
+        labels.push(projData[i].month);
+        amounts.push(projData[i].projected_amount);
+    }
+
+    var ctx = document.getElementById('projectionChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Expected Saved Amount',
+                    data: amounts,
+                    borderColor: '#e11d48',
+                    backgroundColor: 'rgba(225, 29, 72, 0.05)',
+                    borderWidth: 2,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: '#e11d48',
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    fill: true,
+                    tension: 0
+                },
+                {
+                    label: 'Target',
+                    data: amounts.map(function() { return targetAmount; }),
+                    borderColor: '#0a0a0a',
+                    borderDash: [5, 5],
+                    borderWidth: 1.5,
+                    pointRadius: 0,
+                    pointHoverRadius: 0,
+                    fill: false,
+                    tension: 0
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { intersect: false, mode: 'index' },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    align: 'end',
+                    labels: {
+                        usePointStyle: true,
+                        boxWidth: 8,
+                        padding: 24,
+                        font: { family: "'Outfit', sans-serif", size: 12, weight: '600' },
+                        color: '#0a0a0a'
+                    }
+                },
+                tooltip: {
+                    backgroundColor: '#0a0a0a',
+                    titleFont: { family: "'Outfit', sans-serif", size: 12 },
+                    bodyFont: { family: "'Outfit', sans-serif", size: 13, weight: 'bold' },
+                    padding: 10,
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: function(context) {
+                            var val = context.parsed.y;
+                            if (val !== null) {
+                                var remaining = targetAmount - val;
+                                if (context.dataset.label === 'Expected Saved Amount') {
+                                    return 'Saved: ₹' + val.toLocaleString() + '  |  Remaining: ₹' + Math.max(0, remaining).toLocaleString();
+                                }
+                                return context.dataset.label + ': ₹' + val.toLocaleString();
+                            }
+                            return '';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: targetAmount > 0 ? targetAmount * 1.15 : 100,
+                    grid: { color: '#f4f4f5', drawBorder: false },
+                    ticks: {
+                        callback: function(value) { return '₹' + value.toLocaleString(); },
+                        font: { family: "'Outfit', sans-serif", size: 11, weight: '500' },
+                        color: '#52525b'
+                    },
+                    border: { display: false }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { family: "'Outfit', sans-serif", size: 11, weight: '500' }, color: '#52525b' },
+                    border: { display: false }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

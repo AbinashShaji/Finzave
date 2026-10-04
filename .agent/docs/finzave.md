@@ -2484,3 +2484,27 @@ The goal is to make FinZave a coherent, technically sound, polished, efficient a
 - **Design Improvements:** Removed excess whitespace, heavily favored Black/White text layout, utilized strong typography over color to create hierarchy, and maintained strict table padding.
 - **Completeness Handling:** "Incomplete Month" logic perfectly retained on Page 1, overriding Savings/Savings Rate with "Provisional" to prevent misleading 100% metrics.
 - **Modified Files:** `utils/pdf_generator.py`.
+
+## Goal Intelligence Architecture
+**New Service Layer (`goals/services.py`)**
+- Added `build_goal_intelligence(goal, current_period)`: Orchestrates the calculation of progress, affordability, health, and projection data points for a specific goal.
+- Avoids duplicated financial math by requiring a pre-calculated `FinancialPeriod` representing current savings capacity.
+
+**Data Flow**
+1. User clicks "View Goal Analysis" in `goals.html`.
+2. `GET /app/goals/<int:goal_id>` (routes/goals.py) verifies user ownership.
+3. Route invokes `utils.finance.build_financial_periods(months=1)` to find the user's *actual* current monthly savings capacity.
+4. Route passes the `Goal` object and the `FinancialPeriod` capacity to `build_goal_intelligence()`.
+5. Service returns comprehensive dictionary passed to `goal_detail.html`.
+
+**Financial Engine Dependency**
+- Deeply integrates with the existing `FinancialPeriod`. It checks the required monthly contribution of a goal against the historical current savings amount in the period.
+- Prevents database redundancy by refusing to re-query income or expense sums manually inside the goals module.
+
+**Health Calculation Rules (Deterministic)**
+- **GREEN**: Required monthly savings is well within the user's current savings capacity (impact <= 50%).
+- **YELLOW**: Goal requires a high portion of savings (impact > 50%), prompting adjustment warnings.
+- **RED**: Target is past the deadline or required monthly savings exceeds the user's total savings capacity.
+
+**Projection Logic**
+- Linear mathematical projection calculating Month 1... Month N based on current savings + required monthly rate, capped at the Target Amount, and returning simple JSON usable by Chart.js.

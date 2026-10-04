@@ -110,6 +110,9 @@
                     <span class="text-sm font-medium text-fz-black">₹{{ "{:,.0f}".format(goal.req_monthly) }}/mo</span>
                 </div>
             </div>
+            <a href="{{ url_for('app.goal_detail', goal_id=goal.id) }}" class="mt-4 w-full bg-fz-gray-50 text-fz-black border border-fz-gray-200 text-center py-2 rounded-lg text-sm font-bold hover:bg-fz-gray-100 transition-colors flex items-center justify-center gap-2">
+                View Goal Analysis <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
         </div>
         {% endfor %}
 
@@ -152,6 +155,9 @@
                 </div>
                 <button onclick="deleteGoal({{ goal.id }})" class="text-fz-gray-400 hover:text-fz-red p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
             </div>
+            <a href="{{ url_for('app.goal_detail', goal_id=goal.id) }}" class="mt-4 w-full bg-green-50 text-green-700 border border-green-200 text-center py-2 rounded-lg text-sm font-bold hover:bg-green-100 transition-colors flex items-center justify-center gap-2">
+                View Goal Analysis <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
         </div>
         {% endfor %}
 

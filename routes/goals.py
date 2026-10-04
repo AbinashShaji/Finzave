@@ -4,6 +4,8 @@ from routes.user import app_bp
 from extensions import db
 from models.goal import Goal
 from datetime import datetime, date
+from utils.finance import build_financial_periods
+from goals.services import build_goal_intelligence
 
 def prepare_goals_data(user_goals):
     today = date.today()
@@ -170,3 +172,26 @@ def delete_goal(goal_id):
         db.session.rollback()
         return jsonify({"error": "Failed to delete goal"}), 400
 
+
+
+@app_bp.route('/goals/<int:goal_id>', methods=['GET'])
+@jwt_required()
+def goal_detail(goal_id):
+    user_id = int(get_jwt_identity())
+    goal = db.session.get(Goal, goal_id)
+    
+    if not goal or goal.user_id != user_id:
+        # Prevent accessing another user's goals
+        return jsonify({"error": "Goal not found"}), 404
+        
+    # Fetch current financial capacity
+    periods = build_financial_periods(user_id, months=1)
+    current_period = periods[-1] if periods else None
+    
+    intel = build_goal_intelligence(goal, current_period)
+    
+    return render_template(
+        'app/goal_detail.html',
+        goal=goal,
+        intel=intel
+    )
