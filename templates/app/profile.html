@@ -123,6 +123,52 @@
     
     <div id="pref-msg" class="hidden text-sm font-medium mt-1 text-center bg-white p-4 rounded-xl border border-fz-gray-200"></div>
 
+    <!-- Danger Zone -->
+    <div class="bg-white p-6 md:p-8 rounded-2xl border border-fz-red/20 shadow-sm">
+        <div class="flex items-center gap-3 mb-4 border-b border-fz-gray-100 pb-4">
+            <i data-lucide="alert-triangle" class="w-6 h-6 text-fz-red"></i>
+            <h2 class="text-xl font-bold text-fz-red">Danger Zone</h2>
+        </div>
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div>
+                <h3 class="text-base font-bold text-fz-black">Delete Account</h3>
+                <p class="text-sm text-fz-gray-500 mt-1">Once deleted, this action cannot be undone. All your personal data, goals, and history will be permanently removed.</p>
+            </div>
+            <button type="button" id="delete-account-trigger" class="px-5 py-2.5 rounded-lg border-2 border-fz-red text-fz-red font-bold hover:bg-fz-red hover:text-white transition-colors flex-shrink-0">
+                Delete Account
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<!-- Delete Account Modal -->
+<div id="delete-modal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-fz-black/40 backdrop-blur-sm" id="delete-modal-backdrop"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white rounded-2xl shadow-xl p-6">
+        <h3 class="text-xl font-bold text-fz-black mb-2 flex items-center gap-2">
+            <i data-lucide="alert-circle" class="w-5 h-5 text-fz-red"></i>
+            Delete your account?
+        </h3>
+        <p class="text-sm text-fz-gray-500 mb-6">This action is permanent. Your account, goals, plans, reports, and personal data will be permanently removed. Enter your password to continue.</p>
+        
+        <form id="delete-account-form" class="space-y-4">
+            <div>
+                <input type="password" id="delete-password" required class="w-full px-4 py-2.5 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fz-red" placeholder="Enter your password">
+            </div>
+            <div id="delete-msg" class="hidden text-sm font-medium text-fz-red"></div>
+            
+            <div class="flex items-center justify-end gap-3 pt-2">
+                <button type="button" id="cancel-delete-btn" class="px-4 py-2 rounded-lg text-sm font-semibold text-fz-gray-600 hover:bg-fz-gray-100 transition-colors">
+                    Cancel
+                </button>
+                <button type="submit" id="confirm-delete-btn" class="bg-fz-red text-white px-5 py-2 rounded-lg text-sm font-bold hover:bg-red-700 transition-colors flex items-center">
+                    <span>Delete Account</span>
+                    <svg class="spinner hidden animate-spin ml-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}
 
@@ -274,6 +320,57 @@
             }
             
             updatePreferences(document.getElementById('currency-select').value, !isChecked);
+        });
+
+        // Delete Account Logic
+        const deleteModal = document.getElementById('delete-modal');
+        const closeDeleteModal = () => {
+            deleteModal.classList.add('hidden');
+            document.getElementById('delete-account-form').reset();
+            document.getElementById('delete-msg').classList.add('hidden');
+        };
+
+        document.getElementById('delete-account-trigger').addEventListener('click', () => {
+            deleteModal.classList.remove('hidden');
+            document.getElementById('delete-password').focus();
+        });
+
+        document.getElementById('cancel-delete-btn').addEventListener('click', closeDeleteModal);
+        document.getElementById('delete-modal-backdrop').addEventListener('click', closeDeleteModal);
+
+        document.getElementById('delete-account-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('confirm-delete-btn');
+            const spinner = btn.querySelector('.spinner');
+            const msgEl = document.getElementById('delete-msg');
+            
+            btn.disabled = true;
+            spinner.classList.remove('hidden');
+            msgEl.classList.add('hidden');
+            
+            try {
+                const res = await fetch('/app/api/profile/delete-account', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+                    body: JSON.stringify({
+                        password: document.getElementById('delete-password').value
+                    })
+                });
+                const data = await res.json();
+                
+                if (res.ok) {
+                    window.location.href = '/login';
+                } else {
+                    msgEl.textContent = data.message || 'Incorrect password. Please try again.';
+                    msgEl.classList.remove('hidden');
+                }
+            } catch (err) {
+                msgEl.textContent = 'An error occurred. Please try again.';
+                msgEl.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                spinner.classList.add('hidden');
+            }
         });
 
     });

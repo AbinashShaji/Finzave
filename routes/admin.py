@@ -77,109 +77,263 @@ def settings_redirect():
 def get_stats():
     from datetime import datetime, timedelta, timezone
     from models.activity import UserActivity
-    from sqlalchemy import func
+    from models.income import Income
+    from models.expense import Expense
+    from models.goal import Goal
+    from sqlalchemy import func, cast, Date
+    from sqlalchemy.orm import joinedload
 
     now = datetime.now(timezone.utc)
+    twenty_four_hours_ago = now - timedelta(hours=24)
     seven_days_ago = now - timedelta(days=7)
+    thirty_days_ago = now - timedelta(days=30)
     fifteen_mins_ago = now - timedelta(minutes=15)
 
-    total_users = User.query.count()
+    # ──────────────────────────────────────────────
+    # SECTION 1 — EXECUTIVE OVERVIEW
+    # ──────────────────────────────────────────────
 
-    # Calculate active/online users
-    active_user_ids = db.session.query(UserActivity.user_id).filter(UserActivity.created_at >= seven_days_ago).distinct().all()
-    active_users = len(active_user_ids)
-    inactive_users = total_users - active_users
-    
-    online_user_ids = db.session.query(UserActivity.user_id).filter(UserActivity.created_at >= fifteen_mins_ago).distinct().all()
-    online_users = len(online_user_ids)
+    total_users = User.query.filter(User.role != 'admin').count()
 
-    # Fetch recent activities for trending/grouping
-    # Explicitly filter out 'login' and 'logout' as they are not product modules
+    # Active users by period
+    active_24h_ids = db.session.query(UserActivity.user_id).filter(
+        UserActivity.created_at >= twenty_four_hours_ago
+    ).distinct().count()
+
+    active_7d_ids = db.session.query(UserActivity.user_id).filter(
+        UserActivity.created_at >= seven_days_ago
+    ).distinct().count()
+
+    active_30d_ids = db.session.query(UserActivity.user_id).filter(
+        UserActivity.created_at >= thirty_days_ago
+    ).distinct().count()
+
+    online_users = db.session.query(UserActivity.user_id).filter(
+        UserActivity.created_at >= fifteen_mins_ago
+    ).distinct().count()
+
+    # User growth — compare this month vs last month
+    this_month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    last_month_start = (this_month_start - timedelta(days=1)).replace(day=1)
+    users_this_month = User.query.filter(User.created_at >= this_month_start, User.role != 'admin').count()
+    users_last_month = User.query.filter(
+        User.created_at >= last_month_start,
+        User.created_at < this_month_start,
+        User.role != 'admin'
+    ).count()
+    user_growth_pct = 0
+    if users_last_month > 0:
+        user_growth_pct = round(((users_this_month - users_last_month) / users_last_month) * 100, 1)
+    elif users_this_month > 0:
+        user_growth_pct = 100.0
+
+    # Privacy-safe product counts only — no financial amounts
+    total_income_txns = db.session.query(func.count(Income.id)).scalar()
+    total_expense_txns = db.session.query(func.count(Expense.id)).scalar()
+    total_transactions = total_income_txns + total_expense_txns
+    total_goals = Goal.query.count()
+
+    # Platform health — check DB connectivity and basic status
+    db_status = "Operational"
+    try:
+        db.session.execute(db.text("SELECT 1"))
+    except Exception:
+        db_status = "Error"
+
+    # ──────────────────────────────────────────────
+    # SECTION 2 — USER ANALYTICS
+    # ──────────────────────────────────────────────
+
+    # User growth over last 30 days (registrations per day)
+    user_growth_data = db.session.query(
+        cast(User.created_at, Date).label('reg_date'),
+        func.count(User.id).label('count')
+    ).filter(
+        User.created_at >= thirty_days_ago,
+        User.role != 'admin'
+    ).group_by(cast(User.created_at, Date)).order_by(cast(User.created_at, Date)).all()
+
+    user_growth_chart = [{"date": str(row.reg_date), "count": row.count} for row in user_growth_data]
+
+    # Fill in missing days with 0
+    if user_growth_chart:
+        filled = {}
+        for i in range(30):
+            d = (now - timedelta(days=29-i)).strftime('%Y-%m-%d')
+            filled[d] = 0
+        for item in user_growth_chart:
+            if item['date'] in filled:
+                filled[item['date']] = item['count']
+        user_growth_chart = [{"date": k, "count": v} for k, v in filled.items()]
+
+    # Engagement trend — daily activity counts over last 14 days
     recent_product_activities = UserActivity.query.filter(
-        UserActivity.created_at >= seven_days_ago,
+        UserActivity.created_at >= now - timedelta(days=14),
         UserActivity.action.notin_(['login', 'logout'])
     ).all()
-    
-    # Group by date for engagement trend
+
     trend = {}
+    for i in range(14):
+        d = (now - timedelta(days=13-i)).strftime('%Y-%m-%d')
+        trend[d] = 0
     for act in recent_product_activities:
         date_str = act.created_at.strftime('%Y-%m-%d')
-        trend[date_str] = trend.get(date_str, 0) + 1
-        
-    engagement_trend = [{"date": k, "count": v} for k, v in sorted(trend.items())]
+        if date_str in trend:
+            trend[date_str] = trend.get(date_str, 0) + 1
 
-    # Module usage
+    engagement_trend = [{"date": k, "count": v} for k, v in trend.items()]
+
+    # Most active users (by activity count in last 30 days)
+    most_active_users = db.session.query(
+        User.username,
+        func.count(UserActivity.id).label('activity_count')
+    ).join(UserActivity, User.id == UserActivity.user_id).filter(
+        UserActivity.created_at >= thirty_days_ago,
+        User.role != 'admin'
+    ).group_by(User.username).order_by(func.count(UserActivity.id).desc()).limit(5).all()
+
+    most_active_list = [{"username": row.username, "count": row.activity_count} for row in most_active_users]
+
+    # ──────────────────────────────────────────────
+    # SECTION 3 — FEATURE USAGE (privacy-safe counts)
+    # ──────────────────────────────────────────────
+
+    # Module usage from activity tracking
+    all_product_activities = UserActivity.query.filter(
+        UserActivity.created_at >= thirty_days_ago,
+        UserActivity.action.notin_(['login', 'logout'])
+    ).all()
+
     modules = {}
-    for act in recent_product_activities:
+    for act in all_product_activities:
         modules[act.action] = modules.get(act.action, 0) + 1
-    module_usage = [{"module": k, "count": v} for k, v in sorted(modules.items(), key=lambda item: item[1], reverse=True)]
 
-    # Recent activity list (last 10 non-sensitive)
-    from sqlalchemy.orm import joinedload
-    latest_activities = UserActivity.query.options(joinedload(UserActivity.user)).order_by(UserActivity.created_at.desc()).limit(10).all()
-    recent_activity_list = []
-    for a in latest_activities:
-        recent_activity_list.append({
-            "action": a.action,
-            "username": a.user.username if a.user else "Unknown",
-            "time": a.created_at.isoformat()
-        })
+    total_module_events = sum(modules.values()) if modules else 1
+    feature_usage = [{
+        "feature": k.replace('_', ' ').title(),
+        "count": v,
+        "percentage": round((v / total_module_events) * 100, 1)
+    } for k, v in sorted(modules.items(), key=lambda item: item[1], reverse=True)]
 
-    # Recent Feedback
-    recent_feedbacks = Feedback.query.options(joinedload(Feedback.user)).filter(Feedback.status != 'deleted').order_by(Feedback.created_at.desc()).limit(5).all()
-    recent_feedback_list = []
-    for f in recent_feedbacks:
-        recent_feedback_list.append({
-            "username": f.user.username if f.user else "Unknown",
-            "content": f.content,
-            "status": f.status,
-            "time": f.created_at.isoformat() if f.created_at else None
-        })
+    # ──────────────────────────────────────────────
+    # SECTION 4 — USER MANAGEMENT INSIGHTS
+    # ──────────────────────────────────────────────
 
-    # Recent Reviews
-    recent_reviews = Review.query.options(joinedload(Review.user)).filter(Review.status != 'deleted').order_by(Review.created_at.desc()).limit(5).all()
-    recent_review_list = []
-    for r in recent_reviews:
-        recent_review_list.append({
-            "username": r.user.username if r.user else "Anonymous",
-            "rating": r.rating,
-            "content": r.content,
-            "status": r.status,
-            "time": r.created_at.isoformat() if r.created_at else None
-        })
+    # New users (registered in last 7 days)
+    new_users = User.query.filter(
+        User.created_at >= seven_days_ago,
+        User.role != 'admin'
+    ).order_by(User.created_at.desc()).limit(5).all()
+    new_users_list = [{
+        "username": u.username,
+        "email": u.email,
+        "created_at": u.created_at.isoformat() if u.created_at else None
+    } for u in new_users]
 
-    # Generate User Insights
-    insights = []
-    if module_usage:
-        insights.append(f"'{module_usage[0]['module'].replace('_', ' ').title()}' is currently the most-used FinZave module.")
-    
-    if active_users > 0:
-        insights.append(f"{active_users} users were active in the last 7 days.")
-    else:
-        insights.append("User engagement has been quiet over the last 7 days.")
+    # Recently active users
+    recently_active = db.session.query(
+        User.username,
+        func.max(UserActivity.created_at).label('last_active')
+    ).join(UserActivity, User.id == UserActivity.user_id).filter(
+        User.role != 'admin'
+    ).group_by(User.username).order_by(func.max(UserActivity.created_at).desc()).limit(5).all()
 
-    if recent_feedback_list:
-        insights.append(f"{recent_feedback_list[0]['username']} submitted feedback recently.")
-        
-    if recent_review_list:
-        insights.append(f"A new review was submitted by {recent_review_list[0]['username']}.")
-        
-    if not insights or len(recent_product_activities) == 0:
-        insights = ["Not enough activity data to generate engagement insights yet."]
+    recently_active_list = [{
+        "username": row.username,
+        "last_active": row.last_active.isoformat() if row.last_active else None
+    } for row in recently_active]
+
+    # Inactive users — no activity in last 30 days
+    active_user_ids_30d = [row[0] for row in db.session.query(UserActivity.user_id).filter(
+        UserActivity.created_at >= thirty_days_ago
+    ).distinct().all()]
+
+    inactive_users_list = User.query.filter(
+        User.role != 'admin',
+        ~User.id.in_(active_user_ids_30d) if active_user_ids_30d else True
+    ).order_by(User.created_at.desc()).limit(5).all()
+
+    inactive_list = [{
+        "username": u.username,
+        "email": u.email,
+        "created_at": u.created_at.isoformat() if u.created_at else None
+    } for u in inactive_users_list]
+
+    # Recent activity timeline removed for privacy — not returned to frontend
+
+    # ──────────────────────────────────────────────
+    # SECTION 5 — FEEDBACK AND REVIEWS
+    # ──────────────────────────────────────────────
+
+    recent_feedbacks = Feedback.query.options(
+        joinedload(Feedback.user)
+    ).filter(Feedback.status != 'deleted').order_by(Feedback.created_at.desc()).limit(5).all()
+
+    recent_feedback_list = [{
+        "username": f.user.username if f.user else "Unknown",
+        "type": f.feedback_type,
+        "content": f.content,
+        "status": f.status,
+        "time": f.created_at.isoformat() if f.created_at else None
+    } for f in recent_feedbacks]
+
+    recent_reviews = Review.query.options(
+        joinedload(Review.user)
+    ).filter(Review.status != 'deleted').order_by(Review.created_at.desc()).limit(5).all()
+
+    recent_review_list = [{
+        "username": r.user.username if r.user else "Anonymous",
+        "rating": r.rating,
+        "content": r.content,
+        "status": r.status,
+        "time": r.created_at.isoformat() if r.created_at else None
+    } for r in recent_reviews]
+
+    # Feedback/review summary counts
+    total_feedback = Feedback.query.filter(Feedback.status != 'deleted').count()
+    pending_feedback = Feedback.query.filter_by(status='pending').count()
+    total_reviews = Review.query.filter(Review.status != 'deleted').count()
+    avg_rating = db.session.query(func.avg(Review.rating)).filter(Review.status != 'deleted').scalar()
+    avg_rating = round(float(avg_rating), 1) if avg_rating else None
+
 
     return jsonify({
-        "kpis": {
+        # Section 1 — Executive Overview (privacy-safe product metrics only)
+        "executive": {
             "total_users": total_users,
-            "active_users": active_users,
-            "inactive_users": inactive_users,
-            "online_users": online_users
+            "user_growth_pct": user_growth_pct,
+            "users_this_month": users_this_month,
+            "active_24h": active_24h_ids,
+            "active_7d": active_7d_ids,
+            "active_30d": active_30d_ids,
+            "online_users": online_users,
+            "total_transactions": total_transactions,
+            "income_txns": total_income_txns,
+            "expense_txns": total_expense_txns,
+            "total_goals": total_goals,
+            "db_status": db_status,
         },
+        # Section 2 — User Analytics
+        "user_growth_chart": user_growth_chart,
         "engagement_trend": engagement_trend,
-        "module_usage": module_usage,
-        "recent_activity": recent_activity_list,
+        "most_active_users": most_active_list,
+        # Section 3 — Feature Usage
+        "feature_usage": feature_usage,
+        # Section 4 — User Management
+        "new_users": new_users_list,
+        "recently_active": recently_active_list,
+        "inactive_users": inactive_list,
+        # Section 5 — Feedback & Reviews
         "recent_feedback": recent_feedback_list,
         "recent_reviews": recent_review_list,
-        "user_insights": insights
+        "feedback_summary": {
+            "total": total_feedback,
+            "pending": pending_feedback,
+        },
+        "review_summary": {
+            "total": total_reviews,
+            "avg_rating": avg_rating,
+        },
     }), 200
 
 @admin_bp.route('/api/admin/users', methods=['GET'])

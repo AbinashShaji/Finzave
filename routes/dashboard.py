@@ -9,10 +9,13 @@ from utils.rule_engine import evaluate_rules
 from analysis.scoring import calculate_health_score
 import json
 
+from utils.activity import log_activity
+
 @app_bp.route('/')
 @jwt_required()
 def dashboard():
     user_id = int(get_jwt_identity())
+    log_activity('dashboard_view')
     
     # Use the same data adapter
     periods = build_financial_periods(user_id, months=6)

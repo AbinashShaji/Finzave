@@ -12,6 +12,7 @@ from models.goal import Goal
 from utils.cache_keys import user_analysis_key, user_analysis_monthly_key, user_analysis_yearly_key
 from routes.goals import prepare_goals_data
 from recommendations import generate_recommendations
+from utils.activity import log_activity
 import json
 
 
@@ -20,6 +21,7 @@ import json
 @cache.cached(timeout=86400, key_prefix=lambda: user_analysis_key(get_jwt_identity()))
 def analysis():
     user_id = int(get_jwt_identity())
+    log_activity('analysis_view')
 
     # 1. Fetch Financial Data
     periods = build_financial_periods(user_id, months=6)

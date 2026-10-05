@@ -4,292 +4,666 @@
 {% block header_title %}Product Analytics{% endblock %}
 
 {% block content %}
-<!-- KPI Section -->
-<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-    <div class="bg-white p-6 rounded-xl border border-fz-gray-200 shadow-sm">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="text-sm font-medium text-fz-gray-500">Total Users</h3>
-            <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
-                <i data-lucide="users" class="w-5 h-5"></i>
+<div id="admin-dashboard" class="space-y-8 max-w-full">
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SECTION 1 — EXECUTIVE OVERVIEW             -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <!-- Total Users -->
+            <div class="bg-white p-5 rounded-2xl border border-fz-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-xs font-semibold text-fz-gray-600 uppercase tracking-wider">Total Users</h3>
+                    <div class="w-9 h-9 rounded-full bg-fz-gray-100 flex items-center justify-center text-fz-black">
+                        <i data-lucide="users" class="w-4 h-4"></i>
+                    </div>
+                </div>
+                <p class="text-3xl font-bold text-fz-black" id="kpi-total-users">—</p>
+                <p class="text-xs text-fz-gray-500 mt-2" id="kpi-user-growth"></p>
+            </div>
+
+            <!-- Active Users -->
+            <div class="bg-white p-5 rounded-2xl border border-fz-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-xs font-semibold text-fz-gray-600 uppercase tracking-wider">Active Users</h3>
+                    <div class="w-9 h-9 rounded-full bg-green-50 flex items-center justify-center text-green-600">
+                        <i data-lucide="activity" class="w-4 h-4"></i>
+                    </div>
+                </div>
+                <p class="text-3xl font-bold text-fz-black" id="kpi-active-24h">—</p>
+                <div class="flex items-center gap-3 mt-2 text-xs text-fz-gray-500">
+                    <span id="kpi-active-7d-label"></span>
+                    <span class="text-fz-gray-300">·</span>
+                    <span id="kpi-active-30d-label"></span>
+                </div>
+            </div>
+
+            <!-- Feature Engagement -->
+            <div class="bg-white p-5 rounded-2xl border border-fz-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-xs font-semibold text-fz-gray-600 uppercase tracking-wider">Feature Engagement</h3>
+                    <div class="w-9 h-9 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+                        <i data-lucide="layers" class="w-4 h-4"></i>
+                    </div>
+                </div>
+                <p class="text-3xl font-bold text-fz-black" id="kpi-total-txns">—</p>
+                <p class="text-xs text-fz-gray-500 mt-2" id="kpi-txn-detail"></p>
+            </div>
+
+            <!-- Platform Health -->
+            <div class="bg-white p-5 rounded-2xl border border-fz-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-xs font-semibold text-fz-gray-600 uppercase tracking-wider">Platform Health</h3>
+                    <div class="w-9 h-9 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600">
+                        <i data-lucide="shield-check" class="w-4 h-4"></i>
+                    </div>
+                </div>
+                <div id="kpi-health" class="mt-1">
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        <span class="text-sm font-medium text-fz-black">Database</span>
+                        <span class="text-xs text-emerald-600 ml-auto font-medium" id="health-db">—</span>
+                    </div>
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        <span class="text-sm font-medium text-fz-black">API Server</span>
+                        <span class="text-xs text-emerald-600 ml-auto font-medium">Operational</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full" id="health-online-dot"></span>
+                        <span class="text-sm font-medium text-fz-black">Online Now</span>
+                        <span class="text-xs text-fz-gray-600 ml-auto font-medium" id="health-online">—</span>
+                    </div>
+                </div>
             </div>
         </div>
-        <p class="text-3xl font-bold" id="stat-total-users">-</p>
-    </div>
-    
-    <div class="bg-white p-6 rounded-xl border border-fz-gray-200 shadow-sm">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="text-sm font-medium text-fz-gray-500">Active Users (7d)</h3>
-            <div class="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center text-green-600">
-                <i data-lucide="activity" class="w-5 h-5"></i>
+    </section>
+
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SECTION 2 — USER ANALYTICS                 -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section>
+        <h2 class="text-lg font-bold text-fz-black mb-4 flex items-center gap-2">
+            <i data-lucide="trending-up" class="w-5 h-5 text-fz-gray-500"></i>
+            User Analytics
+        </h2>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            <!-- User Growth Chart -->
+            <div class="lg:col-span-2 bg-white p-5 rounded-2xl border border-fz-gray-200 shadow-sm">
+                <h3 class="text-sm font-semibold text-fz-black mb-3">User Registrations <span class="text-fz-gray-400 font-normal">— Last 30 Days</span></h3>
+                <div id="userGrowthContainer" class="relative h-56">
+                    <canvas id="userGrowthChart"></canvas>
+                </div>
+                <div id="userGrowthEmpty" class="hidden h-56 flex flex-col items-center justify-center text-center px-4">
+                    <div class="w-10 h-10 rounded-full bg-fz-gray-100 flex items-center justify-center text-fz-gray-400 mb-3">
+                        <i data-lucide="user-plus" class="w-5 h-5"></i>
+                    </div>
+                    <p class="text-sm text-fz-gray-500">No new user registrations in the last 30 days.</p>
+                    <p class="text-xs text-fz-gray-400 mt-1">Growth data will appear as users sign up.</p>
+                </div>
+            </div>
+
+            <!-- Most Active Users -->
+            <div class="bg-white p-5 rounded-2xl border border-fz-gray-200 shadow-sm">
+                <h3 class="text-sm font-semibold text-fz-black mb-3">Most Active Users <span class="text-fz-gray-400 font-normal">— 30 Days</span></h3>
+                <div id="most-active-users" class="space-y-3">
+                    <p class="text-sm text-fz-gray-500">Loading...</p>
+                </div>
             </div>
         </div>
-        <p class="text-3xl font-bold" id="stat-active-users">-</p>
-    </div>
-    
-    <div class="bg-white p-6 rounded-xl border border-fz-gray-200 shadow-sm">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="text-sm font-medium text-fz-gray-500">Inactive Users</h3>
-            <div class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400">
-                <i data-lucide="user-minus" class="w-5 h-5"></i>
+
+        <!-- Engagement Trend -->
+        <div class="bg-white p-5 rounded-2xl border border-fz-gray-200 shadow-sm mt-5">
+            <h3 class="text-sm font-semibold text-fz-black mb-3">Engagement Trend <span class="text-fz-gray-400 font-normal">— Last 14 Days</span></h3>
+            <div id="engagementContainer" class="relative h-48">
+                <canvas id="engagementChart"></canvas>
+            </div>
+            <div id="engagementEmpty" class="hidden h-48 flex flex-col items-center justify-center text-center px-4">
+                <div class="w-10 h-10 rounded-full bg-fz-gray-100 flex items-center justify-center text-fz-gray-400 mb-3">
+                    <i data-lucide="bar-chart-2" class="w-5 h-5"></i>
+                </div>
+                <p class="text-sm text-fz-gray-500">Not enough activity data available yet.</p>
+                <p class="text-xs text-fz-gray-400 mt-1">Analytics will appear as users interact with FinZave.</p>
             </div>
         </div>
-        <p class="text-3xl font-bold text-fz-gray-500" id="stat-inactive-users">-</p>
-    </div>
+    </section>
 
-    <div class="bg-white p-6 rounded-xl border border-fz-gray-200 shadow-sm">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="text-sm font-medium text-fz-gray-500">Currently Online</h3>
-            <div class="w-10 h-10 rounded-full bg-fz-red bg-opacity-10 flex items-center justify-center text-fz-red">
-                <i data-lucide="zap" class="w-5 h-5"></i>
+
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SECTION 4 — FEATURE USAGE                  -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section>
+        <h2 class="text-lg font-bold text-fz-black mb-4 flex items-center gap-2">
+            <i data-lucide="layers" class="w-5 h-5 text-fz-gray-500"></i>
+            Feature Adoption
+        </h2>
+        <div class="bg-white p-5 rounded-2xl border border-fz-gray-200 shadow-sm">
+            <div id="feature-usage-bars" class="space-y-3">
+                <p class="text-sm text-fz-gray-500">Loading...</p>
+            </div>
+            <div id="feature-usage-empty" class="hidden flex flex-col items-center justify-center py-8 text-center">
+                <div class="w-10 h-10 rounded-full bg-fz-gray-100 flex items-center justify-center text-fz-gray-400 mb-3">
+                    <i data-lucide="mouse-pointer-click" class="w-5 h-5"></i>
+                </div>
+                <p class="text-sm text-fz-gray-500">No feature usage data available yet.</p>
+                <p class="text-xs text-fz-gray-400 mt-1">Usage metrics will appear as users explore FinZave modules.</p>
             </div>
         </div>
-        <p class="text-3xl font-bold" id="stat-online-users">-</p>
-    </div>
-</div>
+    </section>
 
-<!-- Charts Section -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-    <div class="bg-white p-6 rounded-xl border border-fz-gray-200 shadow-sm flex flex-col">
-        <h3 class="text-lg font-bold mb-4">Engagement Trend (7d)</h3>
-        <div id="trendChartContainer" class="relative h-64 flex-grow">
-            <canvas id="trendChart"></canvas>
-        </div>
-        <div id="trendEmpty" class="hidden h-64 flex items-center justify-center text-fz-gray-500">
-            Not enough activity data yet.
-        </div>
-    </div>
-    <div class="bg-white p-6 rounded-xl border border-fz-gray-200 shadow-sm flex flex-col">
-        <h3 class="text-lg font-bold mb-4">Most-Used Modules</h3>
-        <div id="moduleChartContainer" class="relative h-64 flex-grow">
-            <canvas id="moduleChart"></canvas>
-        </div>
-        <div id="moduleEmpty" class="hidden h-64 flex items-center justify-center text-fz-gray-500">
-            Not enough activity data yet.
-        </div>
-    </div>
-</div>
 
-<!-- Feedback & Reviews Section -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-    <!-- Recent Feedback -->
-    <div class="bg-white p-6 rounded-xl border border-fz-gray-200 shadow-sm">
-        <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-bold">Recent Feedback</h3>
-            <a href="{{ url_for('admin.feedback') }}" class="text-sm text-fz-red hover:underline">View all</a>
-        </div>
-        <div class="space-y-4" id="recent-feedback-list">
-            <p class="text-fz-gray-500 text-sm">Loading feedback...</p>
-        </div>
-    </div>
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SECTION 5 — USER MANAGEMENT INSIGHTS       -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section>
+        <h2 class="text-lg font-bold text-fz-black mb-4 flex items-center gap-2">
+            <i data-lucide="user-check" class="w-5 h-5 text-fz-gray-500"></i>
+            User Management
+        </h2>
 
-    <!-- Recent Reviews -->
-    <div class="bg-white p-6 rounded-xl border border-fz-gray-200 shadow-sm">
-        <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-bold">Recent Reviews</h3>
-            <a href="{{ url_for('admin.reviews') }}" class="text-sm text-fz-red hover:underline">View all</a>
-        </div>
-        <div class="space-y-4" id="recent-reviews-list">
-            <p class="text-fz-gray-500 text-sm">Loading reviews...</p>
-        </div>
-    </div>
-</div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
+            <!-- New Users -->
+            <div class="bg-white p-5 rounded-2xl border border-fz-gray-200 shadow-sm">
+                <h3 class="text-sm font-semibold text-fz-black mb-3">New Users <span class="text-fz-gray-400 font-normal">— Last 7 Days</span></h3>
+                <div id="new-users-list" class="space-y-2.5">
+                    <p class="text-sm text-fz-gray-500">Loading...</p>
+                </div>
+            </div>
 
-<!-- User Insights -->
-<div class="bg-white p-6 rounded-xl border border-fz-gray-200 shadow-sm mb-8">
-    <h3 class="text-lg font-bold mb-4">User Insights</h3>
-    <ul class="space-y-2 list-disc list-inside text-fz-gray-600" id="user-insights-list">
-        <li>Loading insights...</li>
-    </ul>
-</div>
+            <!-- Recently Active -->
+            <div class="bg-white p-5 rounded-2xl border border-fz-gray-200 shadow-sm">
+                <h3 class="text-sm font-semibold text-fz-black mb-3">Recently Active</h3>
+                <div id="recently-active-list" class="space-y-2.5">
+                    <p class="text-sm text-fz-gray-500">Loading...</p>
+                </div>
+            </div>
 
-<!-- Recent Activity -->
-<div class="bg-white p-6 rounded-xl border border-fz-gray-200 shadow-sm mb-8">
-    <h3 class="text-lg font-bold mb-4">Recent Activity</h3>
-    <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm whitespace-nowrap">
-            <thead class="bg-fz-gray-50 border-b border-fz-gray-200 text-fz-gray-500 uppercase font-semibold text-xs tracking-wider">
-                <tr>
-                    <th class="px-4 py-3">User</th>
-                    <th class="px-4 py-3">Action</th>
-                    <th class="px-4 py-3 text-right">Time</th>
-                </tr>
-            </thead>
-            <tbody id="activity-tbody" class="divide-y divide-fz-gray-100">
-                <tr>
-                    <td colspan="3" class="px-4 py-6 text-center text-fz-gray-500">Loading activity...</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+            <!-- Inactive Users -->
+            <div class="bg-white p-5 rounded-2xl border border-fz-gray-200 shadow-sm">
+                <h3 class="text-sm font-semibold text-fz-black mb-3">Inactive Users <span class="text-fz-gray-400 font-normal">— 30+ Days</span></h3>
+                <div id="inactive-users-list" class="space-y-2.5">
+                    <p class="text-sm text-fz-gray-500">Loading...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SECTION 6 — FEEDBACK & REVIEWS             -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section>
+        <h2 class="text-lg font-bold text-fz-black mb-4 flex items-center gap-2">
+            <i data-lucide="message-circle" class="w-5 h-5 text-fz-gray-500"></i>
+            Feedback & Reviews
+        </h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <!-- Recent Feedback -->
+            <div class="bg-white p-5 rounded-2xl border border-fz-gray-200 shadow-sm">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-sm font-semibold text-fz-black">Recent Feedback</h3>
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs text-fz-gray-400" id="feedback-summary-text"></span>
+                        <a href="{{ url_for('admin.feedback') }}" class="text-xs font-medium text-fz-red hover:underline">View all</a>
+                    </div>
+                </div>
+                <div class="space-y-3" id="recent-feedback-list">
+                    <p class="text-sm text-fz-gray-500">Loading...</p>
+                </div>
+            </div>
+
+            <!-- Recent Reviews -->
+            <div class="bg-white p-5 rounded-2xl border border-fz-gray-200 shadow-sm">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-sm font-semibold text-fz-black">Recent Reviews</h3>
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs text-fz-gray-400" id="review-summary-text"></span>
+                        <a href="{{ url_for('admin.reviews') }}" class="text-xs font-medium text-fz-red hover:underline">View all</a>
+                    </div>
+                </div>
+                <div class="space-y-3" id="recent-reviews-list">
+                    <p class="text-sm text-fz-gray-500">Loading...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SECTION 7 — ADMIN ACTION PANEL             -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section>
+        <h2 class="text-lg font-bold text-fz-black mb-4 flex items-center gap-2">
+            <i data-lucide="zap" class="w-5 h-5 text-fz-gray-500"></i>
+            Quick Actions
+        </h2>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <a href="{{ url_for('admin.users') }}" class="bg-white p-4 rounded-2xl border border-fz-gray-200 shadow-sm hover:border-fz-gray-300 hover:shadow-md transition-all group text-center">
+                <div class="w-10 h-10 rounded-full bg-fz-black text-white flex items-center justify-center mx-auto mb-2 group-hover:bg-fz-red transition-colors">
+                    <i data-lucide="users" class="w-4 h-4"></i>
+                </div>
+                <p class="text-sm font-semibold text-fz-black">Manage Users</p>
+                <p class="text-xs text-fz-gray-400 mt-0.5">View & manage accounts</p>
+            </a>
+            <a href="{{ url_for('admin.feedback') }}" class="bg-white p-4 rounded-2xl border border-fz-gray-200 shadow-sm hover:border-fz-gray-300 hover:shadow-md transition-all group text-center">
+                <div class="w-10 h-10 rounded-full bg-fz-black text-white flex items-center justify-center mx-auto mb-2 group-hover:bg-fz-red transition-colors">
+                    <i data-lucide="message-square" class="w-4 h-4"></i>
+                </div>
+                <p class="text-sm font-semibold text-fz-black">Review Feedback</p>
+                <p class="text-xs text-fz-gray-400 mt-0.5">Respond to submissions</p>
+            </a>
+            <a href="{{ url_for('admin.reviews') }}" class="bg-white p-4 rounded-2xl border border-fz-gray-200 shadow-sm hover:border-fz-gray-300 hover:shadow-md transition-all group text-center">
+                <div class="w-10 h-10 rounded-full bg-fz-black text-white flex items-center justify-center mx-auto mb-2 group-hover:bg-fz-red transition-colors">
+                    <i data-lucide="star" class="w-4 h-4"></i>
+                </div>
+                <p class="text-sm font-semibold text-fz-black">View Reviews</p>
+                <p class="text-xs text-fz-gray-400 mt-0.5">Manage app reviews</p>
+            </a>
+            <a href="{{ url_for('admin.profile') }}" class="bg-white p-4 rounded-2xl border border-fz-gray-200 shadow-sm hover:border-fz-gray-300 hover:shadow-md transition-all group text-center">
+                <div class="w-10 h-10 rounded-full bg-fz-black text-white flex items-center justify-center mx-auto mb-2 group-hover:bg-fz-red transition-colors">
+                    <i data-lucide="settings" class="w-4 h-4"></i>
+                </div>
+                <p class="text-sm font-semibold text-fz-black">Admin Settings</p>
+                <p class="text-xs text-fz-gray-400 mt-0.5">Profile & system</p>
+            </a>
+        </div>
+    </section>
+
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", async () => {
-        try {
-            const res = await fetch('/api/admin/stats');
-            if (res.ok) {
-                const data = await res.json();
-                
-                // KPIs
-                document.getElementById('stat-total-users').textContent = data.kpis.total_users;
-                document.getElementById('stat-active-users').textContent = data.kpis.active_users;
-                document.getElementById('stat-inactive-users').textContent = data.kpis.inactive_users;
-                document.getElementById('stat-online-users').innerHTML = data.kpis.online_users > 0 
-                    ? `<span class="inline-block w-2 h-2 bg-fz-red rounded-full mr-1 animate-pulse"></span> ${data.kpis.online_users}`
-                    : '0';
+document.addEventListener("DOMContentLoaded", async () => {
+    // ────── GLOBAL CHART DEFAULTS ──────
+    Chart.defaults.font.family = "'Outfit', sans-serif";
+    Chart.defaults.color = '#737373';
 
-                // Recent Feedback
-                const feedbackContainer = document.getElementById('recent-feedback-list');
-                if (data.recent_feedback && data.recent_feedback.length > 0) {
-                    feedbackContainer.innerHTML = data.recent_feedback.map(f => `
-                        <div class="border-b border-fz-gray-100 pb-3 last:border-0 last:pb-0">
-                            <p class="text-sm font-medium text-fz-black">${f.username} submitted feedback: <span class="font-normal text-fz-gray-600">"${f.content || 'No content'}"</span></p>
-                            <div class="flex items-center gap-2 mt-1">
-                                <span class="text-xs text-fz-gray-400">${new Date(f.time).toLocaleString()}</span>
-                                <span class="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-gray-100 text-gray-600">${f.status}</span>
-                            </div>
-                        </div>
-                    `).join('');
-                } else {
-                    feedbackContainer.innerHTML = '<p class="text-fz-gray-500 text-sm">No recent feedback.</p>';
-                }
+    const FZ_BLACK = '#0a0a0a';
+    const FZ_RED = '#e11d48';
+    const FZ_GRAY_200 = '#e4e4e7';
+    const FZ_GRAY_400 = '#a1a1aa';
 
-                // Recent Reviews
-                const reviewsContainer = document.getElementById('recent-reviews-list');
-                if (data.recent_reviews && data.recent_reviews.length > 0) {
-                    reviewsContainer.innerHTML = data.recent_reviews.map(r => `
-                        <div class="border-b border-fz-gray-100 pb-3 last:border-0 last:pb-0">
-                            <p class="text-sm font-medium text-fz-black">${r.username} submitted a ${r.rating}-star review.</p>
-                            <p class="text-sm text-fz-gray-600 truncate">"${r.content || ''}"</p>
-                            <div class="flex items-center gap-2 mt-1">
-                                <span class="text-xs text-fz-gray-400">${new Date(r.time).toLocaleString()}</span>
-                                <span class="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-gray-100 text-gray-600">${r.status}</span>
-                            </div>
-                        </div>
-                    `).join('');
-                } else {
-                    reviewsContainer.innerHTML = '<p class="text-fz-gray-500 text-sm">No recent reviews.</p>';
-                }
+    // ────── HELPER FUNCTIONS ──────
+    function formatCurrency(val) {
+        return '₹' + Number(val).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    }
 
-                // User Insights
-                const insightsContainer = document.getElementById('user-insights-list');
-                if (data.user_insights && data.user_insights.length > 0) {
-                    insightsContainer.innerHTML = data.user_insights.map(i => `<li>${i}</li>`).join('');
-                } else {
-                    insightsContainer.innerHTML = '<li>No insights available.</li>';
-                }
+    function formatCurrencyDetailed(val) {
+        return '₹' + Number(val).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
 
-                // Recent Activity
-                const tbody = document.getElementById('activity-tbody');
-                if (data.recent_activity && data.recent_activity.length > 0) {
-                    tbody.innerHTML = data.recent_activity.map(a => `
-                        <tr class="hover:bg-fz-gray-50 transition-colors">
-                            <td class="px-4 py-3 font-medium">${a.username}</td>
-                            <td class="px-4 py-3">
-                                <span class="inline-flex px-2 py-0.5 rounded text-xs bg-fz-gray-100 border border-fz-gray-200">
-                                    Opened ${a.action.replace('_', ' ')}
-                                </span>
-                            </td>
-                            <td class="px-4 py-3 text-right text-fz-gray-500 text-xs">${new Date(a.time).toLocaleString()}</td>
-                        </tr>
-                    `).join('');
-                } else {
-                    tbody.innerHTML = '<tr><td colspan="3" class="px-4 py-6 text-center text-fz-gray-500">No recent activity.</td></tr>';
-                }
+    function timeAgo(isoStr) {
+        if (!isoStr) return '—';
+        const diff = Date.now() - new Date(isoStr).getTime();
+        const mins = Math.floor(diff / 60000);
+        if (mins < 1) return 'Just now';
+        if (mins < 60) return `${mins}m ago`;
+        const hrs = Math.floor(mins / 60);
+        if (hrs < 24) return `${hrs}h ago`;
+        const days = Math.floor(hrs / 24);
+        return `${days}d ago`;
+    }
 
-                // Init Charts
-                initCharts(data.engagement_trend, data.module_usage);
-            }
-        } catch (error) {
-            console.error('Error fetching stats:', error);
+    function getStatusBadge(status) {
+        const colors = {
+            'pending': 'bg-yellow-50 text-yellow-700 border-yellow-200',
+            'in_progress': 'bg-blue-50 text-blue-700 border-blue-200',
+            'resolved': 'bg-green-50 text-green-700 border-green-200',
+            'accepted': 'bg-green-50 text-green-700 border-green-200',
+            'live': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+        };
+        const cls = colors[status] || 'bg-gray-50 text-gray-600 border-gray-200';
+        return `<span class="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded border ${cls}">${status.replace('_', ' ')}</span>`;
+    }
+
+    function renderStars(rating) {
+        let html = '';
+        for (let i = 1; i <= 5; i++) {
+            html += i <= rating
+                ? '<i data-lucide="star" class="w-3.5 h-3.5 text-yellow-500 fill-yellow-500 inline-block"></i>'
+                : '<i data-lucide="star" class="w-3.5 h-3.5 text-fz-gray-300 inline-block"></i>';
         }
-    });
+        return html;
+    }
 
-    function initCharts(trendData, moduleData) {
-        Chart.defaults.font.family = "'Outfit', sans-serif";
-        Chart.defaults.color = '#737373';
-        
-        // Engagement Trend Chart (Line)
-        if (!trendData || trendData.length === 0) {
-            document.getElementById('trendChartContainer').classList.add('hidden');
-            document.getElementById('trendEmpty').classList.remove('hidden');
+    function getActionIcon(action) {
+        const icons = {
+            'dashboard': 'layout-dashboard',
+            'transactions': 'arrow-left-right',
+            'analysis': 'bar-chart-3',
+            'planning': 'calculator',
+            'goals': 'target',
+            'feedback': 'message-square',
+            'settings': 'settings',
+            'reports': 'file-text',
+            'profile': 'user',
+        };
+        return icons[action] || 'activity';
+    }
+
+    // ────── FETCH DATA ──────
+    try {
+        const res = await fetch('/api/admin/stats');
+        if (!res.ok) throw new Error('Failed to load');
+        const data = await res.json();
+
+        // ────── SECTION 1: EXECUTIVE OVERVIEW ──────
+        const ex = data.executive;
+
+        document.getElementById('kpi-total-users').textContent = ex.total_users;
+        const growthEl = document.getElementById('kpi-user-growth');
+        if (ex.user_growth_pct > 0) {
+            growthEl.innerHTML = `<span class="text-green-600 font-medium">+${ex.user_growth_pct}%</span> this month · ${ex.users_this_month} new`;
+        } else if (ex.user_growth_pct < 0) {
+            growthEl.innerHTML = `<span class="text-fz-red font-medium">${ex.user_growth_pct}%</span> this month`;
         } else {
-            const trendCtx = document.getElementById('trendChart').getContext('2d');
-            new Chart(trendCtx, {
+            growthEl.textContent = `${ex.users_this_month} new this month`;
+        }
+
+        document.getElementById('kpi-active-24h').textContent = ex.active_24h;
+        document.getElementById('kpi-active-7d-label').textContent = `${ex.active_7d} in 7d`;
+        document.getElementById('kpi-active-30d-label').textContent = `${ex.active_30d} in 30d`;
+
+        document.getElementById('kpi-total-txns').textContent = ex.total_transactions.toLocaleString();
+        document.getElementById('kpi-txn-detail').innerHTML = `
+            <span>${ex.income_txns} income entries</span>
+            <span class="text-fz-gray-300 mx-1">·</span>
+            <span>${ex.expense_txns} expense entries</span>
+            <span class="text-fz-gray-300 mx-1">·</span>
+            <span>${ex.total_goals} goals</span>
+        `;
+
+        document.getElementById('health-db').textContent = ex.db_status;
+        const onlineDot = document.getElementById('health-online-dot');
+        if (ex.online_users > 0) {
+            onlineDot.classList.add('bg-emerald-500', 'animate-pulse');
+            document.getElementById('health-online').textContent = `${ex.online_users} user${ex.online_users > 1 ? 's' : ''}`;
+        } else {
+            onlineDot.classList.add('bg-fz-gray-300');
+            document.getElementById('health-online').textContent = 'None';
+        }
+
+        // ────── SECTION 2: USER ANALYTICS ──────
+        // User Growth Chart
+        const growthData = data.user_growth_chart;
+        if (!growthData || growthData.length === 0 || growthData.every(d => d.count === 0)) {
+            document.getElementById('userGrowthContainer').classList.add('hidden');
+            document.getElementById('userGrowthEmpty').classList.remove('hidden');
+        } else {
+            new Chart(document.getElementById('userGrowthChart').getContext('2d'), {
                 type: 'line',
                 data: {
-                    labels: trendData.map(d => new Date(d.date).toLocaleDateString(undefined, {month: 'short', day: 'numeric'})),
+                    labels: growthData.map(d => {
+                        const dt = new Date(d.date + 'T00:00:00');
+                        return dt.toLocaleDateString('en-IN', {month: 'short', day: 'numeric'});
+                    }),
                     datasets: [{
-                        label: 'Activity Events',
-                        data: trendData.map(d => d.count),
-                        borderColor: '#0f0f0f', // fz-black
-                        backgroundColor: 'rgba(15, 15, 15, 0.05)',
+                        label: 'New Users',
+                        data: growthData.map(d => d.count),
+                        borderColor: FZ_BLACK,
+                        backgroundColor: 'rgba(10, 10, 10, 0.04)',
                         borderWidth: 2,
                         pointBackgroundColor: '#fff',
-                        pointBorderColor: '#ff2d20', // fz-red
+                        pointBorderColor: FZ_RED,
                         pointBorderWidth: 2,
                         pointRadius: 4,
+                        pointHoverRadius: 6,
                         fill: true,
-                        tension: 0.3
+                        tension: 0.35,
                     }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
+                    responsive: true, maintainAspectRatio: false,
                     plugins: {
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: '#0f0f0f',
+                            backgroundColor: FZ_BLACK,
                             padding: 12,
-                            titleFont: { size: 13 },
-                            bodyFont: { size: 13 }
+                            titleFont: { size: 12, weight: 'bold' },
+                            bodyFont: { size: 12 },
+                            callbacks: {
+                                title: function(items) {
+                                    const raw = growthData[items[0].dataIndex].date;
+                                    const dt = new Date(raw + 'T00:00:00');
+                                    return dt.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+                                },
+                                label: function(item) {
+                                    const v = item.raw;
+                                    return `New Users: ${v}`;
+                                }
+                            }
                         }
                     },
                     scales: {
-                        y: { beginAtZero: true, grid: { borderDash: [2, 4], color: '#e5e5e5' }, ticks: { precision: 0 } },
-                        x: { grid: { display: false } }
+                        y: {
+                            beginAtZero: true,
+                            grid: { borderDash: [2, 4], color: FZ_GRAY_200 },
+                            ticks: { precision: 0, stepSize: 1 },
+                            title: { display: true, text: 'New Users', font: { size: 11 }, color: FZ_GRAY_400 }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { maxTicksLimit: 8, font: { size: 11 } },
+                            title: { display: true, text: 'Date', font: { size: 11 }, color: FZ_GRAY_400 }
+                        }
                     }
                 }
             });
         }
 
-        // Module Usage Chart (Bar)
-        if (!moduleData || moduleData.length === 0) {
-            document.getElementById('moduleChartContainer').classList.add('hidden');
-            document.getElementById('moduleEmpty').classList.remove('hidden');
+        // Most Active Users
+        const mauContainer = document.getElementById('most-active-users');
+        if (data.most_active_users && data.most_active_users.length > 0) {
+            const maxCount = data.most_active_users[0].count;
+            mauContainer.innerHTML = data.most_active_users.map((u, i) => `
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-fz-black text-white flex items-center justify-center text-xs font-bold flex-shrink-0">${u.username.charAt(0).toUpperCase()}</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-sm font-medium text-fz-black truncate">${u.username}</span>
+                            <span class="text-xs text-fz-gray-500 flex-shrink-0 ml-2">${u.count} events</span>
+                        </div>
+                        <div class="w-full bg-fz-gray-100 rounded-full h-1.5">
+                            <div class="h-1.5 rounded-full ${i === 0 ? 'bg-fz-red' : 'bg-fz-black'}" style="width: ${Math.round((u.count / maxCount) * 100)}%"></div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
         } else {
-            const modCtx = document.getElementById('moduleChart').getContext('2d');
-            new Chart(modCtx, {
+            mauContainer.innerHTML = '<p class="text-sm text-fz-gray-500 text-center py-4">No active users in the last 30 days.</p>';
+        }
+
+        // Engagement Trend
+        const engData = data.engagement_trend;
+        if (!engData || engData.length === 0 || engData.every(d => d.count === 0)) {
+            document.getElementById('engagementContainer').classList.add('hidden');
+            document.getElementById('engagementEmpty').classList.remove('hidden');
+        } else {
+            new Chart(document.getElementById('engagementChart').getContext('2d'), {
                 type: 'bar',
                 data: {
-                    labels: moduleData.map(d => d.module.replace('_', ' ')),
+                    labels: engData.map(d => new Date(d.date + 'T00:00:00').toLocaleDateString('en-IN', {month: 'short', day: 'numeric'})),
                     datasets: [{
-                        label: 'Events',
-                        data: moduleData.map(d => d.count),
-                        backgroundColor: '#ff2d20', // fz-red
-                        borderRadius: 4
+                        label: 'Platform Interactions',
+                        data: engData.map(d => d.count),
+                        backgroundColor: engData.map((d, i) => i === engData.length - 1 ? FZ_RED : FZ_BLACK),
+                        borderRadius: 4,
+                        barPercentage: 0.6,
                     }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
+                    responsive: true, maintainAspectRatio: false,
                     plugins: {
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: '#0f0f0f',
-                            padding: 12,
+                            backgroundColor: FZ_BLACK, padding: 10,
+                            callbacks: {
+                                title: function(items) {
+                                    const raw = engData[items[0].dataIndex].date;
+                                    const dt = new Date(raw + 'T00:00:00');
+                                    return dt.toLocaleDateString('en-IN', { day: 'numeric', month: 'long' });
+                                },
+                                label: function(item) {
+                                    return `Interactions: ${item.raw}`;
+                                }
+                            }
                         }
                     },
                     scales: {
-                        y: { beginAtZero: true, grid: { borderDash: [2, 4], color: '#e5e5e5' }, ticks: { precision: 0 } },
-                        x: { grid: { display: false } }
+                        y: {
+                            beginAtZero: true,
+                            grid: { borderDash: [2, 4], color: FZ_GRAY_200 },
+                            ticks: { precision: 0 },
+                            title: { display: true, text: 'Interactions', font: { size: 11 }, color: FZ_GRAY_400 }
+                        },
+                        x: { grid: { display: false }, ticks: { font: { size: 11 } } }
                     }
                 }
             });
         }
+
+
+        // ────── SECTION 3: FEATURE USAGE ──────
+        const fuContainer = document.getElementById('feature-usage-bars');
+        const fuEmpty = document.getElementById('feature-usage-empty');
+        if (data.feature_usage && data.feature_usage.length > 0) {
+            fuContainer.innerHTML = data.feature_usage.map(f => `
+                <div class="flex items-center gap-4">
+                    <div class="w-28 flex-shrink-0">
+                        <span class="text-sm font-medium text-fz-black">${f.feature}</span>
+                    </div>
+                    <div class="flex-1">
+                        <div class="w-full bg-fz-gray-100 rounded-full h-3">
+                            <div class="h-3 rounded-full bg-fz-black transition-all" style="width: ${f.percentage}%"></div>
+                        </div>
+                    </div>
+                    <div class="w-16 text-right flex-shrink-0">
+                        <span class="text-sm font-bold text-fz-black">${f.percentage}%</span>
+                    </div>
+                    <div class="w-16 text-right flex-shrink-0">
+                        <span class="text-xs text-fz-gray-500">${f.count} uses</span>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            fuContainer.classList.add('hidden');
+            fuEmpty.classList.remove('hidden');
+        }
+
+
+        // ────── SECTION 4: USER MANAGEMENT ──────
+        const nuContainer = document.getElementById('new-users-list');
+        if (data.new_users && data.new_users.length > 0) {
+            nuContainer.innerHTML = data.new_users.map(u => `
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-green-50 text-green-600 flex items-center justify-center text-xs font-bold flex-shrink-0">
+                        <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-fz-black truncate">${u.username}</p>
+                        <p class="text-xs text-fz-gray-400">${timeAgo(u.created_at)}</p>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            nuContainer.innerHTML = '<p class="text-sm text-fz-gray-500 text-center py-4">No new registrations this week.</p>';
+        }
+
+        // Recently Active
+        const raContainer = document.getElementById('recently-active-list');
+        if (data.recently_active && data.recently_active.length > 0) {
+            raContainer.innerHTML = data.recently_active.map(u => `
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-fz-black text-white flex items-center justify-center text-xs font-bold flex-shrink-0">${u.username.charAt(0).toUpperCase()}</div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-fz-black truncate">${u.username}</p>
+                        <p class="text-xs text-fz-gray-400">${timeAgo(u.last_active)}</p>
+                    </div>
+                    <div class="w-2 h-2 rounded-full bg-green-500 flex-shrink-0"></div>
+                </div>
+            `).join('');
+        } else {
+            raContainer.innerHTML = '<p class="text-sm text-fz-gray-500 text-center py-4">No recent activity data.</p>';
+        }
+
+        // Inactive Users
+        const iuContainer = document.getElementById('inactive-users-list');
+        if (data.inactive_users && data.inactive_users.length > 0) {
+            iuContainer.innerHTML = data.inactive_users.map(u => `
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-fz-gray-100 text-fz-gray-400 flex items-center justify-center text-xs font-bold flex-shrink-0">${u.username.charAt(0).toUpperCase()}</div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-fz-gray-500 truncate">${u.username}</p>
+                        <p class="text-xs text-fz-gray-400">Joined ${timeAgo(u.created_at)}</p>
+                    </div>
+                    <div class="w-2 h-2 rounded-full bg-fz-gray-300 flex-shrink-0"></div>
+                </div>
+            `).join('');
+        } else {
+            iuContainer.innerHTML = '<p class="text-sm text-fz-gray-500 text-center py-4">All users are active. Great!</p>';
+        }
+
+
+
+        // ────── SECTION 6: FEEDBACK & REVIEWS ──────
+        // Feedback
+        const fbContainer = document.getElementById('recent-feedback-list');
+        const fbSummary = document.getElementById('feedback-summary-text');
+        fbSummary.textContent = `${data.feedback_summary.total} total · ${data.feedback_summary.pending} pending`;
+
+        if (data.recent_feedback && data.recent_feedback.length > 0) {
+            fbContainer.innerHTML = data.recent_feedback.map(f => `
+                <div class="border-b border-fz-gray-100 pb-3 last:border-0 last:pb-0">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-sm font-medium text-fz-black">${f.username}</span>
+                        ${getStatusBadge(f.status)}
+                    </div>
+                    <p class="text-sm text-fz-gray-600 line-clamp-2">"${f.content || 'No content'}"</p>
+                    <div class="flex items-center gap-2 mt-1.5">
+                        <span class="text-[10px] uppercase font-bold text-fz-gray-400">${f.type || 'General'}</span>
+                        <span class="text-fz-gray-300">·</span>
+                        <span class="text-xs text-fz-gray-400">${timeAgo(f.time)}</span>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            fbContainer.innerHTML = '<p class="text-sm text-fz-gray-500 text-center py-4">No feedback submissions yet.</p>';
+        }
+
+        // Reviews
+        const rvContainer = document.getElementById('recent-reviews-list');
+        const rvSummary = document.getElementById('review-summary-text');
+        rvSummary.textContent = data.review_summary.avg_rating
+            ? `${data.review_summary.total} total · ${data.review_summary.avg_rating}★ avg`
+            : `${data.review_summary.total} total`;
+
+        if (data.recent_reviews && data.recent_reviews.length > 0) {
+            rvContainer.innerHTML = data.recent_reviews.map(r => `
+                <div class="border-b border-fz-gray-100 pb-3 last:border-0 last:pb-0">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-sm font-medium text-fz-black">${r.username}</span>
+                        ${getStatusBadge(r.status)}
+                    </div>
+                    <div class="flex items-center gap-1 mb-1">${renderStars(r.rating)}</div>
+                    <p class="text-sm text-fz-gray-600 line-clamp-2">${r.content ? `"${r.content}"` : '<span class="italic text-fz-gray-400">No written review</span>'}</p>
+                    <span class="text-xs text-fz-gray-400 mt-1 block">${timeAgo(r.time)}</span>
+                </div>
+            `).join('');
+        } else {
+            rvContainer.innerHTML = '<p class="text-sm text-fz-gray-500 text-center py-4">No reviews submitted yet.</p>';
+        }
+
+        // Re-initialize Lucide icons for dynamically inserted content
+        lucide.createIcons();
+
+    } catch (error) {
+        console.error('Error loading admin dashboard:', error);
     }
+});
 </script>
 {% endblock %}

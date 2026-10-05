@@ -6,6 +6,7 @@ from models.goal import Goal
 from datetime import datetime, date
 from utils.finance import build_financial_periods
 from goals.services import build_goal_intelligence
+from utils.activity import log_activity
 
 def prepare_goals_data(user_goals):
     today = date.today()
@@ -76,6 +77,7 @@ def prepare_goals_data(user_goals):
 @jwt_required()
 def goals():
     user_id = int(get_jwt_identity())
+    log_activity('goals_view')
     user_goals = db.session.query(Goal).filter_by(user_id=user_id).order_by(Goal.target_date.asc()).all()
     
     total_saved = sum(g.current_saved for g in user_goals if g.current_saved is not None and g.current_saved >= 0)
@@ -116,6 +118,7 @@ def create_goal():
         )
         db.session.add(new_goal)
         db.session.commit()
+        log_activity('goal_created')
         return jsonify({"msg": "Goal created successfully"}), 201
     except ValueError as e:
         return jsonify({"error": "Invalid input format"}), 400
@@ -148,6 +151,11 @@ def update_goal(goal_id):
             goal.target_date = datetime.strptime(data['target_date'], '%Y-%m-%d').date()
             
         db.session.commit()
+        
+        log_activity('goal_updated')
+        if goal.current_saved >= goal.target_amount:
+            log_activity('goal_completed')
+            
         return jsonify({"msg": "Goal updated successfully"}), 200
     except ValueError as e:
         return jsonify({"error": "Invalid input format"}), 400

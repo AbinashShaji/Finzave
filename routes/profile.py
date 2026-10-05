@@ -4,6 +4,7 @@ from routes.user import app_bp
 from extensions import db
 from models.user import User
 from models.setting import Setting
+from utils.activity import log_activity
 
 @app_bp.route('/settings')
 @jwt_required()
@@ -13,6 +14,7 @@ def settings():
 @app_bp.route('/profile')
 @jwt_required()
 def profile():
+    log_activity('profile_view')
     return render_template('app/profile.html')
 
 @app_bp.route('/api/profile', methods=['GET', 'PUT'])
@@ -127,3 +129,30 @@ def update_preferences():
         
     db.session.commit()
     return jsonify({"message": "Preferences updated successfully"}), 200
+@app_bp.route('/api/profile/delete-account', methods=['POST'])
+@jwt_required()
+def delete_account():
+    from flask_jwt_extended import unset_jwt_cookies
+    
+    current_user_id = get_jwt_identity()
+    user = db.session.get(User, int(current_user_id))
+    
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+        
+    data = request.json
+    password = data.get('password')
+    
+    if not password or not user.check_password(password):
+        return jsonify({"message": "Incorrect password. Please try again."}), 401
+        
+    try:
+        db.session.delete(user)
+        db.session.commit()
+        
+        response = jsonify({"message": "Account deleted successfully"})
+        unset_jwt_cookies(response)
+        return response, 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": "An error occurred while deleting your account."}), 500

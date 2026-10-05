@@ -9,11 +9,13 @@ from utils.pdf_generator import generate_financial_report_pdf
 from models.expense import Expense
 import csv
 import io
+from utils.activity import log_activity
 
 @app_bp.route('/reports')
 @jwt_required()
 def reports():
     user_id = int(get_jwt_identity())
+    log_activity('reports_view')
     periods = build_financial_periods(user_id, months=6)
     
     # We need global has_data to know if user has ANY data ever
@@ -59,6 +61,7 @@ def reports():
 @jwt_required()
 def export_csv():
     user_id = int(get_jwt_identity())
+    log_activity('report_generated')
     
     expenses = db.session.query(Expense).filter_by(user_id=user_id).order_by(Expense.date.desc()).all()
     
@@ -79,6 +82,7 @@ def export_csv():
 @jwt_required()
 def export_pdf():
     user_id = int(get_jwt_identity())
+    log_activity('report_generated')
     periods = build_financial_periods(user_id, months=6)
     
     selected_period = request.args.get('period')

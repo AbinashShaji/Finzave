@@ -5,10 +5,12 @@ from planning.sip import calculate_sip
 from planning.emi import calculate_emi
 from planning.insights import generate_planning_insight
 from utils.finance import build_financial_periods
+from utils.activity import log_activity
 
 @app_bp.route('/planning')
 @jwt_required()
 def planning():
+    log_activity('planning_view')
     return render_template('app/planning.html')
 
 def get_current_savings(user_id):
@@ -61,6 +63,7 @@ def api_calculate_sip():
             insight = generate_planning_insight(monthly_investment, savings, "SIP")
             result["insight"] = insight
         
+        log_activity('plan_created')
         return jsonify(result), 200
     except ValueError:
         return jsonify({"error": "Invalid numeric input"}), 400
@@ -97,6 +100,7 @@ def api_calculate_emi():
             insight = generate_planning_insight(result.get("monthly_emi", 0), savings, "EMI")
             result["insight"] = insight
         
+        log_activity('plan_created')
         return jsonify(result), 200
     except ValueError:
         return jsonify({"error": "Invalid numeric input"}), 400
