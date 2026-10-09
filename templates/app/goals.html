@@ -110,9 +110,14 @@
                     <span class="text-sm font-medium text-fz-black">₹{{ "{:,.0f}".format(goal.req_monthly) }}/mo</span>
                 </div>
             </div>
-            <a href="{{ url_for('app.goal_detail', goal_id=goal.id) }}" class="mt-4 w-full bg-fz-gray-50 text-fz-black border border-fz-gray-200 text-center py-2 rounded-lg text-sm font-bold hover:bg-fz-gray-100 transition-colors flex items-center justify-center gap-2">
-                View Goal Analysis <i data-lucide="arrow-right" class="w-4 h-4"></i>
-            </a>
+            <div class="mt-4 flex gap-3">
+                <button onclick="openUpdateProgressModal({{ goal.id }}, '{{ goal.goal_name|e }}', {{ goal.current_saved }}, {{ goal.target_amount }})" class="flex-1 bg-fz-red text-white border border-fz-red text-center py-2 rounded-lg text-sm font-bold hover:bg-red-700 hover:border-red-700 transition-colors flex items-center justify-center gap-2 whitespace-nowrap">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i> Update
+                </button>
+                <a href="{{ url_for('app.goal_detail', goal_id=goal.id) }}" class="flex-1 bg-fz-gray-50 text-fz-black border border-fz-gray-200 text-center py-2 rounded-lg text-sm font-bold hover:bg-fz-gray-100 transition-colors flex items-center justify-center gap-2 whitespace-nowrap">
+                    Analysis <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </a>
+            </div>
         </div>
         {% endfor %}
 
@@ -206,6 +211,51 @@
         </form>
     </div>
 </div>
+
+<!-- Update Progress Modal -->
+<div id="progress-modal" class="hidden" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 99999; background-color: rgba(0,0,0,0.6); align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+    <div class="absolute inset-0" onclick="closeModal('progress-modal')"></div>
+    <div class="relative w-full max-w-md bg-white rounded-2xl shadow-2xl p-6 mx-4 transform transition-all">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold text-fz-black">Update Goal Progress</h3>
+            <button onclick="closeModal('progress-modal')" class="text-fz-gray-400 hover:text-fz-black">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+        
+        <div class="mb-4">
+            <p class="text-sm text-fz-gray-500 font-medium mb-1">Goal</p>
+            <p id="progress-goal-name" class="text-lg font-bold text-fz-black"></p>
+            <p class="text-xs text-fz-gray-500 mt-1">Current Saved: <span id="progress-current-text" class="font-bold text-fz-black"></span> / <span id="progress-target-text"></span></p>
+        </div>
+        
+        <form id="progress-form" class="space-y-4" onsubmit="saveProgress(event)">
+            <input type="hidden" id="progress-goal-id" value="">
+            <input type="hidden" id="progress-target-amount" value="">
+            
+            <div>
+                <label class="block text-sm font-medium text-fz-gray-600 mb-1">New Saved Amount (₹)</label>
+                <input type="number" id="progress-new-amount" required min="0" step="0.01" class="w-full px-4 py-2 border border-fz-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fz-black text-sm">
+            </div>
+            
+            <div class="flex gap-2 mb-2">
+                <button type="button" onclick="incrementProgress(500)" class="flex-1 bg-fz-gray-50 border border-fz-gray-200 text-fz-black py-1.5 rounded-lg text-xs font-bold hover:bg-fz-gray-100">+ ₹500</button>
+                <button type="button" onclick="incrementProgress(1000)" class="flex-1 bg-fz-gray-50 border border-fz-gray-200 text-fz-black py-1.5 rounded-lg text-xs font-bold hover:bg-fz-gray-100">+ ₹1000</button>
+                <button type="button" onclick="incrementProgress(5000)" class="flex-1 bg-fz-gray-50 border border-fz-gray-200 text-fz-black py-1.5 rounded-lg text-xs font-bold hover:bg-fz-gray-100">+ ₹5000</button>
+            </div>
+            
+            <div id="progress-error" class="text-sm font-semibold text-fz-red mt-2 hidden"></div>
+            
+            <div class="flex gap-3 mt-6">
+                <button type="button" onclick="closeModal('progress-modal')" class="flex-1 bg-white border border-fz-gray-200 text-fz-black py-2.5 rounded-lg font-medium hover:bg-fz-gray-50 transition-colors">Cancel</button>
+                <button type="submit" id="progress-submit-btn" class="flex-1 bg-fz-black text-white py-2.5 rounded-lg font-medium hover:bg-fz-red transition-colors shadow-sm flex justify-center items-center">
+                    <span>Update Progress</span>
+                    <svg class="spinner hidden animate-spin ml-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -289,6 +339,79 @@
         } catch (err) {
             errorEl.textContent = 'A network error occurred.';
             errorEl.classList.remove('hidden');
+        }
+    }
+
+    function openUpdateProgressModal(id, name, saved, target) {
+        document.getElementById('progress-goal-id').value = id;
+        document.getElementById('progress-goal-name').textContent = name;
+        document.getElementById('progress-target-amount').value = target;
+        document.getElementById('progress-current-text').textContent = '₹' + parseFloat(saved).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('progress-target-text').textContent = '₹' + parseFloat(target).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        
+        document.getElementById('progress-new-amount').value = saved;
+        document.getElementById('progress-error').classList.add('hidden');
+        
+        const modal = document.getElementById('progress-modal');
+        modal.classList.remove('hidden');
+        modal.style.display = 'flex';
+    }
+
+    function incrementProgress(amount) {
+        const input = document.getElementById('progress-new-amount');
+        const currentVal = parseFloat(input.value) || 0;
+        input.value = (currentVal + amount).toFixed(2);
+    }
+
+    async function saveProgress(e) {
+        e.preventDefault();
+        const id = document.getElementById('progress-goal-id').value;
+        const amount = parseFloat(document.getElementById('progress-new-amount').value);
+        const target = parseFloat(document.getElementById('progress-target-amount').value);
+        const errorEl = document.getElementById('progress-error');
+        const btn = document.getElementById('progress-submit-btn');
+        const spinner = btn.querySelector('.spinner');
+        
+        if (isNaN(amount) || amount < 0) {
+            errorEl.textContent = "Please enter a valid amount.";
+            errorEl.classList.remove('hidden');
+            return;
+        }
+        
+        if (amount > target) {
+            errorEl.textContent = "Saved amount cannot exceed your target.";
+            errorEl.classList.remove('hidden');
+            return;
+        }
+        
+        btn.disabled = true;
+        spinner.classList.remove('hidden');
+        errorEl.classList.add('hidden');
+        
+        try {
+            const csrfToken = getCookie('csrf_access_token');
+            const res = await fetch(`/app/api/goals/${id}/update-progress`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({ current_saved: amount })
+            });
+            const data = await res.json();
+            
+            if (res.ok) {
+                window.location.reload();
+            } else {
+                errorEl.textContent = data.msg || data.error || 'Failed to update progress.';
+                errorEl.classList.remove('hidden');
+            }
+        } catch (err) {
+            errorEl.textContent = 'A network error occurred.';
+            errorEl.classList.remove('hidden');
+        } finally {
+            btn.disabled = false;
+            spinner.classList.add('hidden');
         }
     }
 

@@ -370,6 +370,14 @@
         <button onclick="closeModal('success')" class="w-full bg-fz-black text-white py-3 rounded-xl font-medium hover:bg-fz-red transition-colors shadow-sm">OK</button>
     </div>
 </div>
+
+<datalist id="csv-categories">
+    {% for cat in expense_categories %}
+    <option value="{{ cat }}"></option>
+    {% endfor %}
+</datalist>
+
+<div id="expense-categories-data" data-categories="{{ expense_categories | tojson | forceescape }}" class="hidden"></div>
 {% endblock %}
 
 {% block scripts %}
@@ -619,31 +627,61 @@
                     const tbody = document.getElementById('csv-preview-body');
                     tbody.innerHTML = '';
                     
-                    // Render valid rows
-                    data.valid_records.forEach(r => {
-                        const tr = buildRow([
-                            { text: r.row_number, className: "px-4 py-2" },
-                            { text: r.date, className: "px-4 py-2" },
-                            { text: r.category, className: "px-4 py-2" },
-                            { text: '₹' + r.amount, className: "px-4 py-2 text-right" },
-                            { html: '<span class="text-green-600 text-xs font-semibold">Valid</span>', className: "px-4 py-2" },
-                            { html: `<input type="checkbox" class="csv-row-select w-4 h-4 rounded border-gray-300 text-fz-red accent-red-600 focus:ring-fz-red cursor-pointer" value="${r.row_number}" checked>`, className: "px-4 py-2 text-center" }
-                        ], "bg-white hover:bg-gray-50 transition-colors");
-                        tbody.appendChild(tr);
+                    let allRecords = [...data.valid_records, ...data.invalid_records].sort((a, b) => {
+                        if (a.is_valid && !b.is_valid) return -1;
+                        if (!a.is_valid && b.is_valid) return 1;
+                        return a.row_number - b.row_number;
                     });
                     
-                    // Render invalid rows
-                    data.invalid_records.forEach(r => {
-                        const tr = buildRow([
-                            { text: r.row_number, className: "px-4 py-2 text-gray-400" },
-                            { text: r.date || '-', className: "px-4 py-2 text-gray-400" },
-                            { text: r.category || '-', className: "px-4 py-2 text-gray-400" },
-                            { text: r.amount ? '₹'+r.amount : '-', className: "px-4 py-2 text-right text-gray-400" },
-                            { html: `<span class="text-fz-red text-xs font-semibold">${r.errors.map(e => e.replace(/</g, '&lt;').replace(/>/g, '&gt;')).join(', ')}</span>`, className: "px-4 py-2" },
-                            { html: `<input type="checkbox" disabled class="w-4 h-4 rounded border-gray-200 text-gray-300 cursor-not-allowed">`, className: "px-4 py-2 text-center" }
-                        ], "bg-red-50");
-                        tbody.appendChild(tr);
+                    const cats = JSON.parse(document.getElementById('expense-categories-data').dataset.categories || '[]');
+                    
+                    let htmlStr = '';
+                    allRecords.forEach(r => {
+                        const isValid = r.is_valid;
+                        const rowClass = isValid ? 'bg-white hover:bg-gray-50 transition-colors' : 'bg-red-50 transition-colors';
+                        const dateClass = r.errors.some(e=>e.toLowerCase().includes('date')) ? 'border-red-500 bg-red-50' : 'border-gray-200';
+                        const catClass = r.errors.some(e=>e.toLowerCase().includes('category')) ? 'border-red-500 bg-red-50' : 'border-gray-200';
+                        const amtClass = r.errors.some(e=>e.toLowerCase().includes('amount')) ? 'border-red-500 bg-red-50' : 'border-gray-200';
+                        
+                        let isCustom = r.category && !cats.includes(r.category);
+                        
+                        let selectOptions = `<option value="" disabled ${!r.category ? 'selected' : ''}>Select category...</option>`;
+                        if (isCustom && r.category) {
+                            selectOptions += `<option value="${r.category}" selected>${r.category} (Invalid)</option>`;
+                        }
+                        cats.forEach(c => {
+                            selectOptions += `<option value="${c}" ${c === r.category && !isCustom ? 'selected' : ''}>${c}</option>`;
+                        });
+                        selectOptions += `<option value="__custom__">Other (Custom)</option>`;
+                        
+                        htmlStr += `
+                            <tr class="${rowClass}" id="csv-row-${r.row_number}">
+                                <td class="px-4 py-2">${r.row_number}</td>
+                                <td class="px-4 py-2">
+                                    <input type="date" class="csv-input-date w-full min-w-[130px] px-2 py-1 border rounded ${dateClass}" value="${r.date || ''}" data-row="${r.row_number}">
+                                </td>
+                                <td class="px-4 py-2 align-top">
+                                    <div class="relative min-w-[160px]">
+                                        <select class="csv-select-cat w-full px-2 py-1 border rounded ${catClass}" data-row="${r.row_number}">
+                                            ${selectOptions}
+                                        </select>
+                                        <input type="text" class="csv-input-cat w-full px-2 py-1 border rounded ${catClass} hidden" value="${isCustom ? r.category : ''}" placeholder="Type category..." data-row="${r.row_number}">
+                                    </div>
+                                </td>
+                                <td class="px-4 py-2 text-right">
+                                    <input type="number" step="0.01" class="csv-input-amt w-24 px-2 py-1 border rounded text-right ${amtClass}" value="${r.amount || ''}" data-row="${r.row_number}">
+                                </td>
+                                <td class="px-4 py-2" id="csv-status-${r.row_number}">
+                                    ${isValid ? '<span class="text-green-600 text-xs font-semibold">Valid</span>' : `<span class="text-fz-red text-xs font-semibold">${r.errors.join(', ')}</span>`}
+                                </td>
+                                <td class="px-4 py-2 text-center">
+                                    <input type="checkbox" class="csv-row-select w-4 h-4 rounded border-gray-300 text-fz-red accent-red-600 focus:ring-fz-red cursor-pointer" value="${r.row_number}" ${isValid ? 'checked' : ''}>
+                                    <input type="hidden" class="csv-input-desc" value="${(r.description || '').replace(/"/g, '&quot;')}" data-row="${r.row_number}">
+                                </td>
+                            </tr>
+                        `;
                     });
+                    tbody.innerHTML = htmlStr;
                     
                     const confirmBtn = document.getElementById('csv-confirm-btn');
                     
@@ -712,13 +750,102 @@
             }
         });
         
+        // Track edits visually
+        document.getElementById('csv-preview-body').addEventListener('input', (e) => {
+            if (e.target.tagName === 'INPUT' && !e.target.classList.contains('csv-row-select')) {
+                e.target.classList.add('bg-yellow-50', 'border-yellow-300');
+                e.target.classList.remove('border-red-500', 'bg-red-50', 'border-gray-200');
+                
+                // Also check the checkbox automatically if user edits
+                const rowNum = e.target.getAttribute('data-row');
+                const cb = document.querySelector(`.csv-row-select[value="${rowNum}"]`);
+                if(cb && !cb.checked) {
+                    cb.checked = true;
+                    // Trigger change manually to update counts
+                    cb.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            }
+        });
+        
+        document.getElementById('csv-preview-body').addEventListener('change', (e) => {
+            const rowNum = e.target.getAttribute('data-row');
+            if(!rowNum) return;
+            const row = document.getElementById(`csv-row-${rowNum}`);
+            if (row) {
+                row.classList.remove('bg-red-50');
+                row.classList.add('bg-white');
+                const statusCell = document.getElementById(`csv-status-${rowNum}`);
+                if (statusCell && statusCell.innerText.includes('Invalid category')) {
+                    statusCell.innerHTML = '<span class="text-yellow-600 text-xs font-semibold">Edited</span>';
+                }
+            }
+
+            if (e.target.classList.contains('csv-select-cat')) {
+                const inputCat = row.querySelector('.csv-input-cat');
+                
+                e.target.classList.add('bg-yellow-50', 'border-yellow-300');
+                e.target.classList.remove('border-red-500', 'bg-red-50', 'border-gray-200');
+                
+                if (e.target.value === '__custom__') {
+                    e.target.classList.add('hidden');
+                    inputCat.classList.remove('hidden');
+                    inputCat.value = '';
+                    inputCat.focus();
+                } else {
+                    inputCat.classList.add('hidden');
+                    inputCat.value = e.target.value;
+                }
+                
+                const cb = document.querySelector(`.csv-row-select[value="${rowNum}"]`);
+                if(cb && !cb.checked) {
+                    cb.checked = true;
+                    cb.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            }
+        });
+
+        // Revert to dropdown if input is cleared
+        document.getElementById('csv-preview-body').addEventListener('focusout', (e) => {
+            if (e.target.classList.contains('csv-input-cat') && e.target.value.trim() === '') {
+                const rowNum = e.target.getAttribute('data-row');
+                const row = document.getElementById(`csv-row-${rowNum}`);
+                const selectCat = row.querySelector('.csv-select-cat');
+                e.target.classList.add('hidden');
+                selectCat.classList.remove('hidden');
+                selectCat.value = '';
+                
+                // Keep the yellow edit styling on the select
+                selectCat.classList.add('bg-yellow-50', 'border-yellow-300');
+                selectCat.classList.remove('border-red-500', 'bg-red-50', 'border-gray-200');
+            }
+        });
+
         document.getElementById('csv-confirm-btn').addEventListener('click', async () => {
             if (!uploadedFile) return;
             
-            // Gather selected rows
+            // Gather selected rows and their input values
             const selectedCheckboxes = document.querySelectorAll('.csv-row-select:checked');
             if (selectedCheckboxes.length === 0) return;
-            const selectedRows = Array.from(selectedCheckboxes).map(cb => parseInt(cb.value, 10));
+            
+            const records = Array.from(selectedCheckboxes).map(cb => {
+                const rowNum = cb.value;
+                const row = document.getElementById(`csv-row-${rowNum}`);
+                const selectCat = row.querySelector('.csv-select-cat');
+                const inputCat = row.querySelector('.csv-input-cat');
+                
+                let finalCategory = selectCat.value;
+                if (finalCategory === '__custom__' || selectCat.classList.contains('hidden')) {
+                    finalCategory = inputCat.value;
+                }
+                
+                return {
+                    row_number: parseInt(rowNum, 10),
+                    date: row.querySelector('.csv-input-date').value,
+                    category: finalCategory,
+                    amount: row.querySelector('.csv-input-amt').value,
+                    description: row.querySelector('.csv-input-desc').value
+                };
+            });
             
             const btn = document.getElementById('csv-confirm-btn');
             btn.disabled = true;
@@ -726,18 +853,14 @@
             const errDiv = document.getElementById('csv-error');
             errDiv.classList.add('hidden');
             
-            // To ensure strict security, we send the file again for server-side revalidation
-            const formData = new FormData();
-            formData.append('file', uploadedFile);
-            formData.append('selected_rows', JSON.stringify(selectedRows));
-            
             try {
                 const res = await fetch('/app/api/transactions/confirm-csv', {
                     method: 'POST',
                     headers: {
+                        'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': getCookie('csrf_access_token')
                     },
-                    body: formData
+                    body: JSON.stringify({ records })
                 });
                 const data = await res.json();
                 
@@ -747,7 +870,29 @@
                     loadExpenses();
                     showSuccess("Import Successful", data.message || "Your expenses have been successfully imported.");
                 } else {
-                    errDiv.textContent = data.error || "Failed to import CSV";
+                    if (data.details) {
+                        errDiv.textContent = "Please fix the highlighted errors before importing.";
+                        // Highlight errors
+                        data.details.forEach(errObj => {
+                            const rowNum = errObj.row;
+                            const statusCell = document.getElementById(`csv-status-${rowNum}`);
+                            const row = document.getElementById(`csv-row-${rowNum}`);
+                            if(statusCell) statusCell.innerHTML = `<span class="text-fz-red text-xs font-semibold">${errObj.errors.join(', ')}</span>`;
+                            if(row) {
+                                row.classList.add('bg-red-50');
+                                row.classList.remove('bg-white');
+                                
+                                errObj.errors.forEach(e => {
+                                    const lower = e.toLowerCase();
+                                    if(lower.includes('date')) row.querySelector('.csv-input-date').classList.add('border-red-500', 'bg-red-50');
+                                    if(lower.includes('amount')) row.querySelector('.csv-input-amt').classList.add('border-red-500', 'bg-red-50');
+                                    if(lower.includes('category')) row.querySelector('.csv-input-cat').classList.add('border-red-500', 'bg-red-50');
+                                });
+                            }
+                        });
+                    } else {
+                        errDiv.textContent = data.error || "Failed to import CSV";
+                    }
                     errDiv.classList.remove('hidden');
                     btn.disabled = false;
                     btn.innerHTML = 'Try Again';

@@ -52,17 +52,24 @@ def process_expense_csv(file_stream: bytes, user_id: int = None) -> dict:
         }
         
         # Validate Date
+        raw_date = str(row['date']).strip()
+        if raw_date.lower() == 'nan': raw_date = ''
+        record['date'] = raw_date
         try:
             date_val = pd.to_datetime(row['date']).date()
             if date_val > datetime.now().date():
                 record['is_valid'] = False
                 record['errors'].append("Future transaction date is not allowed")
-            record['date'] = date_val.isoformat()
+            else:
+                record['date'] = date_val.isoformat()
         except Exception:
             record['is_valid'] = False
             record['errors'].append("Invalid date format")
             
         # Validate Amount
+        raw_amount = str(row['amount']).strip()
+        if raw_amount.lower() == 'nan': raw_amount = ''
+        record['amount'] = raw_amount
         try:
             amount = float(row['amount'])
             if amount <= 0:
@@ -74,7 +81,9 @@ def process_expense_csv(file_stream: bytes, user_id: int = None) -> dict:
             
         # Validate Category
         category = str(row['category']).strip()
-        if not category or category.lower() == 'nan':
+        if category.lower() == 'nan': category = ''
+        record['category'] = category
+        if not category:
             record['is_valid'] = False
             record['errors'].append("Category cannot be empty")
         else:

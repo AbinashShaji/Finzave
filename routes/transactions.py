@@ -394,53 +394,81 @@ def upload_csv():
 @jwt_required()
 def confirm_csv():
     user_id = int(get_jwt_identity())
-    if 'file' not in request.files:
-        return jsonify({"error": "No file part"}), 400
+    data = request.json
+    if not data or 'records' not in data:
+        return jsonify({"error": "Missing records data"}), 400
         
-    file = request.files['file']
-    if file.filename == '' or not file.filename.lower().endswith('.csv'):
-        return jsonify({"error": "No selected file or invalid extension. Must be a .csv file."}), 400
-        
-    file_bytes = file.read(2 * 1024 * 1024) # Read up to 2MB
-    if len(file.read(1)) > 0:
-        return jsonify({"error": "File exceeds maximum allowed size of 2MB."}), 400
-        
-    result = process_expense_csv(file_bytes, user_id=user_id)
-    
-    if not result['success']:
-        return jsonify({"error": result['error']}), 400
-        
-    records = result.get('valid_records', [])
+    records = data['records']
     if not records:
-        return jsonify({"error": "No valid records to import"}), 400
+        return jsonify({"error": "No records to import"}), 400
         
-    selected_rows_str = request.form.get('selected_rows')
-    if selected_rows_str:
-        import json
+    valid_records = []
+    errors = []
+    
+    existing_hashes = set()
+    try:
+        existing_expenses = Expense.query.filter_by(user_id=user_id).all()
+        for ex in existing_expenses:
+            h = f"{ex.date.isoformat()}_{float(ex.amount)}_{ex.category.lower()}_{ex.description.lower()}"
+            existing_hashes.add(h)
+    except Exception:
+        pass
+        
+    for i, r in enumerate(records):
+        row_num = r.get('row_number', i+1)
+        row_errors = []
+        
         try:
-            selected_rows = json.loads(selected_rows_str)
-            if not isinstance(selected_rows, list):
-                return jsonify({"error": "Invalid format for selected rows"}), 400
-            selected_rows = [int(r) for r in selected_rows]
-            records = [r for r in records if r['row_number'] in selected_rows]
-            if not records:
-                return jsonify({"error": "No selected valid rows to import"}), 400
-        except (ValueError, json.JSONDecodeError):
-            return jsonify({"error": "Invalid selected rows provided"}), 400
+            date_val = datetime.strptime(str(r.get('date', '')), '%Y-%m-%d').date()
+            if date_val > datetime.now().date():
+                row_errors.append("Future date")
+        except:
+            row_errors.append("Invalid date")
+            
+        try:
+            amount = float(r.get('amount', 0))
+            if amount <= 0:
+                row_errors.append("Invalid amount")
+        except:
+            row_errors.append("Invalid amount")
+            
+        cat = str(r.get('category', '')).strip()
+        if not cat:
+            row_errors.append("Missing category")
+            
+        if not row_errors:
+            desc = str(r.get('description', ''))[:255]
+            row_hash = f"{date_val.isoformat()}_{float(amount)}_{cat.lower()}_{desc.lower()}"
+            if row_hash in existing_hashes:
+                row_errors.append("Duplicate transaction")
+            else:
+                existing_hashes.add(row_hash)
+                valid_records.append({
+                    "date": date_val,
+                    "amount": amount,
+                    "category": cat,
+                    "description": desc
+                })
+                
+        if row_errors:
+            errors.append({"row": row_num, "errors": row_errors})
+            
+    if errors:
+        return jsonify({"error": "Validation failed", "details": errors}), 400
         
     try:
-        for r in records:
+        for r in valid_records:
             expense = Expense(
                 user_id=user_id,
                 amount=r['amount'],
                 category=r['category'],
-                date=datetime.strptime(r['date'], '%Y-%m-%d').date(),
-                description=r.get('description', '')
+                date=r['date'],
+                description=r['description']
             )
             db.session.add(expense)
         db.session.commit()
         invalidate_user_financial_cache(user_id)
-        return jsonify({"message": f"{len(records)} expenses imported successfully"}), 201
+        return jsonify({"message": f"{len(valid_records)} expenses imported successfully"}), 201
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 400

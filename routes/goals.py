@@ -163,6 +163,46 @@ def update_goal(goal_id):
         db.session.rollback()
         return jsonify({"error": "Failed to update goal"}), 400
 
+@app_bp.route('/api/goals/<int:goal_id>/update-progress', methods=['POST'])
+@jwt_required()
+def update_goal_progress(goal_id):
+    user_id = int(get_jwt_identity())
+    goal = db.session.get(Goal, goal_id)
+    
+    if not goal or goal.user_id != user_id:
+        return jsonify({"error": "Goal not found"}), 404
+        
+    data = request.json
+    try:
+        if 'current_saved' not in data:
+            return jsonify({"error": "current_saved is required"}), 400
+            
+        val = float(data['current_saved'])
+        
+        if val < 0:
+            return jsonify({"error": "Saved amount cannot be negative"}), 400
+            
+        if val > goal.target_amount:
+            return jsonify({"error": "Saved amount cannot exceed target amount"}), 400
+            
+        goal.current_saved = val
+        db.session.commit()
+        
+        log_activity('goal_updated')
+        if goal.current_saved >= goal.target_amount:
+            log_activity('goal_completed')
+            
+        return jsonify({
+            "msg": "Goal progress updated successfully",
+            "current_saved": goal.current_saved
+        }), 200
+        
+    except ValueError:
+        return jsonify({"error": "Invalid numeric input"}), 400
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Failed to update progress"}), 500
+
 @app_bp.route('/api/goals/<int:goal_id>', methods=['DELETE'])
 @jwt_required()
 def delete_goal(goal_id):

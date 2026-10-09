@@ -47,7 +47,7 @@
                     </button>
                 </div>
                 <p id="password-helper" class="text-xs text-fz-red mt-1 overflow-hidden transition-all duration-300 max-h-0 opacity-0">
-                    Password must be at least 6 characters and include one uppercase letter, one lowercase letter, and one special character.
+                    Password must be at least 6 characters and include one uppercase letter, one lowercase letter, one number, and one special character.
                 </p>
             </div>
 
@@ -143,9 +143,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const hasLength = p.length >= 6;
         const hasUpper = /[A-Z]/.test(p);
         const hasLower = /[a-z]/.test(p);
+        const hasNumber = /[0-9]/.test(p);
         const hasSpecial = /[^a-zA-Z0-9]/.test(p);
         
-        isPasswordValid = hasLength && hasUpper && hasLower && hasSpecial;
+        isPasswordValid = hasLength && hasUpper && hasLower && hasNumber && hasSpecial;
         
         if (p.length > 0) {
             if (isPasswordValid) {

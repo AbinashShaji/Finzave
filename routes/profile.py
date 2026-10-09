@@ -93,6 +93,8 @@ def update_password():
         return jsonify({"message": "Password must contain at least 1 uppercase letter"}), 400
     if not re.search(r'[a-z]', new_password):
         return jsonify({"message": "Password must contain at least 1 lowercase letter"}), 400
+    if not re.search(r'[0-9]', new_password):
+        return jsonify({"message": "Password must contain at least 1 number"}), 400
     if not re.search(r'[^a-zA-Z0-9]', new_password):
         return jsonify({"message": "Password must contain at least 1 special character"}), 400
         
@@ -140,7 +142,10 @@ def delete_account():
     if not user:
         return jsonify({"message": "User not found"}), 404
         
-    data = request.json
+    data = request.get_json()
+    if not data:
+        return jsonify({"message": "Missing JSON in request"}), 400
+        
     password = data.get('password')
     
     if not password or not user.check_password(password):

@@ -42,6 +42,8 @@ def register():
         return jsonify({"message": "Password must contain at least 1 uppercase letter"}), 400
     if not re.search(r'[a-z]', password):
         return jsonify({"message": "Password must contain at least 1 lowercase letter"}), 400
+    if not re.search(r'[0-9]', password):
+        return jsonify({"message": "Password must contain at least 1 number"}), 400
     if not re.search(r'[^a-zA-Z0-9]', password):
         return jsonify({"message": "Password must contain at least 1 special character"}), 400
 
@@ -66,13 +68,13 @@ def login():
     if not data:
         return jsonify({"message": "Missing JSON in request"}), 400
 
-    username = data.get('username')
+    identifier = data.get('identifier') or data.get('username') or data.get('email')
     password = data.get('password')
 
-    if not username or not password:
+    if not identifier or not password:
         return jsonify({"message": "Missing required fields"}), 400
 
-    user = User.query.filter_by(username=username).first()
+    user = User.query.filter((User.username == identifier) | (User.email == identifier)).first()
     if not user or not user.check_password(password):
         return jsonify({"message": "Invalid credentials"}), 401
         
