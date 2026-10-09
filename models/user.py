@@ -1,3 +1,13 @@
+"""
+Module: models/user.py
+
+Purpose:
+Defines SQLAlchemy database schemas and relationships.
+
+Flow:
+User Request -> Route Handler -> Business Logic -> Database
+
+"""
 from typing import List, Optional, TYPE_CHECKING
 from datetime import datetime, timezone
 from sqlalchemy.orm import Mapped, mapped_column, relationship

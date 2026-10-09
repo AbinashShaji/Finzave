@@ -1,3 +1,13 @@
+"""
+Module: tests/conftest.py
+
+Purpose:
+Contains Pytest test cases ensuring application stability.
+
+Flow:
+User Request -> Route Handler -> Business Logic -> Database
+
+"""
 import pytest
 from app import create_app
 from extensions import db

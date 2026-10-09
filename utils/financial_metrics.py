@@ -1,3 +1,13 @@
+"""
+Module: utils/financial_metrics.py
+
+Purpose:
+Provides reusable helper functions and core business logic.
+
+Flow:
+User Request -> Route Handler -> Business Logic -> Database
+
+"""
 from typing import List, Dict, Any
 from utils.rule_engine import FinancialPeriod, percentage_change
 

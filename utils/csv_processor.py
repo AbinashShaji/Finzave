@@ -1,3 +1,13 @@
+"""
+Module: utils/csv_processor.py
+
+Purpose:
+Provides reusable helper functions and core business logic.
+
+Flow:
+User Request -> Route Handler -> Business Logic -> Database
+
+"""
 import pandas as pd
 from datetime import datetime
 import io

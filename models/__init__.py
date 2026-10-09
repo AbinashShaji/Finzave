@@ -1,3 +1,13 @@
+"""
+Module: models/__init__.py
+
+Purpose:
+Defines SQLAlchemy database schemas and relationships.
+
+Flow:
+User Request -> Route Handler -> Business Logic -> Database
+
+"""
 from .user import User
 from .income import Income
 from .expense import Expense

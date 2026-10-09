@@ -1,3 +1,13 @@
+"""
+Module: recommendations/engine.py
+
+Purpose:
+Core application logic and configurations.
+
+Flow:
+User Request -> Route Handler -> Business Logic -> Database
+
+"""
 from typing import List, Dict
 from .rules import RECOMMENDATION_MAPPINGS
 

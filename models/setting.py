@@ -1,3 +1,13 @@
+"""
+Module: models/setting.py
+
+Purpose:
+Defines SQLAlchemy database schemas and relationships.
+
+Flow:
+User Request -> Route Handler -> Business Logic -> Database
+
+"""
 from datetime import datetime, timezone
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Integer, String, Boolean, DateTime, ForeignKey

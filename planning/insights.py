@@ -1,3 +1,13 @@
+"""
+Module: planning/insights.py
+
+Purpose:
+Handles goal projections, SIP, and EMI calculations.
+
+Flow:
+User Request -> Route Handler -> Business Logic -> Database
+
+"""
 def generate_planning_insight(planned_amount: float, monthly_savings: float, plan_type: str) -> dict:
     """
     Generates a financial insight comparing a planned financial commitment 

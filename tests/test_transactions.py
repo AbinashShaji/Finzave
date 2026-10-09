@@ -1,3 +1,13 @@
+"""
+Module: tests/test_transactions.py
+
+Purpose:
+Contains Pytest test cases ensuring application stability.
+
+Flow:
+User Request -> Route Handler -> Business Logic -> Database
+
+"""
 import pytest
 from models.expense import Expense
 from models.income import Income

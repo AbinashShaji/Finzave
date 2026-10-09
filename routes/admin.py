@@ -1,3 +1,13 @@
+"""
+Module: routes/admin.py
+
+Purpose:
+Handles HTTP requests, route definitions, and view controllers.
+
+Flow:
+User Request -> Route Handler -> Business Logic -> Database
+
+"""
 from functools import wraps
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for
 from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity

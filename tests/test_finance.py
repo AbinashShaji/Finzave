@@ -1,3 +1,13 @@
+"""
+Module: tests/test_finance.py
+
+Purpose:
+Contains Pytest test cases ensuring application stability.
+
+Flow:
+User Request -> Route Handler -> Business Logic -> Database
+
+"""
 import pytest
 from utils.rule_engine import FinancialPeriod
 from utils.finance import build_financial_periods

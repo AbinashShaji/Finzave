@@ -1,3 +1,13 @@
+"""
+Module: utils/rule_engine.py
+
+Purpose:
+Provides reusable helper functions and core business logic.
+
+Flow:
+User Request -> Route Handler -> Business Logic -> Database
+
+"""
 import logging
 from typing import List, Dict, Any, Optional
 

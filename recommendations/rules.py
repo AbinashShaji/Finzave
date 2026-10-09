@@ -1,3 +1,13 @@
+"""
+Module: recommendations/rules.py
+
+Purpose:
+Core application logic and configurations.
+
+Flow:
+User Request -> Route Handler -> Business Logic -> Database
+
+"""
 # Static deterministic mappings for recommendation engine
 # Must not contain AI logic, new assumptions, or undefined frameworks.
 

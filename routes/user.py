@@ -1,3 +1,13 @@
+"""
+Module: routes/user.py
+
+Purpose:
+Handles HTTP requests, route definitions, and view controllers.
+
+Flow:
+User Request -> Route Handler -> Business Logic -> Database
+
+"""
 from flask import Blueprint, redirect, url_for, request, jsonify
 from flask_jwt_extended import verify_jwt_in_request, current_user
 

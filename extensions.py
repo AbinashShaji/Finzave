@@ -1,3 +1,13 @@
+"""
+Module: extensions.py
+
+Purpose:
+Core application logic and configurations.
+
+Flow:
+User Request -> Route Handler -> Business Logic -> Database
+
+"""
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from flask_caching import Cache

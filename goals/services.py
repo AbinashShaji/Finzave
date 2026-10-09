@@ -1,3 +1,13 @@
+"""
+Module: goals/services.py
+
+Purpose:
+Core application logic and configurations.
+
+Flow:
+User Request -> Route Handler -> Business Logic -> Database
+
+"""
 from datetime import date
 from typing import Dict, Any, List
 from utils.rule_engine import FinancialPeriod

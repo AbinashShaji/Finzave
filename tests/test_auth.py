@@ -1,3 +1,13 @@
+"""
+Module: tests/test_auth.py
+
+Purpose:
+Contains Pytest test cases ensuring application stability.
+
+Flow:
+User Request -> Route Handler -> Business Logic -> Database
+
+"""
 import pytest
 from models.user import User
 from extensions import db

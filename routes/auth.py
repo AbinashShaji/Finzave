@@ -1,3 +1,13 @@
+"""
+Module: routes/auth.py
+
+Purpose:
+Handles HTTP requests, route definitions, and view controllers.
+
+Flow:
+User Request -> Route Handler -> Business Logic -> Database
+
+"""
 from flask import Blueprint, request, jsonify
 from extensions import db
 from models.user import User

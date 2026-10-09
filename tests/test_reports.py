@@ -1,3 +1,13 @@
+"""
+Module: tests/test_reports.py
+
+Purpose:
+Contains Pytest test cases ensuring application stability.
+
+Flow:
+User Request -> Route Handler -> Business Logic -> Database
+
+"""
 import pytest
 from datetime import date
 from dateutil.relativedelta import relativedelta

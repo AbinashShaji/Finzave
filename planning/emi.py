@@ -1,3 +1,13 @@
+"""
+Module: planning/emi.py
+
+Purpose:
+Handles goal projections, SIP, and EMI calculations.
+
+Flow:
+User Request -> Route Handler -> Business Logic -> Database
+
+"""
 def calculate_emi(principal: float, annual_rate: float, years: int) -> dict:
     """
     Calculates the Equated Monthly Installment (EMI) for a loan.

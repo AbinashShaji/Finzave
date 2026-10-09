@@ -1,3 +1,13 @@
+"""
+Module: analysis/scoring.py
+
+Purpose:
+Performs algorithmic health scoring and complex financial analysis.
+
+Flow:
+User Request -> Route Handler -> Business Logic -> Database
+
+"""
 import logging
 from typing import List, Dict, Any, Optional
 from utils.rule_engine import FinancialPeriod

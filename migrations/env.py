@@ -1,3 +1,13 @@
+"""
+Module: migrations/env.py
+
+Purpose:
+Core application logic and configurations.
+
+Flow:
+User Request -> Route Handler -> Business Logic -> Database
+
+"""
 import logging
 from logging.config import fileConfig
 

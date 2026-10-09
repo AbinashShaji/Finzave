@@ -1,3 +1,13 @@
+"""
+Module: tests/test_goals.py
+
+Purpose:
+Contains Pytest test cases ensuring application stability.
+
+Flow:
+User Request -> Route Handler -> Business Logic -> Database
+
+"""
 import pytest
 import datetime
 from datetime import date, timedelta

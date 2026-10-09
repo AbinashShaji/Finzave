@@ -1,3 +1,13 @@
+"""
+Module: tests/test_planning.py
+
+Purpose:
+Contains Pytest test cases ensuring application stability.
+
+Flow:
+User Request -> Route Handler -> Business Logic -> Database
+
+"""
 import pytest
 from planning.sip import calculate_sip
 from planning.emi import calculate_emi

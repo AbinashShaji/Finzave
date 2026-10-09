@@ -1,3 +1,13 @@
+"""
+Module: routes/transactions.py
+
+Purpose:
+Handles HTTP requests, route definitions, and view controllers.
+
+Flow:
+User Request -> Route Handler -> Business Logic -> Database
+
+"""
 from flask import render_template, request, jsonify, Response, stream_with_context
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from routes.user import app_bp

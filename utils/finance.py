@@ -1,3 +1,13 @@
+"""
+Module: utils/finance.py
+
+Purpose:
+Provides reusable helper functions and core business logic.
+
+Flow:
+User Request -> Route Handler -> Business Logic -> Database
+
+"""
 from datetime import date
 import calendar
 from sqlalchemy import func

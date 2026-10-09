@@ -1,3 +1,13 @@
+"""
+Module: utils/pdf_generator.py
+
+Purpose:
+Provides reusable helper functions and core business logic.
+
+Flow:
+User Request -> Route Handler -> Business Logic -> Database
+
+"""
 import io
 from datetime import datetime
 from reportlab.lib import colors

@@ -1,3 +1,13 @@
+"""
+Module: utils/cache_keys.py
+
+Purpose:
+Provides reusable helper functions and core business logic.
+
+Flow:
+User Request -> Route Handler -> Business Logic -> Database
+
+"""
 from extensions import cache
 
 def user_dashboard_key(user_id):

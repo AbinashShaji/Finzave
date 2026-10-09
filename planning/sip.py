@@ -1,3 +1,13 @@
+"""
+Module: planning/sip.py
+
+Purpose:
+Handles goal projections, SIP, and EMI calculations.
+
+Flow:
+User Request -> Route Handler -> Business Logic -> Database
+
+"""
 def calculate_sip(monthly_investment: float, annual_rate: float, years: int) -> dict:
     """
     Calculates the future value of a Systematic Investment Plan (SIP).

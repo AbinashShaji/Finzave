@@ -1,3 +1,13 @@
+"""
+Module: utils/activity.py
+
+Purpose:
+Provides reusable helper functions and core business logic.
+
+Flow:
+User Request -> Route Handler -> Business Logic -> Database
+
+"""
 from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
 from extensions import db
 from models.activity import UserActivity

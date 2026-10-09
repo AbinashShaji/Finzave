@@ -1,3 +1,13 @@
+"""
+Module: routes/public.py
+
+Purpose:
+Handles HTTP requests, route definitions, and view controllers.
+
+Flow:
+User Request -> Route Handler -> Business Logic -> Database
+
+"""
 from flask import Blueprint, render_template, redirect, url_for, jsonify
 
 public_bp = Blueprint('public', __name__)
