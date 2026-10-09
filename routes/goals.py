@@ -124,7 +124,9 @@ def create_goal():
         return jsonify({"error": "Invalid input format"}), 400
     except Exception as e:
         db.session.rollback()
-        return jsonify({"error": "Failed to create goal"}), 400
+        import logging
+        logging.error(f"Error creating goal: {str(e)}")
+        return jsonify({"error": "Unable to create goal. Please try again later."}), 400
 
 @app_bp.route('/api/goals/<int:goal_id>', methods=['PUT'])
 @jwt_required()
@@ -161,7 +163,9 @@ def update_goal(goal_id):
         return jsonify({"error": "Invalid input format"}), 400
     except Exception as e:
         db.session.rollback()
-        return jsonify({"error": "Failed to update goal"}), 400
+        import logging
+        logging.error(f"Error updating goal: {str(e)}")
+        return jsonify({"error": "Unable to update goal. Please try again later."}), 400
 
 @app_bp.route('/api/goals/<int:goal_id>/update-progress', methods=['POST'])
 @jwt_required()
@@ -201,7 +205,9 @@ def update_goal_progress(goal_id):
         return jsonify({"error": "Invalid numeric input"}), 400
     except Exception as e:
         db.session.rollback()
-        return jsonify({"error": "Failed to update progress"}), 500
+        import logging
+        logging.error(f"Error updating progress: {str(e)}")
+        return jsonify({"error": "Unable to update progress. Please try again."}), 500
 
 @app_bp.route('/api/goals/<int:goal_id>', methods=['DELETE'])
 @jwt_required()
@@ -218,7 +224,9 @@ def delete_goal(goal_id):
         return jsonify({"msg": "Goal deleted successfully"}), 200
     except Exception as e:
         db.session.rollback()
-        return jsonify({"error": "Failed to delete goal"}), 400
+        import logging
+        logging.error(f"Error deleting goal: {str(e)}")
+        return jsonify({"error": "Unable to delete goal. Please try again."}), 400
 
 
 

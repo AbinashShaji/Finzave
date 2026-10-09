@@ -81,8 +81,10 @@ def login():
     if user.is_blocked:
         return jsonify({"message": "Your account has been blocked. Please contact support."}), 403
 
-    access_token = create_access_token(identity=str(user.id))
-    
+    access_token = create_access_token(
+        identity=str(user.id),
+        additional_claims={"is_blocked": user.is_blocked}
+    )
     # Log successful login
     log_activity('login', user.id)
     

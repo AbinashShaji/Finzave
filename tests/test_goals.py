@@ -125,7 +125,7 @@ def test_goal_route_success(client, app):
         goal_id = g.id
         token = create_access_token(identity=str(user.id))
         
-    client.set_cookie('localhost', 'access_token_cookie', token)
+    client.set_cookie('access_token_cookie', token)
     res = client.get(f'/app/goals/{goal_id}')
     assert res.status_code == 200
     assert b"Test Route Goal" in res.data
@@ -149,7 +149,7 @@ def test_goal_route_unauthorized(client, app):
         goal_id = g.id
         token1 = create_access_token(identity=str(user1.id))
         
-    client.set_cookie('localhost', 'access_token_cookie', token1)
+    client.set_cookie('access_token_cookie', token1)
     res = client.get(f'/app/goals/{goal_id}')
     assert res.status_code == 404
 
@@ -160,6 +160,6 @@ def test_goal_route_missing(client, app):
         db.session.commit()
         token = create_access_token(identity=str(user.id))
         
-    client.set_cookie('localhost', 'access_token_cookie', token)
+    client.set_cookie('access_token_cookie', token)
     res = client.get('/app/goals/999999')
     assert res.status_code == 404

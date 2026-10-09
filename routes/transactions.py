@@ -68,10 +68,9 @@ def handle_income():
             return jsonify({"message": "Income updated successfully"}), 201
         except Exception as e:
             db.session.rollback()
-            import traceback
-            error_details = f"{type(e).__name__}: {str(e)}"
-            print(traceback.format_exc())
-            return jsonify({"error": error_details}), 400
+            import logging
+            logging.error(f"Error saving income: {str(e)}")
+            return jsonify({"error": "Unable to save income record. Please check your data and try again."}), 400
             
     # GET
     today = datetime.utcnow().date()
@@ -135,8 +134,8 @@ def handle_income_by_id(income_id):
         except Exception as e:
             db.session.rollback()
             import logging
-            logging.error(f"Error deleting expense: {str(e)}")
-            return jsonify({"error": "An internal error occurred."}), 400
+            logging.error(f"Error deleting income: {str(e)}")
+            return jsonify({"error": "Unable to delete income. Please try again later."}), 400
 
     # PUT
     data = request.json
@@ -173,7 +172,9 @@ def handle_income_by_id(income_id):
         return jsonify({"message": "Income updated successfully"}), 200
     except Exception as e:
         db.session.rollback()
-        return jsonify({"error": str(e)}), 400
+        import logging
+        logging.error(f"Error updating income: {str(e)}")
+        return jsonify({"error": "Unable to update income record. Please try again."}), 400
 
 @app_bp.route('/api/transactions/expense', methods=['GET', 'POST'])
 @jwt_required()

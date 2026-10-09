@@ -50,11 +50,12 @@ def create_app(config_class=Config):
 
     @app.before_request
     def check_if_blocked():
-        from flask_jwt_extended import verify_jwt_in_request, current_user
+        from flask_jwt_extended import verify_jwt_in_request, get_jwt
         try:
-            # Check if there is a valid JWT. If so, it will load current_user
+            # Check if there is a valid JWT.
             verify_jwt_in_request(optional=True)
-            if current_user and current_user.is_blocked:
+            claims = get_jwt()
+            if claims and claims.get("is_blocked"):
                 # Force logout behavior for APIs or Redirect
                 if request.path.startswith('/api') or request.path.startswith('/app/api'):
                     return jsonify({"msg": "Your account has been blocked. Please contact support."}), 403
