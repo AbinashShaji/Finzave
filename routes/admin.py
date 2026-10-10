@@ -9,7 +9,7 @@ User Request -> Route Handler -> Business Logic -> Database
 
 """
 from functools import wraps
-from flask import Blueprint, request, jsonify, render_template, redirect, url_for
+from flask import Blueprint, request, jsonify, render_template, redirect, url_for, current_app
 from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
 from extensions import db
 from models.user import User
@@ -177,20 +177,20 @@ def get_stats():
                 filled[item['date']] = item['count']
         user_growth_chart = [{"date": k, "count": v} for k, v in filled.items()]
 
-    # Engagement trend — daily activity counts over last 14 days
-    recent_product_activities = UserActivity.query.filter(
+    # Engagement trend — daily activity counts over last 14 days (database aggregation)
+    daily_act_counts = db.session.query(
+        cast(UserActivity.created_at, Date).label('act_date'),
+        func.count(UserActivity.id).label('count')
+    ).filter(
         UserActivity.created_at >= now - timedelta(days=14),
         UserActivity.action.notin_(['login', 'logout'])
-    ).all()
+    ).group_by(cast(UserActivity.created_at, Date)).all()
 
+    act_counts_map = {str(row.act_date): row.count for row in daily_act_counts}
     trend = {}
     for i in range(14):
         d = (now - timedelta(days=13-i)).strftime('%Y-%m-%d')
-        trend[d] = 0
-    for act in recent_product_activities:
-        date_str = act.created_at.strftime('%Y-%m-%d')
-        if date_str in trend:
-            trend[date_str] = trend.get(date_str, 0) + 1
+        trend[d] = act_counts_map.get(d, 0)
 
     engagement_trend = [{"date": k, "count": v} for k, v in trend.items()]
 
@@ -209,15 +209,16 @@ def get_stats():
     # SECTION 3 — FEATURE USAGE (privacy-safe counts)
     # ──────────────────────────────────────────────
 
-    # Module usage from activity tracking
-    all_product_activities = UserActivity.query.filter(
+    # Module usage from activity tracking (database aggregation)
+    feature_counts = db.session.query(
+        UserActivity.action,
+        func.count(UserActivity.id).label('count')
+    ).filter(
         UserActivity.created_at >= thirty_days_ago,
         UserActivity.action.notin_(['login', 'logout'])
-    ).all()
+    ).group_by(UserActivity.action).all()
 
-    modules = {}
-    for act in all_product_activities:
-        modules[act.action] = modules.get(act.action, 0) + 1
+    modules = {row.action: row.count for row in feature_counts}
 
     total_module_events = sum(modules.values()) if modules else 1
     feature_usage = [{
@@ -376,9 +377,14 @@ def block_user(user_id):
     if not user:
         return jsonify(message="User not found"), 404
         
-    user.is_blocked = True
-    db.session.commit()
-    return jsonify(message="User blocked successfully"), 200
+    try:
+        user.is_blocked = True
+        db.session.commit()
+        return jsonify(message="User blocked successfully"), 200
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.exception(f"Error blocking user {user_id}: {e}")
+        return jsonify(message="Failed to block user. Please try again."), 500
 
 @admin_bp.route('/api/admin/users/<int:user_id>/unblock', methods=['POST'])
 @admin_required()
@@ -387,10 +393,14 @@ def unblock_user(user_id):
     if not user:
         return jsonify(message="User not found"), 404
         
-    user.is_blocked = False
-    db.session.commit()
-    return jsonify(message="User unblocked successfully"), 200
-
+    try:
+        user.is_blocked = False
+        db.session.commit()
+        return jsonify(message="User unblocked successfully"), 200
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.exception(f"Error unblocking user {user_id}: {e}")
+        return jsonify(message="Failed to unblock user. Please try again."), 500
 
 @admin_bp.route('/api/admin/users/<int:user_id>', methods=['DELETE'])
 @admin_required()
@@ -403,9 +413,17 @@ def delete_user(user_id):
     if not user:
         return jsonify(message="User not found"), 404
         
-    db.session.delete(user)
-    db.session.commit()
-    return jsonify(message="User deleted successfully"), 200
+    if user.role == 'admin':
+        return jsonify(message="Cannot delete an administrator account"), 403
+        
+    try:
+        db.session.delete(user)
+        db.session.commit()
+        return jsonify(message="User deleted successfully"), 200
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.exception(f"Error deleting user {user_id}: {e}")
+        return jsonify(message="Failed to delete user. Please try again."), 500
 
 @admin_bp.route('/api/admin/reviews', methods=['GET'])
 @admin_required()
@@ -440,9 +458,14 @@ def update_review_status(review_id):
     if not review:
         return jsonify(message="Review not found"), 404
         
-    review.status = new_status
-    db.session.commit()
-    return jsonify(message="Review status updated successfully"), 200
+    try:
+        review.status = new_status
+        db.session.commit()
+        return jsonify(message="Review status updated successfully"), 200
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.exception(f"Error updating review status {review_id}: {e}")
+        return jsonify(message="Failed to update review status."), 500
 
 @admin_bp.route('/api/admin/reviews/<int:review_id>', methods=['DELETE'])
 @admin_required()
@@ -451,9 +474,14 @@ def delete_review(review_id):
     if not review:
         return jsonify(message="Review not found"), 404
         
-    review.status = 'deleted'
-    db.session.commit()
-    return jsonify(message="Review deleted successfully"), 200
+    try:
+        review.status = 'deleted'
+        db.session.commit()
+        return jsonify(message="Review deleted successfully"), 200
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.exception(f"Error deleting review {review_id}: {e}")
+        return jsonify(message="Failed to delete review."), 500
 
 @admin_bp.route('/api/admin/feedback', methods=['GET'])
 @admin_required()
@@ -488,9 +516,14 @@ def update_feedback_status(feedback_id):
     if not feedback:
         return jsonify(message="Feedback not found"), 404
         
-    feedback.status = new_status
-    db.session.commit()
-    return jsonify(message="Feedback status updated successfully"), 200
+    try:
+        feedback.status = new_status
+        db.session.commit()
+        return jsonify(message="Feedback status updated successfully"), 200
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.exception(f"Error updating feedback status {feedback_id}: {e}")
+        return jsonify(message="Failed to update feedback status."), 500
 
 @admin_bp.route('/api/admin/feedback/<int:feedback_id>', methods=['DELETE'])
 @admin_required()
@@ -499,9 +532,14 @@ def delete_feedback(feedback_id):
     if not feedback:
         return jsonify(message="Feedback not found"), 404
         
-    feedback.status = 'deleted'
-    db.session.commit()
-    return jsonify(message="Feedback deleted successfully"), 200
+    try:
+        feedback.status = 'deleted'
+        db.session.commit()
+        return jsonify(message="Feedback deleted successfully"), 200
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.exception(f"Error deleting feedback {feedback_id}: {e}")
+        return jsonify(message="Failed to delete feedback."), 500
 
 @admin_bp.route('/api/admin/system', methods=['GET'])
 @admin_required()

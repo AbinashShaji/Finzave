@@ -8,7 +8,7 @@ Flow:
 User Request -> Route Handler -> Business Logic -> Database
 
 """
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from extensions import db
 from models.user import User
 from flask_jwt_extended import (
@@ -66,8 +66,13 @@ def register():
     # Add user
     new_user = User(username=username, email=email, full_name=full_name)
     new_user.set_password(password)
-    db.session.add(new_user)
-    db.session.commit()
+    try:
+        db.session.add(new_user)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.exception(f"Error registering user: {e}")
+        return jsonify({"message": "Registration failed. Please try again."}), 500
 
     return jsonify({"message": "User registered successfully"}), 201
 

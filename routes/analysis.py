@@ -8,7 +8,7 @@ Flow:
 User Request -> Route Handler -> Business Logic -> Database
 
 """
-from flask import render_template
+from flask import render_template, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from routes.user import app_bp
 from utils.finance import build_financial_periods
@@ -55,7 +55,11 @@ def analysis():
         analysis_record.metrics = metrics
         analysis_record.insights = insights
         analysis_record.health_score = health_score
-        db.session.commit()
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            current_app.logger.exception(f"Error saving analysis record: {e}")
 
     # 5. Generate Recommendations
     user_goals = db.session.query(Goal).filter_by(user_id=user_id).all()
@@ -89,7 +93,7 @@ def analysis():
         insights=insights,
         health_score=health_score,
         recommendations=recommendations,
-        chart_data=json.dumps(chart_data),
+        chart_data=chart_data,
     )
 
 
@@ -107,7 +111,7 @@ def analysis_monthly():
         'app/analysis_monthly.html',
         monthly=monthly,
         insights=insights,
-        chart_data=json.dumps(monthly.get("chart_data", {})),
+        chart_data=monthly.get("chart_data", {}),
     )
 
 
@@ -123,5 +127,5 @@ def analysis_yearly():
     return render_template(
         'app/analysis_yearly.html',
         yearly=yearly,
-        chart_data=json.dumps(yearly.get("chart_data", {})),
+        chart_data=yearly.get("chart_data", {}),
     )

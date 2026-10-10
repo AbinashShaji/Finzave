@@ -98,7 +98,7 @@
         {% if metrics.has_data %}
         
         // --- Overview Category Doughnut Chart ---
-        const overviewData = JSON.parse('{{ overview | tojson | safe }}');
+        const overviewData = {{ overview | tojson }};
         if (overviewData.categories && Object.keys(overviewData.categories).length > 0) {
             const catEntries = Object.entries(overviewData.categories).sort((a,b)=>b[1]-a[1]).slice(0, 6); // Top 6
             const catCtx = document.getElementById('categoryChart').getContext('2d');

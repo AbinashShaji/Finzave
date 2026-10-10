@@ -16,23 +16,23 @@ from models.income import Income
 
 def get_active_fixed_incomes(user_id, as_of_date):
     """
-    Returns the latest effective fixed income for each distinct source as of a specific date using database identity.
+    Returns the latest effective fixed income for each distinct source as of a specific date.
     Returns: dict with 'total_amount' and 'active_records'
     """
     fixed_incomes = Income.query.filter(
         Income.user_id == user_id,
         Income.income_type == 'Fixed',
         Income.date <= as_of_date
-    ).order_by(Income.date.desc()).all()
+    ).order_by(Income.date.desc(), Income.id.desc()).all()
     
-    seen_ids = set()
+    seen_sources = set()
     total_amount = 0.0
     active_records = []
     
     for record in fixed_incomes:
-        key = record.id
-        if key not in seen_ids:
-            seen_ids.add(key)
+        source = (record.description or "").strip().lower()
+        if source not in seen_sources:
+            seen_sources.add(source)
             total_amount += record.amount
             active_records.append({
                 "id": record.id,
@@ -137,7 +137,7 @@ def build_financial_periods(user_id, months=12):
         Income.user_id == user_id,
         Income.income_type == 'Fixed',
         Income.date <= today
-    ).order_by(Income.date.desc()).all()
+    ).order_by(Income.date.desc(), Income.id.desc()).all()
     
     # Generate periods from oldest to newest
     for i in range(effective_months - 1, -1, -1):
@@ -151,13 +151,13 @@ def build_financial_periods(user_id, months=12):
         last_day = calendar.monthrange(year, month)[1]
         end_of_month_date = date(year, month, last_day)
         
-        seen_ids = set()
+        seen_sources = set()
         fixed_total = 0.0
         for record in all_fixed:
             if record.date <= end_of_month_date:
-                key = record.id
-                if key not in seen_ids:
-                    seen_ids.add(key)
+                source = (record.description or "").strip().lower()
+                if source not in seen_sources:
+                    seen_sources.add(source)
                     fixed_total += record.amount
                     
         variable_total = variable_dict.get((year, month), 0.0)
@@ -173,15 +173,5 @@ def build_financial_periods(user_id, months=12):
         )
         periods.append(period)
         
-    # If evaluating multi-month history, trim leading periods that have no data prior to earliest user activity
-    if effective_months > 1 and periods:
-        first_data_idx = 0
-        for idx, p in enumerate(periods):
-            if p.status != "no_data":
-                first_data_idx = idx
-                break
-        if first_data_idx > 0:
-            periods = periods[first_data_idx:]
-            
     return periods
 

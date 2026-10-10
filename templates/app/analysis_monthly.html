@@ -209,7 +209,7 @@
 
         {% if monthly.has_data %}
         const monthly = {{ monthly | tojson }};
-        const chartData = JSON.parse('{{ chart_data | safe }}');
+        const chartData = {{ chart_data | tojson }};
 
         const chartFontFamily = "'Outfit', sans-serif";
         const gridColor = '#f1f5f9';

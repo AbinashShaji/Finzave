@@ -191,3 +191,55 @@ def test_fixed_rent_with_reduced_variable_spending():
     rent_warnings = [i for i in insights if i.get("rule_id") in ("RB-02", "RB-07") and "Rent & Housing" in i["message"]]
     assert len(rent_warnings) == 0
 
+
+def test_fixed_income_deduplication_database(app):
+    """Test that multiple historical fixed income entries for the same source do not accumulate."""
+    from datetime import date
+    from extensions import db
+    from models.user import User
+    from models.income import Income
+    from utils.finance import get_active_fixed_incomes
+
+    with app.app_context():
+        user = User(username='test_dedup_user', email='dedup@test.com')
+        user.set_password('Password123!')
+        db.session.add(user)
+        db.session.commit()
+
+        # Jan Salary: 50,000
+        inc1 = Income(user_id=user.id, amount=50000.0, income_type='Fixed', date=date(2026, 1, 1), description='Salary')
+        # Feb Salary update: 55,000
+        inc2 = Income(user_id=user.id, amount=55000.0, income_type='Fixed', date=date(2026, 2, 1), description='Salary')
+        db.session.add_all([inc1, inc2])
+        db.session.commit()
+
+        # As of Feb 15, active salary must be 55,000 (latest), NOT 105,000
+        active = get_active_fixed_incomes(user.id, date(2026, 2, 15))
+        assert active['total_amount'] == 55000.0
+        assert len(active['active_records']) == 1
+        assert active['active_records'][0]['amount'] == 55000.0
+
+
+def test_multiple_fixed_sources_database(app):
+    """Test that distinct fixed income sources remain separate and sum together."""
+    from datetime import date
+    from extensions import db
+    from models.user import User
+    from models.income import Income
+    from utils.finance import get_active_fixed_incomes
+
+    with app.app_context():
+        user = User(username='test_multi_sources', email='sources@test.com')
+        user.set_password('Password123!')
+        db.session.add(user)
+        db.session.commit()
+
+        inc1 = Income(user_id=user.id, amount=50000.0, income_type='Fixed', date=date(2026, 1, 1), description='Salary')
+        inc2 = Income(user_id=user.id, amount=10000.0, income_type='Fixed', date=date(2026, 1, 15), description='Rental Income')
+        db.session.add_all([inc1, inc2])
+        db.session.commit()
+
+        active = get_active_fixed_incomes(user.id, date(2026, 2, 1))
+        assert active['total_amount'] == 60000.0
+        assert len(active['active_records']) == 2
+

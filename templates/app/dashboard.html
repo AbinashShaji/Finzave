@@ -294,7 +294,7 @@
         lucide.createIcons();
         
         {% if has_data %}
-        const chartData = JSON.parse('{{ chart_data | safe }}');
+        const chartData = {{ chart_data | tojson }};
         
         if (chartData.cat_labels && chartData.cat_labels.length > 0 && '{{ current_period.status }}' !== 'incomplete') {
             

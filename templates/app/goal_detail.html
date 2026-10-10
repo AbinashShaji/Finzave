@@ -227,7 +227,7 @@ document.addEventListener("DOMContentLoaded", function() {
     lucide.createIcons();
 
     // Build projection data from real calculations
-    var projData = {{ intel.projection | tojson | safe }};
+    var projData = {{ intel.projection | tojson }};
     var currentSaved = {{ intel.progress.saved }};
     var targetAmount = {{ intel.progress.target }};
 

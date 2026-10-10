@@ -8,7 +8,8 @@ Flow:
 User Request -> Route Handler -> Business Logic -> Database
 
 """
-from flask import render_template, request, jsonify, redirect, url_for
+from flask import render_template, request, jsonify, redirect, url_for, current_app
+import re
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from routes.user import app_bp
 from extensions import db
@@ -58,6 +59,9 @@ def api_profile():
         full_name = data.get('full_name')
         
         if email:
+            email = email.strip()
+            if not re.match(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$', email):
+                return jsonify({"message": "Invalid email format"}), 400
             # Check for duplicate email
             existing_user = User.query.filter_by(email=email).first()
             if existing_user and existing_user.id != user.id:
@@ -65,10 +69,15 @@ def api_profile():
             user.email = email
             
         if full_name is not None:
-            user.full_name = full_name
+            user.full_name = full_name.strip()[:120]
             
-        db.session.commit()
-        return jsonify({"message": "Profile updated successfully"}), 200
+        try:
+            db.session.commit()
+            return jsonify({"message": "Profile updated successfully"}), 200
+        except Exception as e:
+            db.session.rollback()
+            current_app.logger.exception(f"Error updating profile: {e}")
+            return jsonify({"message": "Failed to update profile. Please try again."}), 500
 
 @app_bp.route('/api/profile/password', methods=['POST'])
 @jwt_required()
@@ -96,7 +105,6 @@ def update_password():
     if new_password != confirm_password:
         return jsonify({"message": "New passwords do not match"}), 400
         
-    import re
     if len(new_password) < 6:
         return jsonify({"message": "Password must be at least 6 characters"}), 400
     if not re.search(r'[A-Z]', new_password):
@@ -108,10 +116,14 @@ def update_password():
     if not re.search(r'[^a-zA-Z0-9]', new_password):
         return jsonify({"message": "Password must contain at least 1 special character"}), 400
         
-    user.set_password(new_password)
-    db.session.commit()
-    
-    return jsonify({"message": "Password updated successfully"}), 200
+    try:
+        user.set_password(new_password)
+        db.session.commit()
+        return jsonify({"message": "Password updated successfully"}), 200
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.exception(f"Error updating password: {e}")
+        return jsonify({"message": "Failed to update password. Please try again."}), 500
 
 @app_bp.route('/api/profile/preferences', methods=['PUT'])
 @jwt_required()
@@ -134,13 +146,22 @@ def update_preferences():
     currency = data.get('currency')
     email_notifications = data.get('email_notifications')
     
+    ALLOWED_CURRENCIES = {'INR', 'USD', 'EUR'}
     if currency:
-        setting.currency = currency
+        curr_str = str(currency).strip().upper()
+        if curr_str not in ALLOWED_CURRENCIES:
+            return jsonify({"message": f"Invalid currency. Allowed currencies: {', '.join(sorted(ALLOWED_CURRENCIES))}"}), 400
+        setting.currency = curr_str
     if email_notifications is not None:
         setting.email_notifications = bool(email_notifications)
         
-    db.session.commit()
-    return jsonify({"message": "Preferences updated successfully"}), 200
+    try:
+        db.session.commit()
+        return jsonify({"message": "Preferences updated successfully"}), 200
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.exception(f"Error updating preferences: {e}")
+        return jsonify({"message": "Failed to update preferences. Please try again."}), 500
 @app_bp.route('/api/profile/delete-account', methods=['POST'])
 @jwt_required()
 def delete_account():

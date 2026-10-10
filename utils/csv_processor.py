@@ -13,6 +13,7 @@ from datetime import datetime
 import io
 import logging
 from models.expense import EXPENSE_CATEGORIES, normalize_category, Expense
+from utils.hash_utils import generate_transaction_hash
 
 logger = logging.getLogger(__name__)
 
@@ -100,7 +101,7 @@ def process_expense_csv(file_stream: bytes, user_id: int = None) -> dict:
         try:
             existing_expenses = Expense.query.filter_by(user_id=user_id).all()
             for ex in existing_expenses:
-                h = f"{ex.date.isoformat()}_{ex.amount}_{ex.category}_{ex.description}"
+                h = generate_transaction_hash(ex.date, ex.amount, ex.category, ex.description)
                 existing_hashes.add(h)
         except Exception as e:
             logger.error(f"Error fetching existing expenses: {str(e)}")
@@ -166,7 +167,7 @@ def process_expense_csv(file_stream: bytes, user_id: int = None) -> dict:
 
         if record['is_valid']:
             # Check for duplicates
-            row_hash = f"{record['date']}_{record['amount']}_{record['category']}_{record.get('description', '')}"
+            row_hash = generate_transaction_hash(record['date'], record['amount'], record['category'], record.get('description'))
             if user_id and row_hash in existing_hashes:
                 record['is_valid'] = False
                 record['errors'].append("Duplicate transaction")

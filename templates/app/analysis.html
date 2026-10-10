@@ -354,8 +354,8 @@
         lucide.createIcons();
 
         {% if overview.has_data %}
-        const chartData = JSON.parse('{{ chart_data | safe }}');
-        const overview = JSON.parse('{{ overview | tojson | safe }}');
+        const chartData = {{ chart_data | tojson }};
+        const overview = {{ overview | tojson }};
 
         // --- Category Doughnut ---
         if (!overview.is_incomplete && overview.categories && Object.keys(overview.categories).length > 0) {

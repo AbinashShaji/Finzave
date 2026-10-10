@@ -8,7 +8,7 @@ Flow:
 User Request -> Route Handler -> Business Logic -> Database
 
 """
-from flask import render_template, request, jsonify, Response, stream_with_context
+from flask import render_template, request, jsonify, Response, stream_with_context, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from routes.user import app_bp
 from extensions import db, cache
@@ -22,6 +22,7 @@ from sqlalchemy import func
 import csv
 from io import StringIO
 from utils.cache_keys import invalidate_user_financial_cache
+from utils.hash_utils import generate_transaction_hash, sanitize_csv_value
 
 @app_bp.route('/transactions')
 @jwt_required()
@@ -221,8 +222,8 @@ def handle_expense():
         except ValueError as e:
             return jsonify({"error": "Invalid data format provided."}), 400
         except Exception as e:
-            import logging
-            logging.error(f"Error creating expense: {str(e)}")
+            db.session.rollback()
+            current_app.logger.exception(f"Error creating expense: {str(e)}")
             return jsonify({"error": "An internal error occurred."}), 400
             
     # GET with filters
@@ -293,7 +294,8 @@ def handle_expense_by_id(expense_id):
             return jsonify({"message": "Expense record deleted successfully"}), 200
         except Exception as e:
             db.session.rollback()
-            return jsonify({"error": str(e)}), 400
+            current_app.logger.exception(f"Error deleting expense: {str(e)}")
+            return jsonify({"error": "Unable to delete expense. Please try again later."}), 400
 
     # PUT
     data = request.json
@@ -322,7 +324,8 @@ def handle_expense_by_id(expense_id):
         return jsonify({"message": "Expense updated successfully"}), 200
     except Exception as e:
         db.session.rollback()
-        return jsonify({"error": str(e)}), 400
+        current_app.logger.exception(f"Error updating expense: {str(e)}")
+        return jsonify({"error": "Unable to update expense. Please check your data and try again."}), 400
 
 @app_bp.route('/api/transactions/expense/export', methods=['GET'])
 @jwt_required()
@@ -364,7 +367,12 @@ def export_expenses_csv():
         si.truncate(0)
         
         for e in query.yield_per(100):
-            cw.writerow([e.date.isoformat(), e.category, e.description, f"{e.amount:.2f}"])
+            cw.writerow([
+                sanitize_csv_value(e.date.isoformat()),
+                sanitize_csv_value(e.category),
+                sanitize_csv_value(e.description or ''),
+                f"{e.amount:.2f}"
+            ])
             yield si.getvalue()
             si.seek(0)
             si.truncate(0)
@@ -420,7 +428,7 @@ def confirm_csv():
     try:
         existing_expenses = Expense.query.filter_by(user_id=user_id).all()
         for ex in existing_expenses:
-            h = f"{ex.date.isoformat()}_{float(ex.amount)}_{ex.category}_{(ex.description or '').lower()}"
+            h = generate_transaction_hash(ex.date, ex.amount, ex.category, ex.description)
             existing_hashes.add(h)
     except Exception as e:
         import logging
@@ -440,7 +448,7 @@ def confirm_csv():
         record = val_result['record']
         
         # Check for duplicates
-        row_hash = f"{record['date']}_{record['amount']}_{record['category']}_{(record.get('description') or '').lower()}"
+        row_hash = generate_transaction_hash(record['date'], record['amount'], record['category'], record.get('description'))
         if row_hash in existing_hashes:
             errors.append({"row": row_num, "reason": "Duplicate transaction"})
         else:
@@ -473,6 +481,5 @@ def confirm_csv():
         }), 201
     except Exception as e:
         db.session.rollback()
-        import logging
-        logging.exception("Error during confirm-csv import")
-        return jsonify({"error": str(e)}), 400
+        current_app.logger.exception("Error during confirm-csv import")
+        return jsonify({"error": "Failed to import transactions. Please verify data format."}), 400

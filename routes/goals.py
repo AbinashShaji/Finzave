@@ -17,6 +17,7 @@ from datetime import datetime, date
 from utils.finance import build_financial_periods
 from goals.services import build_goal_intelligence
 from utils.activity import log_activity
+from utils.cache_keys import invalidate_user_financial_cache
 
 def prepare_goals_data(user_goals):
     today = date.today()
@@ -128,6 +129,7 @@ def create_goal():
         )
         db.session.add(new_goal)
         db.session.commit()
+        invalidate_user_financial_cache(user_id)
         log_activity('goal_created')
         return jsonify({"msg": "Goal created successfully"}), 201
     except ValueError as e:
@@ -163,6 +165,7 @@ def update_goal(goal_id):
             goal.target_date = datetime.strptime(data['target_date'], '%Y-%m-%d').date()
             
         db.session.commit()
+        invalidate_user_financial_cache(user_id)
         
         log_activity('goal_updated')
         if goal.current_saved >= goal.target_amount:
@@ -201,6 +204,7 @@ def update_goal_progress(goal_id):
             
         goal.current_saved = val
         db.session.commit()
+        invalidate_user_financial_cache(user_id)
         
         log_activity('goal_updated')
         if goal.current_saved >= goal.target_amount:
@@ -231,6 +235,7 @@ def delete_goal(goal_id):
     try:
         db.session.delete(goal)
         db.session.commit()
+        invalidate_user_financial_cache(user_id)
         return jsonify({"msg": "Goal deleted successfully"}), 200
     except Exception as e:
         db.session.rollback()

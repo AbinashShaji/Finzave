@@ -20,6 +20,7 @@ from models.expense import Expense
 import csv
 import io
 from utils.activity import log_activity
+from utils.hash_utils import sanitize_csv_value
 
 @app_bp.route('/reports')
 @jwt_required()
@@ -80,7 +81,12 @@ def export_csv():
     writer.writerow(['Date', 'Category', 'Amount', 'Description'])
     
     for ex in expenses:
-        writer.writerow([ex.date.strftime('%Y-%m-%d'), ex.category, f"{ex.amount:.2f}", ex.description or ''])
+        writer.writerow([
+            sanitize_csv_value(ex.date.strftime('%Y-%m-%d')),
+            sanitize_csv_value(ex.category),
+            f"{ex.amount:.2f}",
+            sanitize_csv_value(ex.description or '')
+        ])
         
     return Response(
         output.getvalue(),

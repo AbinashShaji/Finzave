@@ -252,8 +252,8 @@
         lucide.createIcons();
 
         {% if yearly.has_data %}
-        const yearly = JSON.parse('{{ yearly | tojson | safe }}');
-        const chartData = JSON.parse('{{ chart_data | safe }}');
+        const yearly = {{ yearly | tojson }};
+        const chartData = {{ chart_data | tojson }};
         const chartFontFamily = "'Outfit', sans-serif";
         const gridColor = '#f1f5f9';
         const gridBorderDash = [4, 4];

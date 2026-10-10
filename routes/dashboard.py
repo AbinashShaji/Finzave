@@ -57,10 +57,10 @@ def dashboard():
         health_data=health_data,
         insights=insights,
         recent_expenses=recent_expenses,
-        chart_data=json.dumps({
+        chart_data={
             'cat_labels': category_labels,
             'cat_data': category_data
-        })
+        }
     )
 
 
