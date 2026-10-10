@@ -26,7 +26,7 @@ from utils.activity import log_activity
 def reports():
     user_id = int(get_jwt_identity())
     log_activity('reports_view')
-    periods = build_financial_periods(user_id, months=6)
+    periods = build_financial_periods(user_id, months=12)
     
     # We need global has_data to know if user has ANY data ever
     has_data = any((p.total_income > 0 or p.total_expenses > 0) for p in periods)
@@ -93,7 +93,7 @@ def export_csv():
 def export_pdf():
     user_id = int(get_jwt_identity())
     log_activity('report_generated')
-    periods = build_financial_periods(user_id, months=6)
+    periods = build_financial_periods(user_id, months=12)
     
     selected_period = request.args.get('period')
     current_period = None

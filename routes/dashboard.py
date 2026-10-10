@@ -28,7 +28,7 @@ def dashboard():
     log_activity('dashboard_view')
     
     # Use the same data adapter
-    periods = build_financial_periods(user_id, months=6)
+    periods = build_financial_periods(user_id, months=12)
     
     # We need has_data for scoring calculation
     has_data = any((p.total_income > 0 or p.total_expenses > 0) for p in periods)

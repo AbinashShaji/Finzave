@@ -11,11 +11,12 @@ User Request -> Route Handler -> Business Logic -> Database
 from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
 from extensions import db
 from models.activity import UserActivity
+from typing import Optional
 import logging
 
 logger = logging.getLogger(__name__)
 
-def log_activity(action: str, user_id: int = None):
+def log_activity(action: str, user_id: Optional[int] = None):
     """
     Logs a non-financial user activity.
     If user_id is not provided, it attempts to fetch it from the current JWT identity.

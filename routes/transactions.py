@@ -15,7 +15,7 @@ from extensions import db, cache
 from models.user import User
 from models.income import Income
 from models.expense import Expense, EXPENSE_CATEGORIES, normalize_category
-from utils.csv_processor import process_expense_csv
+from utils.csv_processor import process_expense_csv, validate_transaction
 from utils.finance import get_active_fixed_incomes
 from datetime import datetime
 from sqlalchemy import func
@@ -420,66 +420,59 @@ def confirm_csv():
     try:
         existing_expenses = Expense.query.filter_by(user_id=user_id).all()
         for ex in existing_expenses:
-            h = f"{ex.date.isoformat()}_{float(ex.amount)}_{ex.category.lower()}_{ex.description.lower()}"
+            h = f"{ex.date.isoformat()}_{float(ex.amount)}_{ex.category}_{(ex.description or '').lower()}"
             existing_hashes.add(h)
-    except Exception:
-        pass
+    except Exception as e:
+        import logging
+        logging.error(f"Error fetching existing expenses: {str(e)}")
+        return jsonify({"error": "Failed to load existing records for duplicate check"}), 500
         
     for i, r in enumerate(records):
         row_num = r.get('row_number', i+1)
-        row_errors = []
         
-        try:
-            date_val = datetime.strptime(str(r.get('date', '')), '%Y-%m-%d').date()
-            if date_val > datetime.now().date():
-                row_errors.append("Future date")
-        except:
-            row_errors.append("Invalid date")
-            
-        try:
-            amount = float(r.get('amount', 0))
-            if amount <= 0:
-                row_errors.append("Invalid amount")
-        except:
-            row_errors.append("Invalid amount")
-            
-        cat = str(r.get('category', '')).strip()
-        if not cat:
-            row_errors.append("Missing category")
-            
-        if not row_errors:
-            desc = str(r.get('description', ''))[:255]
-            row_hash = f"{date_val.isoformat()}_{float(amount)}_{cat.lower()}_{desc.lower()}"
-            if row_hash in existing_hashes:
-                row_errors.append("Duplicate transaction")
-            else:
-                existing_hashes.add(row_hash)
-                valid_records.append({
-                    "date": date_val,
-                    "amount": amount,
-                    "category": cat,
-                    "description": desc
-                })
-                
-        if row_errors:
-            errors.append({"row": row_num, "errors": row_errors})
-            
-    if errors:
-        return jsonify({"error": "Validation failed", "details": errors}), 400
+        # Use shared validation
+        val_result = validate_transaction(r)
         
+        if not val_result['is_valid']:
+            errors.append({"row": row_num, "reason": ", ".join(val_result['errors'])})
+            continue
+            
+        record = val_result['record']
+        
+        # Check for duplicates
+        row_hash = f"{record['date']}_{record['amount']}_{record['category']}_{(record.get('description') or '').lower()}"
+        if row_hash in existing_hashes:
+            errors.append({"row": row_num, "reason": "Duplicate transaction"})
+        else:
+            existing_hashes.add(row_hash)
+            valid_records.append(record)
+            
     try:
         for r in valid_records:
             expense = Expense(
                 user_id=user_id,
                 amount=r['amount'],
                 category=r['category'],
-                date=r['date'],
-                description=r['description']
+                date=datetime.strptime(r['date'], '%Y-%m-%d').date(),
+                description=r.get('description', '')
             )
             db.session.add(expense)
         db.session.commit()
         invalidate_user_financial_cache(user_id)
-        return jsonify({"message": f"{len(valid_records)} expenses imported successfully"}), 201
+        
+        msg = f"{len(valid_records)} transactions imported successfully."
+        if errors:
+            msg += f" {len(errors)} rows skipped."
+            
+        return jsonify({
+            "success": True,
+            "message": msg,
+            "imported": len(valid_records),
+            "failed": len(errors),
+            "errors": errors
+        }), 201
     except Exception as e:
         db.session.rollback()
+        import logging
+        logging.exception("Error during confirm-csv import")
         return jsonify({"error": str(e)}), 400

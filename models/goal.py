@@ -12,6 +12,10 @@ from datetime import date, datetime, timezone
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Integer, String, Float, Date, DateTime, ForeignKey
 from extensions import db
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from models.user import User
 
 class Goal(db.Model):
     __tablename__ = 'goals'

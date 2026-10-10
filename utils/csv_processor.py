@@ -19,6 +19,57 @@ logger = logging.getLogger(__name__)
 REQUIRED_COLUMNS = ['date', 'amount', 'category']
 OPTIONAL_COLUMNS = ['description']
 
+def validate_transaction(row_dict: dict) -> dict:
+    """Validates an individual transaction row dictionary."""
+    errors = []
+    raw_date = str(row_dict.get('date', '')).strip()
+    formatted_date = None
+    try:
+        date_val = pd.to_datetime(raw_date).date()
+        if date_val > datetime.now().date():
+            errors.append("Future transaction date is not allowed")
+        else:
+            formatted_date = date_val.isoformat()
+    except Exception:
+        errors.append("Invalid date format")
+
+    amount = None
+    try:
+        amt = float(row_dict.get('amount', 0))
+        if amt <= 0:
+            errors.append("Amount must be a positive number")
+        else:
+            amount = round(amt, 2)
+    except Exception:
+        errors.append("Amount must be a positive number")
+
+    category = str(row_dict.get('category', '')).strip()
+    normalized_cat = None
+    if not category or category.lower() == 'nan':
+        errors.append("Category cannot be empty")
+    else:
+        normalized_cat = normalize_category(category)
+        if not normalized_cat:
+            errors.append(f"Invalid category: {category}")
+
+    desc = str(row_dict.get('description', '') or '').strip()
+    if desc.lower() == 'nan':
+        desc = ''
+    desc = desc[:255]
+
+    is_valid = len(errors) == 0
+    record = {
+        "date": formatted_date,
+        "amount": amount,
+        "category": normalized_cat,
+        "description": desc
+    }
+    return {
+        "is_valid": is_valid,
+        "errors": errors,
+        "record": record
+    }
+
 def process_expense_csv(file_stream: bytes, user_id: int = None) -> dict:
     """
     Parses an uploaded CSV file containing expenses.

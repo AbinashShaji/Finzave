@@ -158,10 +158,14 @@
                         <td class="text-right px-3 py-3 text-fz-gray-600">₹{{ "{:,.0f}".format(cat.first_month) }}</td>
                         <td class="text-right px-3 py-3 text-fz-black">₹{{ "{:,.0f}".format(cat.last_month) }}</td>
                         <td class="text-right px-3 py-3">
-                            {% if cat.diff > 0 %}
+                            {% if cat.last_month == 0 and cat.first_month > 0 %}
+                            <span class="text-fz-gray-500 text-xs font-medium bg-fz-gray-100 px-2 py-0.5 rounded">No spending recorded this month</span>
+                            {% elif cat.diff > 0 %}
                             <span class="text-red-600 font-medium">+₹{{ "{:,.0f}".format(cat.diff) }}</span>
                             {% elif cat.diff < 0 %}
-                            <span class="text-green-600 font-medium">-₹{{ "{:,.0f}".format(cat.diff|abs) }}</span>
+                            <span class="text-green-600 font-medium">Reduced by ₹{{ "{:,.0f}".format(cat.diff|abs) }}</span>
+                            {% elif cat.last_month > 0 and (cat.category in ['Rent & Housing', 'Rent', 'EMI', 'Insurance'] or cat.diff|abs < 1) %}
+                            <span class="text-blue-600 text-xs font-medium bg-blue-50 px-2 py-0.5 rounded">Stable fixed expense</span>
                             {% else %}
                             <span class="text-fz-gray-400">—</span>
                             {% endif %}
@@ -204,6 +208,7 @@
         lucide.createIcons();
 
         {% if monthly.has_data %}
+        const monthly = {{ monthly | tojson }};
         const chartData = JSON.parse('{{ chart_data | safe }}');
 
         const chartFontFamily = "'Outfit', sans-serif";
@@ -211,8 +216,9 @@
         const gridBorderDash = [4, 4];
 
         // --- Income & Expense Trend (grouped bar) ---
-        if (!monthly.is_incomplete && chartData.labels && chartData.labels.length > 0) {
-            const ieCtx = document.getElementById('incExpTrendChart').getContext('2d');
+        const ieCanvas = document.getElementById('incExpTrendChart');
+        if (ieCanvas && !monthly.is_incomplete && chartData.labels && chartData.labels.length > 0) {
+            const ieCtx = ieCanvas.getContext('2d');
             new Chart(ieCtx, {
                 type: 'bar',
                 data: {
@@ -237,8 +243,9 @@
         }
 
         // --- Savings Trend Line ---
-        if (!monthly.is_incomplete && chartData.labels && chartData.labels.length > 0) {
-            const stCtx = document.getElementById('savingsTrendChart').getContext('2d');
+        const stCanvas = document.getElementById('savingsTrendChart');
+        if (stCanvas && !monthly.is_incomplete && chartData.labels && chartData.labels.length > 0) {
+            const stCtx = stCanvas.getContext('2d');
             new Chart(stCtx, {
                 type: 'line',
                 data: {

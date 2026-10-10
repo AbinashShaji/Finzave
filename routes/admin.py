@@ -15,6 +15,7 @@ from extensions import db
 from models.user import User
 from models.review import Review
 from models.feedback import Feedback
+from sqlalchemy import func
 
 admin_bp = Blueprint('admin', __name__)
 

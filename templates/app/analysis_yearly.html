@@ -59,9 +59,14 @@
                 <span class="text-xs text-fz-gray-500">({{ yearly.h1_data.months }} months)</span>
             </div>
             <div class="space-y-4">
-                <div class="flex justify-between items-center">
-                    <span class="text-sm text-fz-gray-600">Income</span>
-                    <span class="text-base font-bold text-fz-black">₹{{ "{:,.0f}".format(yearly.h1_data.income) }}</span>
+                <div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-fz-gray-600">Income</span>
+                        <span class="text-base font-bold text-fz-black">₹{{ "{:,.0f}".format(yearly.h1_data.income) }}</span>
+                    </div>
+                    {% if yearly.h1_data.fixed_income is defined %}
+                    <div class="text-[11px] text-fz-gray-400 text-right mt-0.5">Recurring: ₹{{ "{:,.0f}".format(yearly.h1_data.fixed_income) }}{% if yearly.h1_data.variable_income > 0 %} | Variable: ₹{{ "{:,.0f}".format(yearly.h1_data.variable_income) }}{% endif %}</div>
+                    {% endif %}
                 </div>
                 <div class="flex justify-between items-center">
                     <span class="text-sm text-fz-gray-600">Expenses</span>
@@ -86,16 +91,21 @@
                 <span class="text-xs text-fz-gray-500">({{ yearly.h2_data.months }} months)</span>
             </div>
             <div class="space-y-4">
-                <div class="flex justify-between items-center">
-                    <span class="text-sm text-fz-gray-600">Income</span>
-                    <div class="flex items-center gap-2">
-                        <span class="text-base font-bold text-fz-black">₹{{ "{:,.0f}".format(yearly.h2_data.income) }}</span>
-                        {% if yearly.income_change is not none %}
-                        <span class="text-xs font-semibold px-1.5 py-0.5 rounded {% if yearly.income_change >= 0 %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %}">
-                            {{ "{:+.1f}".format(yearly.income_change * 100) }}%
-                        </span>
-                        {% endif %}
+                <div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-fz-gray-600">Income</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-base font-bold text-fz-black">₹{{ "{:,.0f}".format(yearly.h2_data.income) }}</span>
+                            {% if yearly.income_change is not none %}
+                            <span class="text-xs font-semibold px-1.5 py-0.5 rounded {% if yearly.income_change >= 0 %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %}">
+                                {{ "{:+.1f}".format(yearly.income_change * 100) }}%
+                            </span>
+                            {% endif %}
+                        </div>
                     </div>
+                    {% if yearly.h2_data.fixed_income is defined %}
+                    <div class="text-[11px] text-fz-gray-400 text-right mt-0.5">Recurring: ₹{{ "{:,.0f}".format(yearly.h2_data.fixed_income) }}{% if yearly.h2_data.variable_income > 0 %} | Variable: ₹{{ "{:,.0f}".format(yearly.h2_data.variable_income) }}{% endif %}</div>
+                    {% endif %}
                 </div>
                 <div class="flex justify-between items-center">
                     <span class="text-sm text-fz-gray-600">Expenses</span>
@@ -184,10 +194,16 @@
                         <td class="text-right px-3 py-3 text-fz-gray-600">₹{{ "{:,.0f}".format(cat.h1) }}</td>
                         <td class="text-right px-3 py-3 text-fz-black">₹{{ "{:,.0f}".format(cat.h2) }}</td>
                         <td class="text-right px-3 py-3">
-                            {% if cat.diff > 0 %}
+                            {% if cat.h2 == 0 and cat.h1 > 0 %}
+                            <span class="text-fz-gray-500 text-xs font-medium bg-fz-gray-100 px-2 py-0.5 rounded">No spending recorded</span>
+                            {% elif cat.diff > 0 %}
                             <span class="text-red-600 font-medium">+₹{{ "{:,.0f}".format(cat.diff) }}</span>
+                            {% elif cat.diff < 0 %}
+                            <span class="text-green-600 font-medium">Reduced by ₹{{ "{:,.0f}".format(cat.diff|abs) }}</span>
+                            {% elif cat.h2 > 0 and (cat.category in ['Rent & Housing', 'Rent', 'EMI', 'Insurance'] or cat.diff|abs < 1) %}
+                            <span class="text-blue-600 text-xs font-medium bg-blue-50 px-2 py-0.5 rounded">Stable fixed expense</span>
                             {% else %}
-                            <span class="text-green-600 font-medium">-₹{{ "{:,.0f}".format(cat.diff|abs) }}</span>
+                            <span class="text-fz-gray-400">—</span>
                             {% endif %}
                         </td>
                         <td class="text-right px-5 py-3">

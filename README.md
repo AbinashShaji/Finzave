@@ -1,6 +1,6 @@
 # FinZave 🚀
 
-![FinZave Banner](https://via.placeholder.com/1200x400.png?text=FinZave+-+Master+Your+Finances)
+![FinZave Banner]
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](#)
 [![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](#)

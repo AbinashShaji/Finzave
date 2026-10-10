@@ -48,6 +48,9 @@
                 </h3>
                 <div class="flex items-end gap-3 mb-2">
                     <span class="text-5xl font-bold tracking-tight">{{ health_score.score }}</span>
+                    {% if health_score.confidence %}
+                    <span class="text-xs text-fz-gray-400 pb-1.5 font-medium">({{ health_score.confidence }}% confidence)</span>
+                    {% endif %}
                 </div>
                 <div class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold
                     {% if health_score.category == 'Excellent' %}bg-green-500/20 text-green-400
@@ -178,10 +181,14 @@
                             <td class="text-right px-3 py-3">
                                 {% if overview.is_incomplete %}
                                 <span class="text-fz-gray-400 text-xs italic">Pending</span>
+                                {% elif entry.current == 0 and entry.previous > 0 %}
+                                <span class="text-fz-gray-500 text-xs font-medium bg-fz-gray-100 px-2 py-0.5 rounded">No spending recorded</span>
                                 {% elif entry.diff is not none and entry.diff > 0 %}
                                 <span class="text-red-600 font-medium">+₹{{ "{:,.0f}".format(entry.diff) }}</span>
                                 {% elif entry.diff is not none and entry.diff < 0 %}
-                                <span class="text-green-600 font-medium">-₹{{ "{:,.0f}".format(entry.diff|abs) }}</span>
+                                <span class="text-green-600 font-medium">Reduced by ₹{{ "{:,.0f}".format(entry.diff|abs) }}</span>
+                                {% elif entry.current > 0 and (entry.category in ['Rent & Housing', 'Rent', 'EMI', 'Insurance'] or (entry.diff is not none and entry.diff|abs < 1)) %}
+                                <span class="text-blue-600 text-xs font-medium bg-blue-50 px-2 py-0.5 rounded">Stable fixed expense</span>
                                 {% else %}
                                 <span class="text-fz-gray-400">—</span>
                                 {% endif %}

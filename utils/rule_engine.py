@@ -138,42 +138,71 @@ def _evaluate_rb02_and_rb07_category_deviation(periods: List[FinancialPeriod], i
     if current_period.total_expenses == 0:
         return
         
+    FIXED_ESSENTIAL_CATEGORIES = {'Rent & Housing', 'EMI', 'Insurance'}
+        
     for category, current_amount in current_period.categories.items():
         current_share = current_amount / current_period.total_expenses
         
-        # Calculate historical average share
+        # Calculate historical average share and historical average amount
         historical_shares = []
+        historical_amounts = []
         for hp in historical_periods:
             if hp.total_expenses > 0:
                 h_amt = hp.categories.get(category, 0.0)
                 historical_shares.append(h_amt / hp.total_expenses)
+                if h_amt > 0:
+                    historical_amounts.append(h_amt)
                 
         if not historical_shares:
             continue
             
         historical_avg_share = sum(historical_shares) / len(historical_shares)
+        historical_avg_amount = (sum(historical_amounts) / len(historical_amounts)) if historical_amounts else 0.0
+        
+        # Safeguard for fixed/essential categories:
+        # If the category amount is stable (current <= historical_avg * 1.05),
+        # do NOT trigger concentration warnings simply because other spending was reduced.
+        if category in FIXED_ESSENTIAL_CATEGORIES:
+            if historical_avg_amount > 0 and current_amount <= historical_avg_amount * 1.05:
+                continue
         
         if historical_avg_share > 0:
             deviation_ratio = current_share / historical_avg_share
+            exp_nature = "fixed essential" if category in FIXED_ESSENTIAL_CATEGORIES else "variable"
             
             if current_share >= HIGH_CATEGORY_PERCENTAGE and deviation_ratio >= CATEGORY_DEVIATION_FACTOR:
                 insights.append({
                     "rule_id": "RB-02",
                     "group": "SPENDING_CONCENTRATION",
                     "severity": "INFO",
-                    "message": f"{category} represents {current_share*100:.1f}% of your spending this month, compared with your usual average of about {historical_avg_share*100:.1f}%."
+                    "message": (
+                        f"{category} is a {exp_nature} expense of ₹{current_amount:,.0f} "
+                        f"({current_share*100:.1f}% of your spending this month), "
+                        f"higher than your historical average of ₹{historical_avg_amount:,.0f} "
+                        f"({historical_avg_share*100:.1f}%)."
+                    )
                 })
             elif deviation_ratio >= CATEGORY_DEVIATION_FACTOR:
                 insights.append({
                     "rule_id": "RB-07",
                     "group": "SPENDING_CONCENTRATION",
                     "severity": "INFO",
-                    "message": f"Your spending in {category} is unusually high compared to your historical average."
+                    "message": (
+                        f"Your spending in {category} is unusually high at ₹{current_amount:,.0f} "
+                        f"compared to your historical average of ₹{historical_avg_amount:,.0f}."
+                    )
                 })
 
 def _evaluate_rb03_low_savings_rate(current_period: FinancialPeriod, insights: List[Dict]):
-    """RB-03: Low Savings Rate"""
-    if current_period.total_income > 0 and current_period.savings_rate is not None:
+    """RB-03: Low Savings Rate / Burn Rate"""
+    if current_period.total_income == 0 and current_period.total_expenses > 0:
+        insights.append({
+            "rule_id": "RB-03",
+            "group": "SAVINGS",
+            "severity": "WARNING",
+            "message": "Expenses detected without income. Review your cash flow."
+        })
+    elif current_period.total_income > 0 and current_period.savings_rate is not None:
         if current_period.savings_rate < LOW_SAVINGS_RATE:
             insights.append({
                 "rule_id": "RB-03",

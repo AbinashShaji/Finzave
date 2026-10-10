@@ -60,11 +60,33 @@ def build_overview(periods: List[FinancialPeriod]) -> Dict[str, Any]:
 
     # --- Savings Impact Analysis: detailed per-category insights ---
     savings_insights = []
+    FIXED_ESSENTIAL_CATEGORIES = {'Rent & Housing', 'EMI', 'Insurance'}
     if current.status == "incomplete":
         savings_insights.append("Your expense data for this month is incomplete. Savings impact will be calculated after transactions are added.")
     elif prev:
         savings_diff = current.savings - prev.savings
         income_diff = current.total_income - prev.total_income
+
+        # Largest expense contextual insight
+        if category_breakdown and category_breakdown[0]["current"] > 0:
+            top = category_breakdown[0]
+            top_cat = top["category"]
+            top_amt = top["current"]
+            top_prev = top["previous"]
+            is_fixed = top_cat in FIXED_ESSENTIAL_CATEGORIES
+            exp_type = "fixed" if is_fixed else "variable"
+            if top_prev > 0 and abs(top_amt - top_prev) <= top_prev * 0.05:
+                savings_insights.append(
+                    f"{top_cat} is your largest expense at ₹{top_amt:,.0f}/month. This remains consistent with previous months and is not increasing."
+                )
+            elif top_amt > top_prev:
+                savings_insights.append(
+                    f"{top_cat} is your largest expense at ₹{top_amt:,.0f}/month (increased from ₹{top_prev:,.0f} last month). As a {exp_type} expense, review if this can be optimized."
+                )
+            else:
+                savings_insights.append(
+                    f"{top_cat} is your largest expense at ₹{top_amt:,.0f}/month (reduced from ₹{top_prev:,.0f} last month)."
+                )
 
         # All categories that moved by ≥ ₹1, sorted by absolute change (biggest movers first)
         changed_cats = sorted(
@@ -77,6 +99,8 @@ def build_overview(periods: List[FinancialPeriod]) -> Dict[str, Any]:
             cat = entry["category"]
             diff = entry["diff"]
             pct_of_income = entry["pct_of_income"]
+            curr_amt = entry["current"]
+            prev_amt = entry["previous"]
 
             # Primary sentence: ₹ change + % of income consumed
             if diff > 0:
@@ -84,7 +108,6 @@ def build_overview(periods: List[FinancialPeriod]) -> Dict[str, Any]:
                     f"{cat} spending increased by ₹{diff:,.0f}, "
                     f"using {pct_of_income:.0f}% of your monthly income."
                 )
-                # Append savings contribution % only when mathematically meaningful
                 if abs(savings_diff) >= 1:
                     contribution_pct = diff / abs(savings_diff) * 100
                     if 10 <= contribution_pct <= 150:
@@ -93,10 +116,13 @@ def build_overview(periods: List[FinancialPeriod]) -> Dict[str, Any]:
                             f"of the overall change in your savings."
                         )
             else:
-                sentence = (
-                    f"{cat} spending decreased by ₹{abs(diff):,.0f}, "
-                    f"now using {pct_of_income:.0f}% of your monthly income."
-                )
+                if curr_amt == 0 and prev_amt > 0:
+                    sentence = f"No {cat} spending recorded this month (previously ₹{prev_amt:,.0f})."
+                else:
+                    sentence = (
+                        f"{cat} spending reduced by ₹{abs(diff):,.0f}, "
+                        f"now using {pct_of_income:.0f}% of your monthly income."
+                    )
                 if abs(savings_diff) >= 1:
                     contribution_pct = abs(diff) / abs(savings_diff) * 100
                     if 10 <= contribution_pct <= 150:
@@ -192,10 +218,12 @@ def build_overview(periods: List[FinancialPeriod]) -> Dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 def _detect_patterns(periods: List[FinancialPeriod]) -> List[str]:
-    """Detects behavioural patterns across 3+ periods."""
+    """Detects behavioural patterns across 3+ periods with actionable metrics."""
     patterns = []
     if len(periods) < 3:
         return patterns
+
+    import calendar
 
     # Consecutive savings improvement
     consecutive_savings_up = 0
@@ -206,7 +234,11 @@ def _detect_patterns(periods: List[FinancialPeriod]) -> List[str]:
             consecutive_savings_up = 0
 
     if consecutive_savings_up >= 2:
-        patterns.append(f"Your savings improved for {consecutive_savings_up + 1} consecutive months.")
+        saved_gain = periods[-1].savings - periods[-1 - consecutive_savings_up].savings
+        patterns.append(
+            f"Your savings improved for {consecutive_savings_up + 1} consecutive months, "
+            f"growing by ₹{saved_gain:,.0f} over this period."
+        )
 
     # Consecutive savings decline
     consecutive_savings_down = 0
@@ -217,23 +249,49 @@ def _detect_patterns(periods: List[FinancialPeriod]) -> List[str]:
             consecutive_savings_down = 0
 
     if consecutive_savings_down >= 2:
-        patterns.append(f"Your savings declined for {consecutive_savings_down + 1} consecutive months.")
+        saved_loss = periods[-1 - consecutive_savings_down].savings - periods[-1].savings
+        patterns.append(
+            f"Your savings declined for {consecutive_savings_down + 1} consecutive months, "
+            f"dropping by ₹{saved_loss:,.0f} over this period."
+        )
 
-    # Category spending increasing for last 3 months
+    # Category spending trends for last 3 months
     recent = periods[-3:]
     cats = set()
     for p in recent:
         cats.update(p.categories.keys())
 
-    for cat in cats:
+    first_period = periods[0]
+    first_month_name = "the start of the period"
+    if "-" in first_period.period_id:
+        try:
+            m_idx = int(first_period.period_id.split("-")[1])
+            first_month_name = calendar.month_name[m_idx]
+        except Exception:
+            pass
+
+    for cat in sorted(cats):
         m1 = recent[0].categories.get(cat, 0.0)
         m2 = recent[1].categories.get(cat, 0.0)
         m3 = recent[2].categories.get(cat, 0.0)
 
-        if m3 > m2 > m1 and m1 > 0:
-            patterns.append(f"{cat} spending has increased for 3 consecutive months.")
-        elif m3 < m2 < m1 and m3 > 0:
-            patterns.append(f"{cat} spending has decreased for 3 consecutive months.")
+        if m3 < m2 < m1 and m1 > 0:
+            first_amt = first_period.categories.get(cat, 0.0)
+            if first_amt > m3:
+                saved_vs_start = first_amt - m3
+                patterns.append(
+                    f"{cat} spending decreased consistently for 3 months, reducing expenses by ₹{saved_vs_start:,.0f} compared with {first_month_name}. This contributed to your improved savings rate."
+                )
+            else:
+                saved_recent = m1 - m3
+                patterns.append(
+                    f"{cat} spending decreased consistently for 3 months, reducing expenses by ₹{saved_recent:,.0f} over the last quarter. This contributed to your improved savings rate."
+                )
+        elif m3 > m2 > m1 and m1 > 0:
+            increased_recent = m3 - m1
+            patterns.append(
+                f"{cat} spending increased consistently for 3 months (up by ₹{increased_recent:,.0f}). Monitor this category to prevent cash flow strain."
+            )
 
     # Consistently high expense months
     avg_expense = sum(p.total_expenses for p in periods) / len(periods) if periods else 0
@@ -250,7 +308,7 @@ def _detect_patterns(periods: List[FinancialPeriod]) -> List[str]:
 def build_monthly_analysis(periods: List[FinancialPeriod]) -> Dict[str, Any]:
     """
     Builds multi-month comparison data including per-month breakdown,
-    averages, best/worst months, category changes, and patterns.
+    averages, best/worst months, category changes, recurring income analysis, and patterns.
     """
     if len(periods) < 2:
         return {"has_data": False}
@@ -262,6 +320,8 @@ def build_monthly_analysis(periods: List[FinancialPeriod]) -> Dict[str, Any]:
         months_data.append({
             "period": p.period_id,
             "income": p.total_income,
+            "fixed_income": p.fixed_income,
+            "variable_income": p.variable_income,
             "expenses": p.total_expenses,
             "savings": p.savings,
             "savings_rate": rate,
@@ -310,6 +370,7 @@ def build_monthly_analysis(periods: List[FinancialPeriod]) -> Dict[str, Any]:
             "diff": diff,
             "change_pct": change_pct,
             "monthly_values": monthly_values,
+            "is_zero_spending": (last_val == 0.0 and first_val > 0.0)
         })
 
     # --- Chart data ---
@@ -325,12 +386,30 @@ def build_monthly_analysis(periods: List[FinancialPeriod]) -> Dict[str, Any]:
 
     # --- Behavioural insights ---
     insights = []
+    
+    # Recurring vs Variable Income Analysis
+    fixed_incomes = [p.fixed_income for p in periods if p.fixed_income > 0]
+    var_entries = [(p.period_id, p.variable_income) for p in periods if p.variable_income > 0]
+    if fixed_incomes:
+        avg_fixed = sum(fixed_incomes) / len(fixed_incomes)
+        if all(abs(f - avg_fixed) < 1.0 for f in fixed_incomes):
+            if var_entries:
+                var_str = ", ".join([f"₹{amt:,.0f} in {pid}" for pid, amt in var_entries])
+                insights.append(
+                    f"Your recurring income remained stable at ₹{avg_fixed:,.0f}/month. Variable income ({var_str}) provided temporary boosts."
+                )
+            else:
+                insights.append(f"Your recurring income remained consistent at ₹{avg_fixed:,.0f}/month across all months.")
+
     if category_comparison:
         top = category_comparison[0]
         if top["diff"] > 0:
             insights.append(f"{top['category']} was ₹{top['diff']:,.0f} higher in the latest month compared to the earliest month in this range.")
         elif top["diff"] < 0:
-            insights.append(f"{top['category']} was ₹{abs(top['diff']):,.0f} lower in the latest month compared to the earliest month in this range.")
+            if top["last_month"] == 0:
+                insights.append(f"No {top['category']} spending recorded in the latest month (was ₹{top['first_month']:,.0f} originally).")
+            else:
+                insights.append(f"{top['category']} was reduced by ₹{abs(top['diff']):,.0f} in the latest month compared to the earliest month in this range.")
 
     insights.extend(patterns)
 
@@ -363,8 +442,8 @@ def build_monthly_analysis(periods: List[FinancialPeriod]) -> Dict[str, Any]:
 def build_yearly_analysis(periods: List[FinancialPeriod]) -> Dict[str, Any]:
     """
     Compares first half vs second half of the provided periods, with monthly
-    trend data, category shifts, savings rate comparison, and long-term insights.
-    Designed for 12 months but works with any count >= 2.
+    trend data, category shifts, savings rate comparison, recurring vs variable income intelligence,
+    and long-term insights. Designed for 12 months but works with any count >= 2.
     """
     if len(periods) < 2:
         return {"has_data": False}
@@ -375,6 +454,8 @@ def build_yearly_analysis(periods: List[FinancialPeriod]) -> Dict[str, Any]:
 
     def aggregate_half(half: List[FinancialPeriod]) -> Dict[str, Any]:
         income = sum(p.total_income for p in half)
+        fixed_income = sum(p.fixed_income for p in half)
+        variable_income = sum(p.variable_income for p in half)
         expenses = sum(p.total_expenses for p in half)
         savings = sum(p.savings for p in half)
         savings_rate = (savings / income) if income > 0 else 0.0
@@ -384,6 +465,8 @@ def build_yearly_analysis(periods: List[FinancialPeriod]) -> Dict[str, Any]:
                 cats[c] = cats.get(c, 0.0) + amt
         return {
             "income": income,
+            "fixed_income": fixed_income,
+            "variable_income": variable_income,
             "expenses": expenses,
             "savings": savings,
             "savings_rate": savings_rate,
@@ -397,8 +480,49 @@ def build_yearly_analysis(periods: List[FinancialPeriod]) -> Dict[str, Any]:
     is_incomplete = periods[-1].status == "incomplete"
 
     income_change = percentage_change(h2_data["income"], h1_data["income"]) if not is_incomplete else None
+    fixed_change = percentage_change(h2_data["fixed_income"], h1_data["fixed_income"]) if not is_incomplete else None
     expense_change = percentage_change(h2_data["expenses"], h1_data["expenses"]) if not is_incomplete else None
     savings_change = percentage_change(h2_data["savings"], h1_data["savings"]) if not is_incomplete else None
+
+    # --- Recurring vs Variable Income Intelligence ---
+    import calendar
+    var_first_half = []
+    for p in first_half:
+        if p.variable_income > 0:
+            m_name = calendar.month_name[int(p.period_id.split("-")[1])] if "-" in p.period_id else p.period_id
+            var_first_half.append((m_name, p.variable_income))
+
+    monthly_fixed_h1 = h1_data["fixed_income"] / h1_data["months"] if h1_data["months"] > 0 else 0
+
+    has_one_time_var = (
+        h1_data["variable_income"] > 0 and
+        h2_data["variable_income"] == 0 and
+        (fixed_change is None or abs(fixed_change) < 0.02)
+    )
+
+    if has_one_time_var and income_change is not None:
+        var_month_name = var_first_half[0][0] if var_first_half else "January"
+        income_narrative = (
+            f"your recurring salary held steady at ₹{monthly_fixed_h1:,.0f}/month "
+            f"(with recorded income down {abs(income_change) * 100:.1f}% due to one-time variable freelance income in {var_month_name})"
+        )
+        context_income_insight = (
+            f"Recorded income decreased by {abs(income_change) * 100:.1f}%, mainly because variable freelance income was present only in the first period. "
+            f"Your recurring salary remained stable."
+        )
+        recurring_salary_insight = (
+            f"Your recurring income remained stable at ₹{monthly_fixed_h1:,.0f}/month. "
+            f"The income change was mainly due to a one-time freelance income of ₹{h1_data['variable_income']:,.0f} recorded in {var_month_name}."
+        )
+    elif fixed_change is not None and abs(fixed_change) >= 0.02:
+        dir_fixed = "increased" if fixed_change > 0 else "decreased"
+        income_narrative = f"your recurring income {dir_fixed} by {abs(fixed_change) * 100:.1f}%"
+        context_income_insight = f"Recurring income {dir_fixed} by {abs(fixed_change) * 100:.1f}% between both periods."
+        recurring_salary_insight = None
+    else:
+        income_narrative = f"your recurring income remained stable at ₹{monthly_fixed_h1:,.0f}/month"
+        context_income_insight = f"Your recurring salary remained consistent at ₹{monthly_fixed_h1:,.0f}/month across both periods."
+        recurring_salary_insight = None
 
     # --- Narrative ---
     def _change_str(val: Optional[float], metric_name: str, invert_color: bool = False) -> str:
@@ -408,7 +532,7 @@ def build_yearly_analysis(periods: List[FinancialPeriod]) -> Dict[str, Any]:
         return f"{metric_name} {direction} by {abs(val) * 100:.1f}%"
 
     narrative = (
-        f"{_change_str(income_change, 'Your income')}, while "
+        f"{income_narrative.capitalize()}, while "
         f"{_change_str(expense_change, 'expenses').lower()}, resulting in "
         f"{_change_str(savings_change, 'savings').lower()}."
     )
@@ -427,6 +551,7 @@ def build_yearly_analysis(periods: List[FinancialPeriod]) -> Dict[str, Any]:
                 "h2": c2,
                 "diff": diff,
                 "change_pct": percentage_change(c2, c1),
+                "is_zero_spending": (c2 == 0.0 and c1 > 0.0)
             })
     category_changes.sort(key=lambda x: abs(x["diff"]), reverse=True)
 
@@ -441,7 +566,13 @@ def build_yearly_analysis(periods: List[FinancialPeriod]) -> Dict[str, Any]:
     # --- Long-term insights ---
     long_term_insights = []
 
-    # Savings rate comparison
+    # 1. Income Context & Recurring Insights
+    if recurring_salary_insight:
+        long_term_insights.append(recurring_salary_insight)
+    if context_income_insight:
+        long_term_insights.append(context_income_insight)
+
+    # 2. Savings rate comparison
     sr_diff = h2_data["savings_rate"] - h1_data["savings_rate"]
     if abs(sr_diff) >= 0.01:
         direction = "improved" if sr_diff > 0 else "declined"
@@ -449,7 +580,7 @@ def build_yearly_analysis(periods: List[FinancialPeriod]) -> Dict[str, Any]:
             f"Your savings rate {direction} from {h1_data['savings_rate'] * 100:.1f}% to {h2_data['savings_rate'] * 100:.1f}%."
         )
 
-    # Top category contributors to savings change
+    # 3. Top category contributors to savings change
     if category_changes:
         top_increase = [c for c in category_changes if c["diff"] > 0]
         top_decrease = [c for c in category_changes if c["diff"] < 0]
@@ -460,16 +591,14 @@ def build_yearly_analysis(periods: List[FinancialPeriod]) -> Dict[str, Any]:
             )
         if top_decrease:
             c = top_decrease[0]
-            long_term_insights.append(
-                f"{c['category']} spending dropped by ₹{abs(c['diff']):,.0f} between the two halves, contributing to savings."
-            )
-
-    # Income trajectory
-    if income_change is not None and abs(income_change) >= 0.05:
-        direction = "grew" if income_change > 0 else "fell"
-        long_term_insights.append(
-            f"Total income {direction} by {abs(income_change) * 100:.1f}% across the period."
-        )
+            if c["h2"] == 0:
+                long_term_insights.append(
+                    f"No {c['category']} spending was recorded in the second half (reduced by ₹{abs(c['diff']):,.0f} compared to the first half)."
+                )
+            else:
+                long_term_insights.append(
+                    f"{c['category']} spending reduced by ₹{abs(c['diff']):,.0f} between the two halves, contributing to savings."
+                )
 
     return {
         "has_data": True,

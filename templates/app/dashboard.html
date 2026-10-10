@@ -136,20 +136,116 @@
                 </div>
             </div>
 
-            <!-- Spending Chart -->
-            <div class="bg-white p-6 rounded-2xl border border-fz-gray-200 shadow-sm">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-lg font-bold text-fz-black">Category Breakdown</h2>
-                    <a href="{{ url_for('app.analysis') }}" class="text-sm font-medium text-fz-red hover:underline">View Analysis</a>
+<style>
+    .category-breakdown-content {
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+    }
+    @media (min-width: 1024px) {
+        .category-breakdown-content {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 32px;
+            align-items: center;
+        }
+    }
+    .chart-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        position: relative;
+    }
+    .chart-wrapper {
+        position: relative;
+        width: 100%;
+        max-width: 360px;
+        height: 330px;
+        margin: 0 auto;
+    }
+    .category-badge {
+        position: absolute;
+        z-index: 20;
+        pointer-events: auto;
+    }
+    .category-badge-card {
+        background: #ffffff;
+        padding: 8px 12px;
+        border-radius: 14px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+        border: 1px solid #f4f4f5;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 140px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .category-badge-card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+            <!-- Spending Chart Redesign -->
+            <div class="bg-white p-6 sm:p-8 rounded-2xl border border-fz-gray-200 shadow-sm flex flex-col relative" id="categoryBreakdownCard">
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-xl font-bold text-fz-black tracking-tight">Category Breakdown</h2>
+                    <a href="{{ url_for('app.analysis') }}" class="text-sm font-semibold text-fz-red hover:text-fz-black transition-colors flex items-center gap-1">
+                        View Analysis <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </a>
                 </div>
+                
                 {% if current_period.status == 'incomplete' or current_period.total_expenses == 0 %}
-                <div class="w-full h-[300px] flex flex-col items-center justify-center text-center px-4" aria-label="Empty chart state">
-                    <i data-lucide="pie-chart" class="w-10 h-10 text-fz-gray-300 mb-3"></i>
-                    <p class="text-sm text-fz-gray-500">Expense distribution will appear once you add transactions.</p>
+                <div class="w-full h-[300px] flex flex-col items-center justify-center text-center px-4 bg-fz-gray-50 rounded-xl border border-dashed border-fz-gray-200" aria-label="Empty chart state">
+                    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-3">
+                        <i data-lucide="pie-chart" class="w-6 h-6 text-fz-gray-400"></i>
+                    </div>
+                    <p class="text-sm font-medium text-fz-gray-500">Expense distribution will appear once you add transactions.</p>
                 </div>
                 {% else %}
-                <div class="w-full h-[300px] relative">
-                    <canvas id="categoryChart" aria-label="Category Breakdown Chart"></canvas>
+                <div class="category-breakdown-content">
+                    
+                    <!-- Left: Circular Chart with Floating Badges -->
+                    <div class="chart-container">
+                        <div class="chart-wrapper">
+                            
+                            <!-- Circular Progress SVG -->
+                            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <div class="relative rounded-full bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-fz-gray-100 flex items-center justify-center p-2" style="width: 230px; height: 230px;">
+                                    <svg id="svgRing" class="w-full h-full drop-shadow-sm pointer-events-auto" viewBox="0 0 100 100" style="width: 100%; height: 100%;">
+                                        <!-- Background Track -->
+                                        <circle stroke="#f4f4f5" stroke-width="7" fill="transparent" r="42" cx="50" cy="50" />
+                                        <!-- Arcs injected by JS -->
+                                    </svg>
+
+                                    <!-- Center Text -->
+                                    <div class="absolute inset-0 flex flex-col items-center justify-center text-center z-10 pointer-events-none px-2">
+                                        <div class="w-8 h-8 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-1 shadow-sm border border-blue-100">
+                                            <i data-lucide="briefcase" class="w-4 h-4"></i>
+                                        </div>
+                                        <span class="text-[9px] font-bold tracking-widest text-fz-gray-400 uppercase mb-0.5">TOTAL EXPENSES</span>
+                                        <div class="text-2xl font-extrabold text-fz-black tracking-tight transition-colors group-hover:text-fz-red">₹{{ "{:,.0f}".format(current_period.total_expenses) }}</div>
+                                        <span class="text-[10px] font-medium text-fz-gray-400 mt-0.5">This Month</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Floating Badges Container -->
+                            <div id="floatingBadges" class="absolute inset-0 pointer-events-none"></div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Top Categories -->
+                    <div class="top-categories-container bg-white rounded-xl border border-fz-gray-100 p-6 shadow-sm">
+                        <div class="flex items-center gap-2 mb-6">
+                            <h3 class="text-[11px] font-bold text-fz-gray-500 uppercase tracking-widest">TOP CATEGORIES</h3>
+                            <div class="h-px bg-fz-gray-100 flex-1"></div>
+                        </div>
+                        <div id="topCategoriesList" class="space-y-4">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
                 </div>
                 {% endif %}
             </div>
@@ -160,7 +256,7 @@
             <div class="bg-white rounded-2xl border border-fz-gray-200 shadow-sm h-full flex flex-col">
                 <div class="p-6 border-b border-fz-gray-200 flex items-center justify-between">
                     <h2 class="text-lg font-bold text-fz-black">Recent Activity</h2>
-                    <a href="{{ url_for('app.transactions') }}" class="text-sm font-medium text-fz-red hover:underline">View All</a>
+                    <a href="{{ url_for('app.transactions') }}" class="text-sm font-semibold text-fz-red hover:underline">View All</a>
                 </div>
                 <div class="p-6 flex-1 overflow-y-auto">
                     {% if recent_expenses %}
@@ -201,26 +297,168 @@
         const chartData = JSON.parse('{{ chart_data | safe }}');
         
         if (chartData.cat_labels && chartData.cat_labels.length > 0 && '{{ current_period.status }}' !== 'incomplete') {
-            const catCtx = document.getElementById('categoryChart').getContext('2d');
-            new Chart(catCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: chartData.cat_labels,
-                    datasets: [{
-                        data: chartData.cat_data,
-                        backgroundColor: ['#e11d48', '#16a34a', '#2563eb', '#9333ea', '#ea580c', '#0891b2', '#475569'],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'right', labels: { boxWidth: 12, font: { size: 12 } } }
+            
+            // Map the colors (matching FinZave palette)
+            const colors = ['#e11d48', '#16a34a', '#2563eb', '#9333ea', '#ea580c', '#0891b2', '#475569'];
+            const icons = {
+                'Rent & Housing': 'home',
+                'Food & Dining': 'utensils',
+                'Transportation': 'car',
+                'Utilities': 'zap',
+                'Shopping': 'shopping-bag',
+                'Healthcare': 'heart-pulse',
+                'Family': 'users',
+                'Insurance': 'shield',
+                'Entertainment': 'tv',
+                'Education': 'book-open',
+                'Other': 'circle-ellipsis'
+            };
+            
+            const total = chartData.cat_data.reduce((a, b) => a + b, 0);
+            
+            let breakdown = chartData.cat_labels.map((label, idx) => {
+                const amount = chartData.cat_data[idx];
+                const percentage = (amount / total) * 100;
+                return {
+                    category: label,
+                    amount: amount,
+                    percentage: percentage,
+                    color: colors[idx % colors.length],
+                    icon: icons[label] || 'tag'
+                };
+            }).filter(item => item.amount > 0);
+            
+            breakdown.sort((a, b) => b.amount - a.amount);
+            
+            // Generate SVG Ring
+            const conicRing = document.getElementById('svgRing');
+            if (conicRing && breakdown.length > 0) {
+                let currentOffset = 0;
+                const radius = 42;
+                const circumference = 2 * Math.PI * radius; // ~263.89
+                
+                breakdown.forEach((item, index) => {
+                    const strokeLength = (item.percentage / 100) * circumference;
+                    const gap = breakdown.length > 1 ? 2.5 : 0;
+                    const finalStrokeLength = Math.max(0.5, strokeLength - gap);
+                    
+                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    circle.setAttribute('cx', '50');
+                    circle.setAttribute('cy', '50');
+                    circle.setAttribute('r', radius);
+                    circle.setAttribute('fill', 'transparent');
+                    circle.setAttribute('stroke', item.color);
+                    circle.setAttribute('stroke-width', '7');
+                    circle.setAttribute('stroke-linecap', 'round');
+                    
+                    circle.setAttribute('stroke-dasharray', `${finalStrokeLength} ${circumference}`);
+                    circle.setAttribute('stroke-dashoffset', `0`);
+                    
+                    const angle = -90 + (currentOffset / 100) * 360;
+                    circle.setAttribute('transform', `rotate(${angle} 50 50)`);
+                    
+                    circle.style.transition = 'stroke-width 0.2s ease';
+                    circle.style.cursor = 'pointer';
+                    
+                    circle.addEventListener('mouseover', () => circle.setAttribute('stroke-width', '9'));
+                    circle.addEventListener('mouseout', () => circle.setAttribute('stroke-width', '7'));
+                    
+                    conicRing.appendChild(circle);
+                    
+                    currentOffset += item.percentage;
+                });
+            }
+            
+            // Generate Top Categories List
+            const listContainer = document.getElementById('topCategoriesList');
+            if (listContainer) {
+                breakdown.slice(0, 5).forEach((item, index) => {
+                    const row = document.createElement('div');
+                    row.className = "flex flex-col gap-2";
+                    row.innerHTML = `
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style="background-color: ${item.color}15; color: ${item.color}">
+                                    <i data-lucide="${item.icon}" class="w-3.5 h-3.5"></i>
+                                </div>
+                                <span class="text-[13px] font-bold text-fz-black">${item.category}</span>
+                            </div>
+                            <div class="flex items-center gap-3 text-right">
+                                <span class="text-[11px] font-semibold" style="color: ${item.color}">${item.percentage.toFixed(1)}%</span>
+                                <span class="text-[13px] font-bold text-fz-black">₹${item.amount.toLocaleString('en-IN', {maximumFractionDigits: 0})}</span>
+                            </div>
+                        </div>
+                        <div class="w-full h-1.5 bg-fz-gray-100 rounded-full overflow-hidden relative">
+                            <div class="absolute left-0 top-0 h-full rounded-full transition-all duration-1000 ease-out" style="width: ${item.percentage}%; background-color: ${item.color};"></div>
+                        </div>
+                    `;
+                    listContainer.appendChild(row);
+                });
+            }
+            
+            // Floating Badges
+            const badgesContainer = document.getElementById('floatingBadges');
+            if (badgesContainer) {
+                const topBadges = breakdown.slice(0, 4);
+                
+                // Specific manual placement:
+                // Rent & Housing: bottom-right
+                // Food & Dining: top-left
+                // Transportation: right-middle
+                // Utilities: bottom-left
+                const positionMap = {
+                    'Rent & Housing': {
+                        css: 'bottom: 8px; right: 0px;',
+                        anim: 'animate-float-slow'
                     },
-                    cutout: '70%'
-                }
-            });
+                    'Food & Dining': {
+                        css: 'top: 8px; left: 0px;',
+                        anim: 'animate-float'
+                    },
+                    'Transportation': {
+                        css: 'top: 38%; right: 0px; transform: translateY(-50%);',
+                        anim: 'animate-float-slower'
+                    },
+                    'Utilities': {
+                        css: 'bottom: 8px; left: 0px;',
+                        anim: 'animate-float-slow'
+                    }
+                };
+
+                const fallbackSlots = [
+                    { css: 'bottom: 8px; right: 0px;', anim: 'animate-float-slow' },
+                    { css: 'top: 8px; left: 0px;', anim: 'animate-float' },
+                    { css: 'top: 38%; right: 0px; transform: translateY(-50%);', anim: 'animate-float-slower' },
+                    { css: 'bottom: 8px; left: 0px;', anim: 'animate-float-slow' }
+                ];
+                
+                topBadges.forEach((item, i) => {
+                    const pos = positionMap[item.category] || fallbackSlots[i];
+                    if (pos) {
+                        const badgeWrapper = document.createElement('div');
+                        badgeWrapper.className = `category-badge`;
+                        badgeWrapper.style.cssText = pos.css;
+                        
+                        badgeWrapper.innerHTML = `
+                            <div class="category-badge-card ${pos.anim || ''}">
+                                <div class="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style="background-color: ${item.color}15; color: ${item.color}">
+                                    <i data-lucide="${item.icon}" class="w-3.5 h-3.5"></i>
+                                </div>
+                                <div class="flex flex-col pr-1 overflow-hidden min-w-0">
+                                    <span class="text-[9px] font-bold uppercase tracking-wider text-fz-gray-500 mb-0.5 truncate">${item.category}</span>
+                                    <span class="text-xs font-bold text-fz-black leading-tight">₹${item.amount.toLocaleString('en-IN', {maximumFractionDigits: 0})}</span>
+                                    <span class="text-[10px] font-bold mt-0.5" style="color: ${item.color}">${item.percentage.toFixed(1)}%</span>
+                                </div>
+                            </div>
+                        `;
+                        badgesContainer.appendChild(badgeWrapper);
+                    }
+                });
+            }
+            
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
         }
         {% endif %}
     });
