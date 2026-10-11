@@ -1,4 +1,13 @@
 
+    function escapeHtml(value) {
+        return String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
     function buildRow(cells, rowClass) {
         const tr = document.createElement('tr');
         if (rowClass) tr.className = rowClass;
@@ -263,10 +272,10 @@
                         
                         let selectOptions = `<option value="" disabled ${!r.category ? 'selected' : ''}>Select category...</option>`;
                         if (isCustom && r.category) {
-                            selectOptions += `<option value="${r.category}" selected>${r.category} (Invalid)</option>`;
+                            selectOptions += `<option value="${escapeHtml(r.category)}" selected>${escapeHtml(r.category)} (Invalid)</option>`;
                         }
                         cats.forEach(c => {
-                            selectOptions += `<option value="${c}" ${c === r.category && !isCustom ? 'selected' : ''}>${c}</option>`;
+                            selectOptions += `<option value="${escapeHtml(c)}" ${c === r.category && !isCustom ? 'selected' : ''}>${escapeHtml(c)}</option>`;
                         });
                         selectOptions += `<option value="__custom__">Other (Custom)</option>`;
                         
@@ -274,25 +283,25 @@
                             <tr class="${rowClass}" id="csv-row-${r.row_number}">
                                 <td class="px-4 py-2">${r.row_number}</td>
                                 <td class="px-4 py-2">
-                                    <input type="date" class="csv-input-date w-full min-w-[130px] px-2 py-1 border rounded ${dateClass}" value="${r.date || ''}" data-row="${r.row_number}">
+                                    <input type="date" class="csv-input-date w-full min-w-[130px] px-2 py-1 border rounded ${dateClass}" value="${escapeHtml(r.date || '')}" data-row="${r.row_number}">
                                 </td>
                                 <td class="px-4 py-2 align-top">
                                     <div class="relative min-w-[160px]">
                                         <select class="csv-select-cat w-full px-2 py-1 border rounded ${catClass}" data-row="${r.row_number}">
                                             ${selectOptions}
                                         </select>
-                                        <input type="text" class="csv-input-cat w-full px-2 py-1 border rounded ${catClass} hidden" value="${isCustom ? r.category : ''}" placeholder="Type category..." data-row="${r.row_number}">
+                                        <input type="text" class="csv-input-cat w-full px-2 py-1 border rounded ${catClass} hidden" value="${isCustom ? escapeHtml(r.category) : ''}" placeholder="Type category..." data-row="${r.row_number}">
                                     </div>
                                 </td>
                                 <td class="px-4 py-2 text-right">
-                                    <input type="number" step="0.01" class="csv-input-amt w-24 px-2 py-1 border rounded text-right ${amtClass}" value="${r.amount || ''}" data-row="${r.row_number}">
+                                    <input type="number" step="0.01" class="csv-input-amt w-24 px-2 py-1 border rounded text-right ${amtClass}" value="${escapeHtml(r.amount ?? '')}" data-row="${r.row_number}">
                                 </td>
                                 <td class="px-4 py-2" id="csv-status-${r.row_number}">
-                                    ${isValid ? '<span class="text-green-600 text-xs font-semibold">Valid</span>' : `<span class="text-fz-red text-xs font-semibold">${r.errors.join(', ')}</span>`}
+                                    ${isValid ? '<span class="text-green-600 text-xs font-semibold">Valid</span>' : `<span class="text-fz-red text-xs font-semibold">${escapeHtml(r.errors.join(', '))}</span>`}
                                 </td>
                                 <td class="px-4 py-2 text-center">
                                     <input type="checkbox" class="csv-row-select w-4 h-4 rounded border-gray-300 text-fz-red accent-red-600 focus:ring-fz-red cursor-pointer" value="${r.row_number}" ${isValid ? 'checked' : ''}>
-                                    <input type="hidden" class="csv-input-desc" value="${(r.description || '').replace(/"/g, '&quot;')}" data-row="${r.row_number}">
+                                    <input type="hidden" class="csv-input-desc" value="${escapeHtml(r.description || '')}" data-row="${r.row_number}">
                                 </td>
                             </tr>
                         `;
@@ -493,7 +502,7 @@
                             const rowNum = errObj.row;
                             const statusCell = document.getElementById(`csv-status-${rowNum}`);
                             const row = document.getElementById(`csv-row-${rowNum}`);
-                            if(statusCell) statusCell.innerHTML = `<span class="text-fz-red text-xs font-semibold">${errObj.errors.join(', ')}</span>`;
+                            if(statusCell) statusCell.innerHTML = `<span class="text-fz-red text-xs font-semibold">${escapeHtml(errObj.errors.join(', '))}</span>`;
                             if(row) {
                                 row.classList.add('bg-red-50');
                                 row.classList.remove('bg-white');

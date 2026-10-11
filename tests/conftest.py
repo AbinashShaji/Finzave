@@ -20,6 +20,7 @@ class TestConfig(Config):
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
     WTF_CSRF_ENABLED = False
     JWT_COOKIE_CSRF_PROTECT = False
+    RATELIMIT_ENABLED = False
     SERVER_NAME = "localhost"
 
 @pytest.fixture

@@ -186,3 +186,182 @@ def test_empty_report_period_access(app, client, test_user):
     res = client.get(f'/app/reports?period={earlier_period}')
     assert res.status_code == 200
     assert b"Invalid period selected" not in res.data
+
+
+def test_registration_email_validation(client):
+    """Verify registration rejects invalid emails and accepts valid email."""
+    invalid_emails = ["random_string", "@", "abc", "test@", "user@domain."]
+    for inv_email in invalid_emails:
+        res = client.post('/api/auth/register', json={
+            "username": f"user_{abs(hash(inv_email))}",
+            "email": inv_email,
+            "password": "Password123!",
+            "confirm_password": "Password123!",
+            "terms_accepted": True
+        })
+        assert res.status_code == 400
+        assert "Invalid email format" in res.get_json().get("message", "")
+
+    # Valid email succeeds
+    res_valid = client.post('/api/auth/register', json={
+        "username": "valid_user_123",
+        "email": "user@example.com",
+        "password": "Password123!",
+        "confirm_password": "Password123!",
+        "terms_accepted": True
+    })
+    assert res_valid.status_code == 201
+
+
+def test_admin_error_message_generic(client):
+    """Verify admin endpoint returns generic Authentication required without stack traces."""
+    res = client.get('/api/admin/users')
+    assert res.status_code == 401
+    data = res.get_json()
+    assert data.get("message") == "Authentication required"
+    assert "traceback" not in res.data.decode('utf-8').lower()
+    assert "Token error" not in data.get("message", "")
+
+
+def test_admin_n_plus_one_behavior(app, client):
+    """Verify /api/admin/users executes a constant bounded query count regardless of user count."""
+    from models.activity import UserActivity
+    from sqlalchemy import event
+
+    with app.app_context():
+        admin = User(username="admin_perf", email="admin_perf@test.com", password_hash="hash", role="admin")
+        db.session.add(admin)
+        db.session.commit()
+        admin_id = admin.id
+        token = create_access_token(identity=str(admin_id))
+
+        # Create 10 users with activities
+        for i in range(10):
+            u = User(username=f"perf_user_{i}", email=f"perf_{i}@test.com", password_hash="hash", role="user")
+            db.session.add(u)
+            db.session.flush()
+            for j in range(3):
+                act = UserActivity(user_id=u.id, action="test_action")
+                db.session.add(act)
+        db.session.commit()
+
+    client.set_cookie('access_token_cookie', token, domain='localhost')
+
+    query_count = [0]
+    def query_listener(conn, cursor, statement, parameters, context, executemany):
+        query_count[0] += 1
+
+    engine = db.engine
+    event.listen(engine, "before_cursor_execute", query_listener)
+    try:
+        res = client.get('/api/admin/users')
+        assert res.status_code == 200
+        users_returned = res.get_json()
+        assert len(users_returned) >= 11
+        # In N+1 it would be 1 + 11 = 12+ queries. With our DB aggregation, queries are <= 5
+        assert query_count[0] <= 5
+    finally:
+        event.remove(engine, "before_cursor_execute", query_listener)
+
+
+def test_cross_user_authorization(app, client):
+    """Verify User A cannot read, update, or delete User B's financial records."""
+    from models.goal import Goal
+    with app.app_context():
+        user_a = User(username="user_a", email="user_a@test.com", password_hash="hash", role="user")
+        user_b = User(username="user_b", email="user_b@test.com", password_hash="hash", role="user")
+        db.session.add_all([user_a, user_b])
+        db.session.commit()
+
+        user_a_id = user_a.id
+        user_b_id = user_b.id
+
+        # User B creates an expense, income, goal
+        exp_b = Expense(user_id=user_b_id, amount=100.0, category="Food & Dining", date=date.today(), description="User B lunch")
+        inc_b = Income(user_id=user_b_id, amount=5000.0, income_type="Fixed", date=date.today(), description="User B salary")
+        goal_b = Goal(user_id=user_b_id, goal_name="User B Car", target_amount=10000.0, current_saved=1000.0, target_date=date(2027, 1, 1))
+        db.session.add_all([exp_b, inc_b, goal_b])
+        db.session.commit()
+
+        exp_b_id = exp_b.id
+        inc_b_id = inc_b.id
+        goal_b_id = goal_b.id
+
+        token_a = create_access_token(identity=str(user_a_id))
+
+    client.set_cookie('access_token_cookie', token_a, domain='localhost')
+
+    # User A attempts to delete User B's expense
+    del_exp = client.delete(f'/app/api/transactions/expense/{exp_b_id}')
+    assert del_exp.status_code == 404
+
+    # User A attempts to update User B's expense
+    put_exp = client.put(f'/app/api/transactions/expense/{exp_b_id}', json={
+        "amount": 999.0,
+        "category": "Shopping",
+        "date": "2026-10-01"
+    })
+    assert put_exp.status_code == 404
+
+    # User A attempts to delete User B's income
+    del_inc = client.delete(f'/app/api/transactions/income/{inc_b_id}')
+    assert del_inc.status_code == 404
+
+    # User A attempts to update User B's goal
+    put_goal = client.put(f'/app/api/goals/{goal_b_id}', json={"goal_name": "Hacked Goal"})
+    assert put_goal.status_code == 404
+
+    # User A attempts to delete User B's goal
+    del_goal = client.delete(f'/app/api/goals/{goal_b_id}')
+    assert del_goal.status_code == 404
+
+    # User A attempts to view User B's goal detail
+    view_goal = client.get(f'/app/goals/{goal_b_id}')
+    assert view_goal.status_code == 404
+
+
+def test_profile_validation_email_and_currency(app, client, test_user):
+    """Verify profile update rejects invalid email and preferences rejects invalid currency."""
+    with app.app_context():
+        token = create_access_token(identity=str(test_user))
+
+    client.set_cookie('access_token_cookie', token, domain='localhost')
+
+    # Invalid email update
+    res_bad_email = client.put('/app/api/profile', json={"email": "bad_email_format"})
+    assert res_bad_email.status_code == 400
+    assert "Invalid email format" in res_bad_email.get_json().get("message", "")
+
+    # Valid email update
+    res_ok_email = client.put('/app/api/profile', json={"email": "updated_user@example.com"})
+    assert res_ok_email.status_code == 200
+
+    # Invalid currency in preferences
+    res_bad_curr = client.put('/app/api/profile/preferences', json={"currency": "BITCOIN"})
+    assert res_bad_curr.status_code == 400
+    assert "Invalid currency" in res_bad_curr.get_json().get("message", "")
+
+    # Valid currency in preferences
+    res_ok_curr = client.put('/app/api/profile/preferences', json={"currency": "INR"})
+    assert res_ok_curr.status_code == 200
+
+
+def test_csv_upload_xss_protection(app, client, test_user):
+    """Verify CSV upload with XSS vectors is parsed safely and returns structured records."""
+    import io
+    with app.app_context():
+        token = create_access_token(identity=str(test_user))
+
+    client.set_cookie('access_token_cookie', token, domain='localhost')
+    xss_csv = "Date,Amount,Category,Description\n2026-10-01,50.0,<script>alert(1)</script>,<img src=x onerror=alert(1)>\n"
+    data = {'file': (io.BytesIO(xss_csv.encode('utf-8')), 'test_xss.csv')}
+    res = client.post('/app/api/transactions/upload-csv', data=data, content_type='multipart/form-data')
+    assert res.status_code == 200
+    payload = res.get_json()
+    assert payload['success'] is True
+    # The invalid category is captured in invalid_records
+    assert len(payload['invalid_records']) == 1
+    rec = payload['invalid_records'][0]
+    assert "<script>alert(1)</script>" in rec['category']
+    assert any("Invalid category" in err for err in rec['errors'])
+

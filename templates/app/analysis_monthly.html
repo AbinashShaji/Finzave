@@ -27,9 +27,9 @@
         <div class="w-16 h-16 bg-fz-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-fz-gray-400">
             <i data-lucide="bar-chart-2" class="w-8 h-8"></i>
         </div>
-        <h3 class="text-lg font-bold text-fz-black mb-2">Not enough data yet</h3>
+        <h3 class="text-lg font-bold text-fz-black mb-2">{{ monthly.message or "Not enough data yet" }}</h3>
         <p class="text-fz-gray-500 max-w-md mx-auto mb-6">
-            We need at least two months of income and expense data to perform month-to-month analysis. Keep adding your transactions!
+            {{ monthly.message or "We need at least three months of financial history to perform trend analysis. Keep adding your transactions!" }}
         </p>
         <a href="{{ url_for('app.transactions') }}" class="bg-fz-black text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-fz-red transition-colors inline-flex items-center gap-2">
             <i data-lucide="plus" class="w-4 h-4"></i> Add Transactions
@@ -155,16 +155,24 @@
                     {% for cat in monthly.category_comparison %}
                     <tr class="hover:bg-fz-gray-50 transition-colors">
                         <td class="px-5 py-3 font-medium text-fz-black">{{ cat.category }}</td>
-                        <td class="text-right px-3 py-3 text-fz-gray-600">₹{{ "{:,.0f}".format(cat.first_month) }}</td>
+                        <td class="text-right px-3 py-3 text-fz-gray-600">
+                            {% if not cat.has_previous_data %}
+                            —
+                            {% else %}
+                            ₹{{ "{:,.0f}".format(cat.first_month) }}
+                            {% endif %}
+                        </td>
                         <td class="text-right px-3 py-3 text-fz-black">₹{{ "{:,.0f}".format(cat.last_month) }}</td>
                         <td class="text-right px-3 py-3">
-                            {% if cat.last_month == 0 and cat.first_month > 0 %}
+                            {% if not cat.has_previous_data %}
+                            <span class="text-fz-gray-500 text-xs font-medium bg-fz-gray-100 px-2 py-0.5 rounded">No previous data available for comparison.</span>
+                            {% elif cat.last_month == 0 and cat.first_month > 0 %}
                             <span class="text-fz-gray-500 text-xs font-medium bg-fz-gray-100 px-2 py-0.5 rounded">No spending recorded this month</span>
-                            {% elif cat.diff > 0 %}
+                            {% elif cat.diff is not none and cat.diff > 0 %}
                             <span class="text-red-600 font-medium">+₹{{ "{:,.0f}".format(cat.diff) }}</span>
-                            {% elif cat.diff < 0 %}
+                            {% elif cat.diff is not none and cat.diff < 0 %}
                             <span class="text-green-600 font-medium">Reduced by ₹{{ "{:,.0f}".format(cat.diff|abs) }}</span>
-                            {% elif cat.last_month > 0 and (cat.category in ['Rent & Housing', 'Rent', 'EMI', 'Insurance'] or cat.diff|abs < 1) %}
+                            {% elif cat.last_month > 0 and (cat.category in ['Rent & Housing', 'Rent', 'EMI', 'Insurance'] or (cat.diff is not none and cat.diff|abs < 1)) %}
                             <span class="text-blue-600 text-xs font-medium bg-blue-50 px-2 py-0.5 rounded">Stable fixed expense</span>
                             {% else %}
                             <span class="text-fz-gray-400">—</span>
@@ -202,7 +210,6 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", () => {
         lucide.createIcons();

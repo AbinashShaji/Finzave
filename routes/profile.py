@@ -16,6 +16,7 @@ from extensions import db
 from models.user import User
 from models.setting import Setting
 from utils.activity import log_activity
+from utils.validators import validate_email
 
 @app_bp.route('/settings')
 @jwt_required()
@@ -60,7 +61,7 @@ def api_profile():
         
         if email:
             email = email.strip()
-            if not re.match(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$', email):
+            if not validate_email(email):
                 return jsonify({"message": "Invalid email format"}), 400
             # Check for duplicate email
             existing_user = User.query.filter_by(email=email).first()
@@ -138,11 +139,6 @@ def update_preferences():
     if not data:
         return jsonify({"message": "Missing data"}), 400
         
-    setting = user.setting
-    if not setting:
-        setting = Setting(user_id=user.id)
-        db.session.add(setting)
-        
     currency = data.get('currency')
     email_notifications = data.get('email_notifications')
     
@@ -151,6 +147,15 @@ def update_preferences():
         curr_str = str(currency).strip().upper()
         if curr_str not in ALLOWED_CURRENCIES:
             return jsonify({"message": f"Invalid currency. Allowed currencies: {', '.join(sorted(ALLOWED_CURRENCIES))}"}), 400
+
+    setting = user.setting
+    if not setting:
+        setting = Setting.query.filter_by(user_id=user.id).first()
+        if not setting:
+            setting = Setting(user_id=user.id)
+            db.session.add(setting)
+        
+    if currency:
         setting.currency = curr_str
     if email_notifications is not None:
         setting.email_notifications = bool(email_notifications)

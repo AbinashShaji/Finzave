@@ -26,11 +26,9 @@ def admin_required():
             try:
                 verify_jwt_in_request()
             except Exception as e:
-                import traceback
-                print(f"JWT Verification Failed in admin_required: {e}")
-                traceback.print_exc()
+                current_app.logger.warning(f"Admin authentication failed: {e}")
                 if request.path.startswith('/api/'):
-                    return jsonify(message=f"Token error: {str(e)}"), 401
+                    return jsonify(message="Authentication required"), 401
                 return redirect(url_for('public.login'))
             
             user_id = int(get_jwt_identity())
@@ -351,17 +349,34 @@ def get_stats():
 @admin_bp.route('/api/admin/users', methods=['GET'])
 @admin_required()
 def get_users():
+    from models.activity import UserActivity
+    from datetime import datetime, timezone
+
+    now = datetime.now(timezone.utc)
+    latest_activities = dict(
+        db.session.query(
+            UserActivity.user_id,
+            func.max(UserActivity.created_at)
+        ).group_by(UserActivity.user_id).all()
+    )
+
     users_list = User.query.order_by(User.created_at.desc()).all()
     result = []
     for u in users_list:
+        last_active = latest_activities.get(u.id)
+        is_online = False
+        if last_active:
+            la_dt = last_active.replace(tzinfo=timezone.utc) if last_active.tzinfo is None else last_active
+            is_online = (now - la_dt).total_seconds() < 900
+
         result.append({
             "id": u.id,
             "username": u.username,
             "email": u.email,
             "role": u.role,
             "is_blocked": u.is_blocked,
-            "is_online": u.is_online,
-            "last_active": u.last_active.isoformat() if u.last_active else None,
+            "is_online": is_online,
+            "last_active": last_active.isoformat() if last_active else None,
             "created_at": u.created_at.isoformat() if u.created_at else None
         })
     return jsonify(result), 200

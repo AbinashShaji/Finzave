@@ -71,28 +71,49 @@ def get_monthly_income_breakdown(user_id, year, month):
         'variable': variable_income
     }
 
-def build_financial_periods(user_id, months=12):
+def build_financial_periods(user_id, months=12, for_analysis=False):
     """
     Builds FinancialPeriod objects for the user.
-    If months > 1, spans at least `months` (default 12) or the user's available history so no data is lost.
-    If months == 1, builds for the current month only.
+    If for_analysis=True: bounds generated periods strictly to the user's earliest real financial month onwards,
+    ensuring no fake historical periods are generated.
+    If for_analysis=False: spans at least `months` (default 12) or user's history so historical reports can be accessed.
     """
     from utils.rule_engine import FinancialPeriod
     from models.expense import Expense
+    from models.user import User
     from dateutil.relativedelta import relativedelta
     from datetime import date
     import calendar
     
     today = date.today()
-    effective_months = months or 12
-    if effective_months > 1:
+    requested_months = months or 12
+    if requested_months <= 1:
+        effective_months = 1
+    else:
         earliest_expense = db.session.query(func.min(Expense.date)).filter(Expense.user_id == user_id).scalar()
         earliest_income = db.session.query(func.min(Income.date)).filter(Income.user_id == user_id).scalar()
-        earliest_dates = [d for d in [earliest_expense, earliest_income] if d is not None]
-        if earliest_dates:
-            earliest_date = min(earliest_dates)
-            history_months = (today.year - earliest_date.year) * 12 + (today.month - earliest_date.month) + 1
-            effective_months = max(effective_months, history_months)
+        
+        user = db.session.get(User, user_id)
+        user_account_date = user.created_at.date() if (user and user.created_at) else None
+        
+        financial_dates = [d for d in [earliest_expense, earliest_income] if d is not None]
+        if financial_dates:
+            earliest_date = min(financial_dates)
+        elif user_account_date:
+            earliest_date = user_account_date
+        else:
+            earliest_date = today
+            
+        if earliest_date > today:
+            earliest_date = today
+
+        history_months = (today.year - earliest_date.year) * 12 + (today.month - earliest_date.month) + 1
+        history_months = max(1, history_months)
+        
+        if for_analysis:
+            effective_months = min(requested_months, history_months)
+        else:
+            effective_months = max(requested_months, history_months)
             
     periods = []
     start_date = (today - relativedelta(months=effective_months - 1)).replace(day=1)

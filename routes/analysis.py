@@ -34,7 +34,7 @@ def analysis():
     log_activity('analysis_view')
 
     # 1. Fetch Financial Data
-    periods = build_financial_periods(user_id, months=12)
+    periods = build_financial_periods(user_id, months=12, for_analysis=True)
 
     # 2. Pipeline Calculations
     metrics = calculate_period_metrics(periods)
@@ -103,7 +103,7 @@ def analysis():
 def analysis_monthly():
     user_id = int(get_jwt_identity())
 
-    periods = build_financial_periods(user_id, months=12)
+    periods = build_financial_periods(user_id, months=12, for_analysis=True)
     monthly = build_monthly_analysis(periods)
     insights = evaluate_rules(periods)
 
@@ -121,7 +121,7 @@ def analysis_monthly():
 def analysis_yearly():
     user_id = int(get_jwt_identity())
 
-    periods = build_financial_periods(user_id, months=12)
+    periods = build_financial_periods(user_id, months=12, for_analysis=True)
     yearly = build_yearly_analysis(periods)
 
     return render_template(

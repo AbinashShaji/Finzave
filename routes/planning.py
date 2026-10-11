@@ -14,41 +14,43 @@ from routes.user import app_bp
 from planning.sip import calculate_sip
 from planning.emi import calculate_emi
 from planning.insights import generate_planning_insight
+from planning.services import calculate_planning_capacity, calculate_loan_affordability
 from utils.finance import build_financial_periods
 from utils.activity import log_activity
 
 @app_bp.route('/planning')
 @jwt_required()
 def planning():
+    user_id = int(get_jwt_identity())
     log_activity('planning_view')
-    return render_template('app/planning.html')
+    try:
+        periods = build_financial_periods(user_id, 12, for_analysis=True)
+    except TypeError:
+        periods = build_financial_periods(user_id, 12)
+    capacity = calculate_planning_capacity(periods)
+    return render_template('app/planning.html', capacity=capacity)
 
 def get_current_savings(user_id):
-    periods = build_financial_periods(user_id, months=1)
-    if periods:
-        return periods[0].savings
+    try:
+        periods = build_financial_periods(user_id, 12, for_analysis=True)
+    except TypeError:
+        periods = build_financial_periods(user_id, 12)
+    capacity = calculate_planning_capacity(periods)
+    if capacity.get("has_history"):
+        return capacity.get("average_savings_capacity", 0.0)
     return None
 
 @app_bp.route('/api/planning/capacity', methods=['GET'])
 @jwt_required()
 def api_planning_capacity():
     user_id = int(get_jwt_identity())
-    periods = build_financial_periods(user_id, months=1)
-    if not periods:
-        return jsonify({"savings": 0, "income": 0, "suggested_sip_min": 0, "suggested_sip_max": 0}), 200
+    try:
+        periods = build_financial_periods(user_id, 12, for_analysis=True)
+    except TypeError:
+        periods = build_financial_periods(user_id, 12)
     
-    savings = periods[0].savings
-    income = periods[0].total_income
-    
-    suggested_min = savings * 0.30 if savings > 0 else 0
-    suggested_max = savings * 0.50 if savings > 0 else 0
-    
-    return jsonify({
-        "savings": savings,
-        "income": income,
-        "suggested_sip_min": suggested_min,
-        "suggested_sip_max": suggested_max
-    }), 200
+    capacity_data = calculate_planning_capacity(periods)
+    return jsonify(capacity_data), 200
 
 @app_bp.route('/api/planning/calculate_sip', methods=['POST'])
 @jwt_required()
@@ -105,10 +107,22 @@ def api_calculate_emi():
             
         result = calculate_emi(principal, annual_rate, years)
         
-        savings = get_current_savings(user_id)
-        if savings is not None:
-            insight = generate_planning_insight(result.get("monthly_emi", 0), savings, "EMI")
-            result["insight"] = insight
+        try:
+            periods = build_financial_periods(user_id, 12, for_analysis=True)
+        except TypeError:
+            periods = build_financial_periods(user_id, 12)
+        capacity = calculate_planning_capacity(periods)
+        
+        if capacity.get("has_history"):
+            monthly_income = float(capacity.get("average_monthly_income", 0.0) or capacity.get("income", 0.0) or 0.0)
+            monthly_savings = float(capacity.get("average_savings_capacity", 0.0))
+            affordability = calculate_loan_affordability(
+                monthly_income=monthly_income,
+                monthly_emi=result.get("monthly_emi", 0.0),
+                monthly_savings=monthly_savings
+            )
+            result["loan_affordability"] = affordability
+            result["insight"] = affordability
         
         log_activity('plan_created')
         return jsonify(result), 200

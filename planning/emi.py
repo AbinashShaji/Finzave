@@ -19,7 +19,14 @@ def calculate_emi(principal: float, annual_rate: float, years: int) -> dict:
     n = Total number of months (years * 12)
     """
     if principal <= 0 or years <= 0:
-        return {"monthly_emi": 0, "total_interest": 0, "total_payment": 0}
+        return {
+            "monthly_emi": 0,
+            "total_interest": 0,
+            "total_payment": 0,
+            "interest_to_principal_ratio": 0.0,
+            "interest_cost_pct": 0,
+            "yearly_amortization": []
+        }
         
     n = years * 12
     
@@ -40,6 +47,8 @@ def calculate_emi(principal: float, annual_rate: float, years: int) -> dict:
             "monthly_emi": monthly_emi,
             "total_interest": 0,
             "total_payment": principal,
+            "interest_to_principal_ratio": 0.0,
+            "interest_cost_pct": 0,
             "yearly_amortization": yearly_amortization
         }
         
@@ -47,6 +56,8 @@ def calculate_emi(principal: float, annual_rate: float, years: int) -> dict:
     monthly_emi = principal * r * ((1 + r) ** n) / (((1 + r) ** n) - 1)
     total_payment = monthly_emi * n
     total_interest = total_payment - principal
+    interest_to_principal_ratio = round((total_interest / principal) * 100, 1) if principal > 0 else 0.0
+    interest_cost_pct = int(round((total_interest / principal) * 100)) if principal > 0 else 0
     
     yearly_amortization = []
     rem_balance = principal
@@ -70,6 +81,9 @@ def calculate_emi(principal: float, annual_rate: float, years: int) -> dict:
     return {
         "monthly_emi": monthly_emi,
         "total_interest": total_interest,
+        "total_interest_paid": total_interest,
         "total_payment": total_payment,
+        "interest_to_principal_ratio": interest_to_principal_ratio,
+        "interest_cost_pct": interest_cost_pct,
         "yearly_amortization": yearly_amortization
     }

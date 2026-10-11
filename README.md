@@ -1,6 +1,6 @@
 # FinZave 🚀
 
-![FinZave Banner]
+![FinZave Preview](static/images/finzave%20preview.png)
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](#)
 [![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](#)
@@ -159,13 +159,14 @@ pytest tests/ -v
 
 ## 📸 Screenshots
 
-*(Placeholder for future screenshots)*
+### Home Page
+![FinZave Home Page](static/images/finzave%20preview.png)
 
 ### Dashboard
-![Dashboard](https://via.placeholder.com/800x400.png?text=Dashboard+Preview)
+![Dashboard](static/images/dashboard.png)
 
 ### Financial Analysis
-![Analysis](https://via.placeholder.com/800x400.png?text=Analysis+Preview)
+![Analysis](static/images/Analysis.png)
 
 ---
 

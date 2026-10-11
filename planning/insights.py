@@ -8,11 +8,30 @@ Flow:
 User Request -> Route Handler -> Business Logic -> Database
 
 """
-def generate_planning_insight(planned_amount: float, monthly_savings: float, plan_type: str) -> dict:
+from typing import Optional
+from planning.services import calculate_loan_affordability
+
+def generate_planning_insight(
+    planned_amount: float,
+    monthly_savings: float,
+    plan_type: str,
+    monthly_income: Optional[float] = None
+) -> dict:
     """
     Generates a financial insight comparing a planned financial commitment 
-    (SIP or EMI) against the user's available monthly savings.
+    (SIP or EMI) against the user's available monthly savings or income.
+    
+    For EMI: If monthly_income is provided, evaluates banking FOIR loan affordability.
+             Otherwise, evaluates against monthly_savings for backward compatibility.
+    For SIP: Evaluates investment affordability against monthly_savings.
     """
+    if plan_type == "EMI" and monthly_income is not None:
+        return calculate_loan_affordability(
+            monthly_income=monthly_income,
+            monthly_emi=planned_amount,
+            monthly_savings=monthly_savings
+        )
+
     if monthly_savings < 0:
         return {
             "status": "WARNING",
@@ -31,15 +50,15 @@ def generate_planning_insight(planned_amount: float, monthly_savings: float, pla
     if percentage > 100:
         return {
             "status": "WARNING",
-            "message": f"This {plan_type} exceeds your current monthly savings capacity."
+            "message": f"This {plan_type} exceeds your average monthly savings capacity."
         }
     elif percentage >= 80:
         return {
             "status": "WARNING",
-            "message": f"This {plan_type} uses {percentage:.0f}% of your current savings. This may reduce your ability to maintain investments and emergency savings."
+            "message": f"This {plan_type} uses {percentage:.0f}% of your average monthly savings. This may reduce your ability to maintain investments and emergency savings."
         }
     else:
         return {
             "status": "SUCCESS",
-            "message": f"This {plan_type} uses {percentage:.0f}% of your current savings. Your remaining savings capacity is approximately ₹{remaining:,.0f}."
+            "message": f"This {plan_type} uses {percentage:.0f}% of your average monthly savings. Your remaining savings capacity is approximately ₹{remaining:,.0f}."
         }

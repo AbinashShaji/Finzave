@@ -98,6 +98,13 @@ def create_app(config_class=Config):
         from flask import render_template
         return render_template('404.html'), 404
 
+    @app.errorhandler(500)
+    def internal_server_error(e):
+        from flask import render_template, request
+        if request.path.startswith('/api') or request.path.startswith('/app/api'):
+            return jsonify({"error": "Internal server error"}), 500
+        return render_template('errors/500.html'), 500
+
     return app
 
 if __name__ == '__main__':

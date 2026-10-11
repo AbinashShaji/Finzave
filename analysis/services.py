@@ -13,6 +13,37 @@ from utils.rule_engine import FinancialPeriod, percentage_change
 
 
 # ---------------------------------------------------------------------------
+# DATA AVAILABILITY VALIDATION
+# ---------------------------------------------------------------------------
+
+def get_available_financial_months(periods: List[FinancialPeriod]) -> int:
+    """Calculates the count of distinct periods that contain real financial records (income or expense)."""
+    return len([p for p in periods if (p.total_income > 0 or p.total_expenses > 0)])
+
+
+def validate_data_availability(periods: List[FinancialPeriod]) -> Optional[str]:
+    """
+    Validates user financial history length.
+    0 months: 'No financial data available for analysis.'
+    1-2 months: 'Not enough financial history for trend analysis.'
+    3+ months: None (valid for full analysis)
+    """
+    count = get_available_financial_months(periods)
+    if count == 0:
+        return "No financial data available for analysis."
+    if count < 3:
+        return "Not enough financial history for trend analysis."
+def filter_analysis_periods(periods: List[FinancialPeriod]) -> List[FinancialPeriod]:
+    """Filters out any leading empty periods before the user's first financial record."""
+    if not periods:
+        return periods
+    first_data_idx = next((i for i, p in enumerate(periods) if p.total_income > 0 or p.total_expenses > 0), None)
+    if first_data_idx is not None and first_data_idx > 0:
+        return periods[first_data_idx:]
+    return periods
+
+
+# ---------------------------------------------------------------------------
 # OVERVIEW (Current Month)
 # ---------------------------------------------------------------------------
 
@@ -79,6 +110,10 @@ def build_overview(periods: List[FinancialPeriod]) -> Dict[str, Any]:
                 savings_insights.append(
                     f"{top_cat} is your largest expense at ₹{top_amt:,.0f}/month. This remains consistent with previous months and is not increasing."
                 )
+            elif top_prev == 0:
+                savings_insights.append(
+                    f"{top_cat} is your largest expense at ₹{top_amt:,.0f}/month. More historical data is required to identify a spending trend."
+                )
             elif top_amt > top_prev:
                 savings_insights.append(
                     f"{top_cat} is your largest expense at ₹{top_amt:,.0f}/month (increased from ₹{top_prev:,.0f} last month). As a {exp_type} expense, review if this can be optimized."
@@ -104,17 +139,23 @@ def build_overview(periods: List[FinancialPeriod]) -> Dict[str, Any]:
 
             # Primary sentence: ₹ change + % of income consumed
             if diff > 0:
-                sentence = (
-                    f"{cat} spending increased by ₹{diff:,.0f}, "
-                    f"using {pct_of_income:.0f}% of your monthly income."
-                )
-                if abs(savings_diff) >= 1:
-                    contribution_pct = diff / abs(savings_diff) * 100
-                    if 10 <= contribution_pct <= 150:
-                        sentence += (
-                            f" This accounts for approximately {contribution_pct:.0f}% "
-                            f"of the overall change in your savings."
-                        )
+                if entry.get("is_new") or prev_amt == 0:
+                    sentence = (
+                        f"No previous spending recorded for {cat} (₹{curr_amt:,.0f} this month). "
+                        f"More historical data is required to identify a spending trend."
+                    )
+                else:
+                    sentence = (
+                        f"{cat} spending increased by ₹{diff:,.0f}, "
+                        f"using {pct_of_income:.0f}% of your monthly income."
+                    )
+                    if abs(savings_diff) >= 1:
+                        contribution_pct = diff / abs(savings_diff) * 100
+                        if 10 <= contribution_pct <= 150:
+                            sentence += (
+                                f" This accounts for approximately {contribution_pct:.0f}% "
+                                f"of the overall change in your savings."
+                            )
             else:
                 if curr_amt == 0 and prev_amt > 0:
                     sentence = f"No {cat} spending recorded this month (previously ₹{prev_amt:,.0f})."
@@ -310,8 +351,14 @@ def build_monthly_analysis(periods: List[FinancialPeriod]) -> Dict[str, Any]:
     Builds multi-month comparison data including per-month breakdown,
     averages, best/worst months, category changes, recurring income analysis, and patterns.
     """
-    if len(periods) < 2:
-        return {"has_data": False}
+    periods = filter_analysis_periods(periods)
+    validation_err = validate_data_availability(periods)
+    if validation_err:
+        return {
+            "has_data": False,
+            "available_financial_months": get_available_financial_months(periods),
+            "message": validation_err
+        }
 
     # --- Per-month data ---
     months_data = []
@@ -357,18 +404,46 @@ def build_monthly_analysis(periods: List[FinancialPeriod]) -> Dict[str, Any]:
 
     category_comparison = []
     for cat, total in top_categories:
-        first_val = periods[0].categories.get(cat, 0.0)
+        # Find the earliest prior month that actually has data for this category (excluding latest period)
+        prior_data_periods = [p for p in periods[:-1] if p.categories.get(cat, 0.0) > 0]
         last_val = periods[-1].categories.get(cat, 0.0)
-        diff = last_val - first_val
-        change_pct = percentage_change(last_val, first_val)
         monthly_values = [p.categories.get(cat, 0.0) for p in periods]
+
+        if not prior_data_periods:
+            has_previous_data = False
+            first_val = 0.0
+            first_month_period = None
+            diff = None
+            change_pct = None
+            change_display = "No previous data available for comparison."
+        else:
+            has_previous_data = True
+            first_period_obj = prior_data_periods[0]
+            first_month_period = first_period_obj.period_id
+            first_val = first_period_obj.categories.get(cat, 0.0)
+            diff = last_val - first_val
+            change_pct = percentage_change(last_val, first_val)
+            if last_val == 0.0 and first_val > 0.0:
+                change_display = "No spending recorded this month"
+            elif diff > 0:
+                change_display = f"+₹{diff:,.0f}"
+            elif diff < 0:
+                change_display = f"Reduced by ₹{abs(diff):,.0f}"
+            elif last_val > 0 and (cat in ['Rent & Housing', 'Rent', 'EMI', 'Insurance'] or abs(diff) < 1):
+                change_display = "Stable fixed expense"
+            else:
+                change_display = "—"
+
         category_comparison.append({
             "category": cat,
             "total": total,
+            "has_previous_data": has_previous_data,
+            "first_actual_month": first_month_period,
             "first_month": first_val,
             "last_month": last_val,
             "diff": diff,
             "change_pct": change_pct,
+            "change_display": change_display,
             "monthly_values": monthly_values,
             "is_zero_spending": (last_val == 0.0 and first_val > 0.0)
         })
@@ -403,13 +478,20 @@ def build_monthly_analysis(periods: List[FinancialPeriod]) -> Dict[str, Any]:
 
     if category_comparison:
         top = category_comparison[0]
-        if top["diff"] > 0:
-            insights.append(f"{top['category']} was ₹{top['diff']:,.0f} higher in the latest month compared to the earliest month in this range.")
-        elif top["diff"] < 0:
+        if not top.get("has_previous_data"):
+            insights.append("More historical data is required to identify a spending trend.")
+        elif top.get("diff") is not None and top["diff"] > 0:
+            first_m = top.get("first_actual_month") or "the earliest month in this range"
+            insights.append(f"{top['category']} was ₹{top['diff']:,.0f} higher in the latest month compared to {first_m}.")
+        elif top.get("diff") is not None and top["diff"] < 0:
+            first_m = top.get("first_actual_month") or "the earliest month in this range"
             if top["last_month"] == 0:
                 insights.append(f"No {top['category']} spending recorded in the latest month (was ₹{top['first_month']:,.0f} originally).")
             else:
-                insights.append(f"{top['category']} was reduced by ₹{abs(top['diff']):,.0f} in the latest month compared to the earliest month in this range.")
+                insights.append(f"{top['category']} was reduced by ₹{abs(top['diff']):,.0f} in the latest month compared to {first_m}.")
+        elif top.get("last_month", 0) > 0 and (top.get("diff") is None or abs(top.get("diff", 0)) < 1):
+            if top.get("category") in ['Rent & Housing', 'Rent', 'EMI', 'Insurance']:
+                insights.append(f"{top['category']} remained stable at ₹{top['last_month']:,.0f}/month across all recorded periods.")
 
     insights.extend(patterns)
 
@@ -445,12 +527,32 @@ def build_yearly_analysis(periods: List[FinancialPeriod]) -> Dict[str, Any]:
     trend data, category shifts, savings rate comparison, recurring vs variable income intelligence,
     and long-term insights. Designed for 12 months but works with any count >= 2.
     """
-    if len(periods) < 2:
-        return {"has_data": False}
+    periods = filter_analysis_periods(periods)
+    validation_err = validate_data_availability(periods)
+    if validation_err:
+        return {
+            "has_data": False,
+            "available_financial_months": get_available_financial_months(periods),
+            "message": validation_err
+        }
+
+    if get_available_financial_months(periods) < 6:
+        return {
+            "has_data": False,
+            "available_financial_months": get_available_financial_months(periods),
+            "message": "Insufficient historical data for yearly comparison."
+        }
 
     midpoint = len(periods) // 2
     first_half = periods[:midpoint]
     second_half = periods[midpoint:]
+
+    if get_available_financial_months(first_half) == 0 or get_available_financial_months(second_half) == 0:
+        return {
+            "has_data": False,
+            "available_financial_months": get_available_financial_months(periods),
+            "message": "Insufficient historical data for yearly comparison."
+        }
 
     def aggregate_half(half: List[FinancialPeriod]) -> Dict[str, Any]:
         income = sum(p.total_income for p in half)

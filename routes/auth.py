@@ -17,6 +17,7 @@ from flask_jwt_extended import (
 )
 from extensions import limiter
 from utils.activity import log_activity
+from utils.validators import validate_email
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
 
@@ -38,6 +39,10 @@ def register():
 
     if not username or not email or not password or not confirm_password:
         return jsonify({"message": "Missing required fields"}), 400
+
+    email = str(email).strip()
+    if not validate_email(email):
+        return jsonify({"message": "Invalid email format"}), 400
         
     if password != confirm_password:
         return jsonify({"message": "Passwords do not match"}), 400

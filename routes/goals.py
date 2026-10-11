@@ -255,11 +255,10 @@ def goal_detail(goal_id):
         # Prevent accessing another user's goals
         return jsonify({"error": "Goal not found"}), 404
         
-    # Fetch current financial capacity
-    periods = build_financial_periods(user_id, months=1)
-    current_period = periods[-1] if periods else None
+    # Fetch historical financial capacity across active periods
+    periods = build_financial_periods(user_id, months=12, for_analysis=True)
     
-    intel = build_goal_intelligence(goal, current_period)
+    intel = build_goal_intelligence(goal, periods)
     
     return render_template(
         'app/goal_detail.html',

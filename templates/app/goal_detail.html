@@ -130,8 +130,11 @@
                     <span style="font-size: 16px; font-weight: 700; color: #0a0a0a;">₹{{ "{:,.0f}".format(intel.total_expenses) }}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: flex-end; padding: 12px 0; border-bottom: 1px solid #e4e4e7;">
-                    <span style="font-size: 13px; font-weight: 600; color: #0a0a0a;">Current Savings Capacity</span>
-                    <span style="font-size: 18px; font-weight: 700; color: #0a0a0a;">₹{{ "{:,.0f}".format(intel.affordability.current_savings_capacity) }}</span>
+                    <div>
+                        <span style="font-size: 13px; font-weight: 600; color: #0a0a0a; display: block;">Average Monthly Savings Capacity</span>
+                        <span style="font-size: 11px; color: #71717a;">{{ intel.affordability.context_message }}</span>
+                    </div>
+                    <span style="font-size: 18px; font-weight: 700; color: #0a0a0a;">₹{{ "{:,.0f}".format(intel.affordability.average_savings_capacity) }}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: flex-end; padding: 12px 0;">
                     <span style="font-size: 13px; font-weight: 600; color: #0a0a0a;">Required Monthly Saving</span>
@@ -142,7 +145,11 @@
             <!-- Impact callout -->
             <div style="margin-top: 20px; background: white; border: 1px solid #e4e4e7; border-radius: 12px; padding: 16px;">
                 <p style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #e11d48; margin: 0 0 6px;">Goal Impact</p>
-                <p style="font-size: 13px; font-weight: 500; color: #0a0a0a; margin: 0;">This goal uses <b>{{ "{:.0f}".format(intel.affordability.raw_impact_pct) }}%</b> of your current monthly savings capacity.</p>
+                {% if intel.affordability.has_history %}
+                <p style="font-size: 13px; font-weight: 500; color: #0a0a0a; margin: 0;">This goal uses <b>{{ "{:.0f}".format(intel.affordability.raw_impact_pct) }}%</b> of your average monthly savings capacity.</p>
+                {% else %}
+                <p style="font-size: 13px; font-weight: 500; color: #71717a; margin: 0;">Not enough financial data to estimate savings capacity.</p>
+                {% endif %}
             </div>
         </div>
 

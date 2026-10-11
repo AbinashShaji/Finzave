@@ -93,8 +93,41 @@ async function fetchCapacity() {
         });
         if (res.ok) {
             const data = await res.json();
-            document.getElementById('cap-savings').textContent = `₹${Math.round(data.savings).toLocaleString()}`;
-            document.getElementById('cap-suggested').textContent = `₹${Math.round(data.suggested_sip_min).toLocaleString()} - ₹${Math.round(data.suggested_sip_max).toLocaleString()}`;
+            const savingsElem = document.getElementById('cap-savings');
+            const suggestedElem = document.getElementById('cap-suggested');
+            const contextElem = document.getElementById('cap-context');
+            const noteElem = document.getElementById('cap-history-note');
+
+            if (data.has_history) {
+                const savingsVal = data.average_savings_capacity !== undefined ? data.average_savings_capacity : data.savings;
+                if (savingsElem) savingsElem.textContent = `₹${Math.round(savingsVal).toLocaleString()}`;
+                
+                if (data.suggested_sip_min > 0 || data.suggested_sip_max > 0) {
+                    if (suggestedElem) suggestedElem.textContent = `₹${Math.round(data.suggested_sip_min).toLocaleString()} - ₹${Math.round(data.suggested_sip_max).toLocaleString()}`;
+                } else {
+                    if (suggestedElem) suggestedElem.textContent = `₹0 - ₹0`;
+                }
+                
+                if (contextElem) contextElem.textContent = data.context_message || `Based on ${data.active_months} months of financial history`;
+                
+                if (noteElem) {
+                    if (data.active_months < 3) {
+                        noteElem.textContent = "Limited financial history. Planning estimates may change as more data is recorded.";
+                        noteElem.classList.remove('hidden');
+                    } else {
+                        noteElem.textContent = "";
+                        noteElem.classList.add('hidden');
+                    }
+                }
+            } else {
+                if (savingsElem) savingsElem.textContent = "—";
+                if (suggestedElem) suggestedElem.textContent = "No estimate available";
+                if (contextElem) contextElem.textContent = "Not enough financial data to estimate planning capacity.";
+                if (noteElem) {
+                    noteElem.textContent = "Not enough financial data to estimate planning capacity.";
+                    noteElem.classList.remove('hidden');
+                }
+            }
         }
     } catch (err) {
         console.error("Failed to fetch capacity", err);
@@ -204,6 +237,43 @@ async function calculateEMI() {
             document.getElementById('emi-principal-cost').textContent = `₹${Math.round(actualPrincipal).toLocaleString()}`;
             document.getElementById('emi-interest').textContent = `₹${Math.round(data.total_interest).toLocaleString()}`;
             document.getElementById('emi-total-paid').textContent = `₹${Math.round(Number(actualPrincipal) + Number(data.total_interest)).toLocaleString()}`;
+            
+            const ratioElem = document.getElementById('emi-interest-ratio');
+            if (ratioElem) {
+                const ratioPct = data.interest_cost_pct !== undefined ? data.interest_cost_pct : (data.interest_to_principal_ratio !== undefined ? Math.round(data.interest_to_principal_ratio) : 0);
+                ratioElem.textContent = `${ratioPct}% of principal`;
+            }
+
+            const foirContainer = document.getElementById('emi-foir-details');
+            const afford = data.loan_affordability || data.insight;
+            if (afford && afford.foir !== undefined) {
+                if (foirContainer) foirContainer.classList.remove('hidden');
+                const incomeEl = document.getElementById('emi-afford-income');
+                const emiEl = document.getElementById('emi-afford-emi');
+                const foirEl = document.getElementById('emi-afford-foir');
+                const riskEl = document.getElementById('emi-afford-risk');
+                const reasonEl = document.getElementById('emi-afford-reason');
+                
+                if (incomeEl) incomeEl.textContent = afford.income > 0 ? `₹${Math.round(afford.income).toLocaleString()}` : '₹0';
+                if (emiEl) emiEl.textContent = `₹${Math.round(afford.emi).toLocaleString()}`;
+                if (foirEl) foirEl.textContent = `${Math.round(afford.foir)}%`;
+                
+                if (riskEl) {
+                    const riskText = afford.display_risk || afford.risk_level || afford.risk || 'Moderate';
+                    riskEl.textContent = riskText;
+                    if (riskText.toLowerCase().includes('healthy') || riskText.toLowerCase().includes('low')) {
+                        riskEl.className = 'inline-block px-2 py-0.5 text-xs font-bold rounded-full bg-emerald-100 text-emerald-800';
+                    } else if (riskText.toLowerCase().includes('moderate')) {
+                        riskEl.className = 'inline-block px-2 py-0.5 text-xs font-bold rounded-full bg-amber-100 text-amber-800';
+                    } else {
+                        riskEl.className = 'inline-block px-2 py-0.5 text-xs font-bold rounded-full bg-rose-100 text-rose-800';
+                    }
+                }
+                
+                if (reasonEl) reasonEl.textContent = afford.reason || afford.message;
+            } else if (foirContainer) {
+                foirContainer.classList.add('hidden');
+            }
             
             displayInsight('emi', data.insight);
             
